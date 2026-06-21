@@ -1,0 +1,390 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Floating island combined entrance + float. Uses CSS vars set from JS. */
+  .floating-island {
+    /* entrance animation then continuous float; both can use per-island vars */
+    animation: bounceIn var(--enter-duration, 600ms) cubic-bezier(0.68, -0.55, 0.265, 1.55) var(--enter-delay, 0ms) both,
+               float var(--float-duration, 3s) ease-in-out var(--float-delay, 0ms) infinite;
+    will-change: transform;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0) translateY(20px);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.1) translateY(-10px);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-3deg);
+    }
+    75% {
+      transform: rotate(3deg);
+    }
+  }
+}
+
+/* island card visuals that use CSS variables set by the component */
+.island-card {
+  background: linear-gradient(135deg, var(--island-color, #6b7280) 0%, var(--island-secondary, #4b5563) 100%);
+}
+
+/* small glow using the accent color */
+.island-card::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  filter: blur(18px);
+  opacity: 0.25;
+  background: radial-gradient(circle at 50% 0%, var(--island-glow, rgba(255,255,255,0.2)), transparent 40%);
+  pointer-events: none;
+}
+
+/* Map panel and decorative patterns moved to CSS to avoid inline background-image in JSX */
+.pattern-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.map-panel-bg {
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill-opacity='0.05'%3E%3Cpolygon fill='%23000' points='50 0 100 50 50 100 0 50'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.title-shadow {
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+}
+
+/* map container and castle helper positions */
+.map-container {
+  width: 520px;
+  height: 360px;
+  position: relative;
+}
+
+.castle-pos {
+  position: absolute;
+  left: 200px;
+  top: 40px;
+}
+
+/* Orbiting helpers */
+.orbit-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: center center;
+  pointer-events: none; /* inner handles clicks */
+}
+
+.orbit-rotator {
+  width: 0;
+  height: 0;
+  transform-origin: center center;
+  animation: spin var(--orbit-speed, 14s) linear var(--orbit-delay, 0s) infinite;
+}
+
+.orbit-inner {
+  pointer-events: auto;
+  transform-origin: center center;
+  /* place island at start angle and radius; rotation of parent will orbit it */
+  transform: rotate(var(--start-angle, 0deg)) translateX(var(--orbit-radius, 120px));
+  animation: spinReverse var(--orbit-speed, 14s) linear var(--orbit-delay, 0s) infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  to { transform: rotate(-360deg); }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Career World map styles */
+.map-checker {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.03) 0 1px,
+      transparent 1px 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.02) 0 1px,
+      transparent 1px 40px
+    );
+  background-size: 80px 80px;
+}
+
+.island-tile {
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));
+  border-radius: 1rem;
+  box-shadow: 0 12px 30px rgba(2,6,23,0.12), inset 0 -4px 8px rgba(0,0,0,0.04);
+}
+
+.island-circle {
+  width: 7.5rem; /* 120px */
+  height: 7.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+  box-shadow: 0 8px 18px rgba(2,6,23,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.island-tile:hover {
+  transform: translateY(-6px) scale(1.02);
+  transition: transform 220ms cubic-bezier(.2,.9,.3,1);
+}
+
+.tile-muted {
+  color: rgba(17,24,39,0.7);
+}
+
+/* Map canvas: allows high z for chat overlay and map drag cursor */
+.map-canvas {
+  touch-action: pan-y pan-x;
+}
+.map-canvas.dragging {
+  cursor: grabbing;
+}
+
+.chat-overlay {
+  z-index: 99999;
+}
+
+/* Enhanced card animations and effects */
+.challenge-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.challenge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.challenge-card:hover::before {
+  left: 100%;
+}
+
+.challenge-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Progress bar animation */
+.progress-bar-fill {
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glow effect for active/completed items */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+}
+
+/* Badge animations */
+.badge-bounce {
+  animation: badgeBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes badgeBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Shimmer loading effect */
+.shimmer-loading {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.1)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Fade in animation */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Button hover effects */
+.button-interactive {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.button-interactive::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button-interactive:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Floating animation for cards */
+.float-card {
+  animation: floatCard 4s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-8px) translateX(3px);
+  }
+  50% {
+    transform: translateY(-12px) translateX(-2px);
+  }
+  75% {
+    transform: translateY(-6px) translateX(4px);
+  }
+}
+
+/* Enhanced challenge card border glow */
+.challenge-border-glow {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.challenge-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--border-color-1, #a855f7), var(--border-color-2, #ec4899));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.challenge-border-glow:hover::before {
+  opacity: 1;
+}
