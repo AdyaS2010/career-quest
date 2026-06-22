@@ -1,8 +1,13 @@
-import { Settings, Sun, Moon, Eye, Accessibility, Wind, Type, Sunset, X } from 'lucide-react';
+import { Settings, Sun, Moon, Eye, Accessibility, Wind, Type, Sunset, X, Compass } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useTutorial } from '../contexts/TutorialContext';
 
 // Accessibility + appearance settings, opened from the in-game HUD.
 export function SettingsModal({ onClose }: { onClose: () => void }) {
+  const { user } = useAuth();
+  const { setTutStep } = useTutorial();
   const {
     theme, toggleTheme,
     dimmed, toggleDim,
@@ -12,6 +17,16 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     reducedMotion, toggleReducedMotion,
   } = useTheme();
 
+  const handleResetTutorial = () => {
+    try {
+      localStorage.removeItem(`questford_onboarded_${user?.id || 'guest'}`);
+    } catch {
+      // ignore
+    }
+    setTutStep(0);
+    onClose();
+  };
+
   const rows: { icon: React.ReactNode; tint: string; title: string; sub: string; on: boolean; toggle: () => void }[] = [
     { icon: theme === 'light' ? <Sun className="w-6 h-6 text-amber-600" /> : <Moon className="w-6 h-6 text-amber-400" />, tint: '#fbbf24', title: 'Appearance', sub: theme === 'light' ? 'Light Mode' : 'Dark Mode', on: theme === 'dark', toggle: toggleTheme },
     { icon: <Sunset className="w-6 h-6 text-indigo-400" />, tint: '#818cf8', title: 'Dim Screen', sub: 'Soften the brightness', on: dimmed, toggle: toggleDim },
@@ -19,9 +34,10 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     { icon: <Eye className="w-6 h-6 text-purple-500" />, tint: '#8b5cf6', title: 'High Contrast', sub: 'Maximum legibility', on: highContrast, toggle: toggleHighContrast },
     { icon: <Accessibility className="w-6 h-6 text-emerald-500" />, tint: '#10b981', title: 'Inclusive Font', sub: 'Easy-to-read typeface', on: dyslexicFriendly, toggle: toggleDyslexicFriendly },
     { icon: <Wind className="w-6 h-6 text-blue-500" />, tint: '#3b82f6', title: 'Reduced Motion', sub: 'Minimize animations', on: reducedMotion, toggle: toggleReducedMotion },
+    { icon: <Compass className="w-6 h-6 text-amber-500" />, tint: '#fbbf24', title: 'Replay Onboarding', sub: 'Restart the tutorial walkthrough', on: false, toggle: handleResetTutorial },
   ];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
         className="w-full max-w-md rounded-[2rem] border-4 p-7 shadow-2xl"
@@ -68,6 +84,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           Done
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Star, Lock, Volume2, VolumeX, Moon, Sun, Sparkles, ExternalLink, X, BarChart3 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -725,15 +726,19 @@ export function CareerWorld() {
             return (
               <div
                 key={challenge.id}
-                className={`relative rounded-3xl border overflow-hidden transition-all h-full ${isLocked ? 'opacity-65' : 'hover:shadow-2xl'}`}
-                style={{
-                  backgroundColor: 'var(--surface-card)',
-                  borderColor: `${paneAccent}66`,
-                  boxShadow: theme === 'dark'
-                    ? `0 12px 24px rgba(2,6,23,0.45), 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`
-                    : `0 14px 24px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.1), inset 0 1px 0 rgba(255,255,255,0.7)`,
-                }}
+                className="animate-float-card h-full"
+                style={{ animationDelay: `${index * 0.22}s` }}
               >
+                <div
+                  className={`relative rounded-3xl border overflow-hidden transition-all duration-500 ease-out hover:scale-[1.03] hover:-translate-y-2 h-full ${isLocked ? 'opacity-65' : 'hover:shadow-2xl'}`}
+                  style={{
+                    backgroundColor: 'var(--surface-card)',
+                    borderColor: `${paneAccent}66`,
+                    boxShadow: theme === 'dark'
+                      ? `0 12px 24px rgba(2,6,23,0.45), 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`
+                      : `0 14px 24px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.1), inset 0 1px 0 rgba(255,255,255,0.7)`,
+                  }}
+                >
                 <div
                   className="pointer-events-none absolute inset-0 rounded-3xl"
                   style={{ background: 'linear-gradient(165deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 36%, transparent 60%)' }}
@@ -797,13 +802,14 @@ export function CareerWorld() {
                   </div>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
         </section>
       </main>
 
       {/* Next Steps — real-world project + resources for this field */}
-      {showRes && (() => { const r = RESOURCES[careerSlug || '']; if (!r) return null; return (
+      {showRes && (() => { const r = RESOURCES[careerSlug || '']; if (!r) return null; return createPortal(
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ background: 'rgba(2,6,23,0.62)', backdropFilter: 'blur(3px)' }} onClick={() => setShowRes(false)}>
           <div className="w-full max-w-md rounded-3xl border-4 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(160deg,#0f1f1a,#0b1220)', borderColor: '#34d399' }} onClick={e => e.stopPropagation()}>
             <div className="relative px-5 py-4 border-b border-white/10" style={{ background: 'linear-gradient(180deg, rgba(52,211,153,0.16), transparent)' }}>
@@ -837,11 +843,12 @@ export function CareerWorld() {
             </div>
             <button onClick={() => setShowRes(false)} className="w-full py-3.5 font-black text-slate-900" style={{ background: '#34d399' }}>Got it</button>
           </div>
-        </div>
+        </div>,
+        document.body
       ); })()}
 
       {/* Career briefing — job description + BLS Quick Facts, shown on entry */}
-      {showBrief && (
+      {showBrief && createPortal(
         <div className="fixed inset-0 z-[150] bg-black/45 flex items-center justify-center p-4">
           <div
             className="w-full max-w-3xl rounded-2xl border shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto"
@@ -896,7 +903,8 @@ export function CareerWorld() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

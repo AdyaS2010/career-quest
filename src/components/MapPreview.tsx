@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { X, Compass, Map as MapIcon, ArrowRight } from 'lucide-react';
@@ -37,7 +38,7 @@ export function MapPreview({ doors, skills, recommended, onPick, onFullMap, onCi
 
   const masteredCount = doors.filter(d => d.mastered).length;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in" style={{ background: 'rgba(5,10,24,0.72)', backdropFilter: 'blur(6px)' }} onClick={onClose}>
       <div className="relative w-full max-w-3xl rounded-3xl overflow-hidden shadow-2xl animate-bounce-in" style={{ background: '#0d1a3a', border: '1px solid rgba(255,255,255,0.14)' }} onClick={e => e.stopPropagation()}>
         {/* header */}
@@ -133,7 +134,8 @@ export function MapPreview({ doors, skills, recommended, onPick, onFullMap, onCi
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

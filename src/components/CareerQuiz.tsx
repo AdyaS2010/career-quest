@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Compass, RotateCcw, X, Trophy } from 'lucide-react';
 import { QUIZ, QUIZ_DOMAINS, scoreQuiz, type QuizResult } from '../pages/city/quiz';
 
@@ -26,7 +27,7 @@ export function CareerQuiz({ existing, skills, firstTime, onResult, onClose, onS
 
   const retake = () => { setAnswers([]); setResult(null); setStep(0); };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[320] flex items-center justify-center p-4" style={{ background: 'radial-gradient(ellipse at 50% -10%, #20305f, #0a0f24 75%)' }}>
       <div className="w-full max-w-lg">
         {step >= 0 ? (
@@ -104,6 +105,7 @@ export function CareerQuiz({ existing, skills, firstTime, onResult, onClose, onS
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
