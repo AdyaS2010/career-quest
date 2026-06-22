@@ -12,7 +12,7 @@ interface Step {
 const STEPS: Step[] = [
   {
     title: 'Welcome to Questford!',
-    body: "I'm Questopher, your guide. This cosy little town is full of careers waiting for you to try. Let me show you around — it'll only take a moment.",
+    body: "I'm Mayor Questopher, your guide. This cosy little town is full of careers waiting for you to try. Let me show you around — it'll only take a moment.",
     cta: 'Show me',
     anchor: 'center-lower'
   },

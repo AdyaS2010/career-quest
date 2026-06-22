@@ -36,13 +36,13 @@ export function GuideProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<GuideState>({
         isVisible: true, // Always visible now as per user request
         isOpen: false,
-        message: "Hi! I'm Questopher!",
+        message: "Hi! I'm Mayor Questopher!",
         emotion: 'happy',
         position: 'bottom-right',
         chatHistory: [{
             id: 'init',
             sender: 'bot',
-            text: "Greetings, traveler! I am Questopher the Career Squire. How can I help you navigate the kingdom today?",
+            text: "Greetings, traveler! I am Mayor Questopher, your career counselor. How can I help you navigate the town today?",
             emotion: 'waving'
         }]
     });

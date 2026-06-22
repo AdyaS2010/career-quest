@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
 import { useTheme } from '../contexts/ThemeContext';
 import type { Career, Profile, ColorScheme } from '../lib/database.types';
-import type { DialogueLine } from './city/story';
+import { currentChapter, ENDING, type DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
 import { SettingsModal } from '../components/SettingsModal';
 import { CareerQuiz } from '../components/CareerQuiz';
@@ -26,6 +26,7 @@ type Rect = { x: number; y: number; w: number; h: number };
 const WALKABLE_OVERRIDES: Rect[] = [
   { x: 22, y: 13, w: 7, h: 3 }, // open courtyard / sidewalk (22,13)–(28,15)
   { x: 28, y: 11, w: 7, h: 5 }, // rooftop (28,11)–(34,15)
+  { x: 27, y: 19, w: 3, h: 3 }, // Mayor's Plaza / Center Court walkable path around 28, 20
 ];
 // Walkable EXCEPT solid buildings (e.g. an open sand area dotted with houses).
 const SOFT_WALKABLE: Rect[] = [
@@ -212,10 +213,9 @@ export function CityHub() {
         const built: Door[] = careers.map((c, i) => { const fixed = DOOR_COORDS[c.slug]; return { slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: fixed?.x ?? (cells[i]?.x ?? npc.x), cy: fixed?.y ?? (cells[i]?.y ?? npc.y), mastered: mastered.has(c.slug) }; });
         if (!alive) return;
         doorsRef.current = built; setDoors(built);
-        npcRef.current = { cx: npc.x, cy: npc.y, lines: [
-          { speaker: 'Mayor Vale', portrait: '🧑‍💼', text: `Welcome to Questford! Every building here is a different career waiting for you to try.` },
-          { speaker: 'Mayor Vale', portrait: '🧑‍💼', text: `Walk up to any one and press E to step inside. Master all eight and you'll have explored the whole city!` },
-        ] };
+        
+        // Place Mayor Questopher statically in the center plaza (28, 20)
+        npcRef.current = { cx: 28, cy: 20, lines: [] };
 
         setReady(true); setLoading(false);
       } catch (e) { console.error('CityHub load', e); setLoading(false); }
@@ -226,6 +226,17 @@ export function CityHub() {
     // after navigating away and back.
     return () => { alive = false; };
   }, [user]);
+
+  // Dynamically update the Mayor's dialogue lines based on actual story progress
+  useEffect(() => {
+    if (!ready || !npcRef.current) return;
+    const started = Object.values(skills).filter(s => s.status !== 'not_started').length;
+    const mastered = Object.values(skills).filter(s => s.status === 'mastered').length;
+    const storyProgress = { started, mastered };
+    const chapter = currentChapter(storyProgress);
+    const lines = (mastered >= 8) ? ENDING : chapter.intro;
+    npcRef.current.lines = lines;
+  }, [skills, ready]);
 
   // The city + menus drift along to the serene "Questford Stroll"; a soft
   // day/night ambient bed sits gently underneath it. We leave the music playing
@@ -352,7 +363,7 @@ export function CityHub() {
         // a gentle chime the moment you step onto a new doormat
         if (key && key.startsWith('d:')) playSfx('chime');
         nearKeyRef.current = key;
-        setNearLabel(near === 'npc' ? 'Talk to Mayor Vale' : near ? `Enter ${near.name}` : null);
+        setNearLabel(near === 'npc' ? 'Talk to Mayor Questopher' : near ? `Enter ${near.name}` : null);
       }
 
       drawChar(ctx, pos.x - cam.x, pos.y - cam.y, '#22c55e', t, faceRef.current, movingRef.current);
@@ -517,7 +528,88 @@ function drawChar(ctx: CanvasRenderingContext2D, x: number, y: number, _body: st
   ctx.restore();
 }
 function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
-  drawChar(ctx, x, y, '#a855f7', t, -1, false);
+  // A dignified, friendly cozy-city Mayor Questopher:
+  // Classy purple counselor coat, gold chain of office with medallion, counselor cap, tidy silver beard.
+  const coatColor = '#5b21b6'; // rich violet/purple
+  const goldColor = '#fbbf24'; // warm gold
+  const skin = '#f6cfa3';
+  const beardColor = '#cbd5e1'; // soft grey/silver beard
+  const capColor = '#4c1d95'; // dark purple cap
+  
+  const bob = Math.sin(t / 430) * 1.1; // gentle breathing bob
+  
+  // Shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 12, 4, 0, 0, 7); ctx.fill();
+  
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob));
+  
+  // legs + shoes
+  ctx.fillStyle = '#1e293b'; ctx.fillRect(-5, -11, 4, 11); ctx.fillRect(1, -11, 4, 11); // dark slate trousers
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(-6, -2, 5, 3); ctx.fillRect(1, -2, 5, 3); // dark leather boots
+  
+  // Coat (purple counselor body)
+  ctx.fillStyle = coatColor; roundRect(ctx, -9, -26, 18, 16, 5); ctx.fill();
+  
+  // Gold Mayoral Chain of Office (golden chain draped around shoulders)
+  ctx.strokeStyle = goldColor; ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(-6, -25);
+  ctx.lineTo(0, -18);
+  ctx.lineTo(6, -25);
+  ctx.stroke();
+  
+  // Center medallion
+  ctx.fillStyle = goldColor;
+  ctx.beginPath();
+  ctx.arc(0, -17, 2, 0, 7);
+  ctx.fill();
+  
+  // Arms
+  ctx.fillStyle = coatColor;
+  ctx.fillRect(-11, -25, 3, 11); // left sleeve
+  ctx.fillRect(8, -25, 3, 11);  // right sleeve
+  
+  // Holding a Guidance Scroll in right hand
+  ctx.fillStyle = '#fffbeb'; // parchment color
+  roundRect(ctx, 8, -17, 5, 8, 1); ctx.fill();
+  ctx.fillStyle = '#b45309'; // amber ribbon
+  ctx.fillRect(8, -13, 5, 2);
+  
+  // Head
+  ctx.fillStyle = skin; roundRect(ctx, -8, -42, 16, 15, 6); ctx.fill();
+  
+  // Silver beard + mustache (tidy, cozy counseling elder)
+  ctx.fillStyle = beardColor;
+  ctx.beginPath();
+  ctx.moveTo(-6, -32);
+  ctx.bezierCurveTo(-7, -26, -3, -21, 0, -21);
+  ctx.bezierCurveTo(3, -21, 7, -26, 6, -32);
+  ctx.closePath();
+  ctx.fill();
+  
+  // mustache
+  ctx.fillStyle = '#94a3b8';
+  roundRect(ctx, -4, -32, 8, 2, 1); ctx.fill();
+  
+  // Counselor Cap (a cozy flat cap with a gold leaf/emblem)
+  ctx.fillStyle = capColor;
+  roundRect(ctx, -8.5, -45, 17, 5, 2); ctx.fill(); // cap brim
+  ctx.fillStyle = capColor;
+  roundRect(ctx, -7, -48, 14, 4, 3); ctx.fill(); // cap top dome
+  
+  // Gold badge on cap
+  ctx.fillStyle = goldColor;
+  ctx.beginPath(); ctx.arc(0, -44.5, 1.5, 0, 7); ctx.fill();
+  
+  // Eyes
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(-3, -35, 1.8, 2); ctx.fillRect(2, -35, 1.8, 2);
+  
+  // Warm smile
+  ctx.strokeStyle = 'rgba(80,45,30,0.6)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, -31.5, 1.8, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke();
+  
+  ctx.restore();
+  
+  // Floating quest prompt above the Mayor's head
   const b = Math.sin(t / 200) * 2;
   ctx.fillStyle = '#fbbf24'; roundRect(ctx, x - 5, y - 60 + b, 10, 13, 3); ctx.fill();
   ctx.fillStyle = '#1f2937'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('!', x, y - 53 + b);

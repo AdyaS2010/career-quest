@@ -29,10 +29,10 @@ export interface Chapter {
 // The story: a fresh graduate arrives in Questford for the city's famous
 // "Internship Rotation" — try real internships at eight workplaces, earn
 // references, build a résumé, and land a dream offer.
-const VALE = 'Coordinator Vale';   // runs the Questford Internship Program
-const VALE_FACE = '🧔‍♂️';
-const QUESTOPHER = 'Questopher';    // your pocket career-guide
-const Q_FACE = '🛡️';
+const VALE = 'Mayor Questopher';   // Mayor & career-guide counselor
+const VALE_FACE = '👑';
+const QUESTOPHER = 'Mayor Questopher';    // unified speaker name
+const Q_FACE = '👑';
 
 export const CHAPTERS: Chapter[] = [
   {
@@ -46,7 +46,7 @@ export const CHAPTERS: Chapter[] = [
     intro: [
       { speaker: VALE, portrait: VALE_FACE, text: "You must be our newest intern! Welcome to Questford — the only town where you can try eight careers before you even graduate." },
       { speaker: VALE, portrait: VALE_FACE, text: "Here's how the Rotation works: every building is a real workplace. Walk in, clock into a shift, and do the actual job. Do well and you earn a reference." },
-      { speaker: QUESTOPHER, portrait: Q_FACE, text: "I'm Questopher — clipped right to your backpack. See a glowing door? Walk up, press E, and step inside. Let's land your first internship!" },
+      { speaker: QUESTOPHER, portrait: Q_FACE, text: "I am Mayor Questopher, your counselor and guide! See a glowing door? Walk up, press E, and step inside. Let's land your first internship!" },
     ],
   },
   {

@@ -742,7 +742,7 @@ export function ProfilePage() {
                   <div className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1 leading-none">Discovery Board Authorization</div>
                   <div className="h-[2px] w-48 bg-slate-900 ml-auto mb-2"></div>
                   <div className="flex flex-col items-end">
-                    <p className="font-serif text-xl font-bold tracking-tighter mb-0.5 text-slate-900">Questopher Rex</p>
+                    <p className="font-serif text-xl font-bold tracking-tighter mb-0.5 text-slate-900">Mayor Questopher</p>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Board Registry ID: 489-CQ-2026</p>
                   </div>
                 </div>

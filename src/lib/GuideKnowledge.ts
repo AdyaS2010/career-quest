@@ -4,31 +4,31 @@ export interface GuideTip {
 }
 
 const GENERAL_TIPS: GuideTip[] = [
-    { text: "Greetings, noble adventurer! I am Sir Questopher, your Career Knight. How may I assist thee?", emotion: 'happy' },
-    { text: "Venture to your Profile to view thy progress and badges of honor! A true knight tracks their growth.", emotion: 'excited' },
-    { text: "The Leaderboard displays the mightiest career explorers in all the kingdom! Strive for the top!", emotion: 'waving' },
-    { text: "Every career realm holds unique trials. I suggest trying a realm thou art curious about, rather than one thou already knows.", emotion: 'thinking' },
-    { text: "Do not fear failure in these simulations. A knight learns more from a fallen bout than an easy victory!", emotion: 'excited' }
+    { text: "Greetings, traveler! I am Mayor Questopher, your career counselor. How may I help you today?", emotion: 'happy' },
+    { text: "Venture to your Profile to view your progress and badges of honor! A true explorer tracks their growth.", emotion: 'excited' },
+    { text: "The Leaderboard displays the top career explorers in all the city! Strive for the top!", emotion: 'waving' },
+    { text: "Every career domain holds unique trials. I suggest trying a domain you are curious about, rather than one you already know.", emotion: 'thinking' },
+    { text: "Do not fear failure in these simulations. An explorer learns more from a setback than an easy victory!", emotion: 'excited' }
 ];
 
 const ROUTE_TIPS: Record<string, GuideTip[]> = {
     '/': [
-        { text: "Welcome to the grand Career Kingdom Map! Click upon any floating realm to begin thy noble quest.", emotion: 'waving' },
-        { text: "Thou canst drag the map to explore distant lands, or zoom to inspect the territories closely. Each island is a new destiny.", emotion: 'happy' },
-        { text: "I see many unchartered territories! The path to Mastery requires thee to earn above 80% on challenges.", emotion: 'thinking' },
+        { text: "Welcome to the Career Map! Click on any floating domain to begin your quest.", emotion: 'waving' },
+        { text: "You can drag the map to explore, or zoom to inspect the areas closely. Each island is a new career choice.", emotion: 'happy' },
+        { text: "I see many unchartered territories! The path to Mastery requires you to earn above 80% on challenges.", emotion: 'thinking' },
     ],
     '/profile': [
-        { text: "Behold thy hall of achievements! An impressive collection, good squire. Let us see thy total XP!", emotion: 'excited' },
-        { text: "Here thou canst track thy total score and level of mastery. Let the medals be thy motivation!", emotion: 'happy' },
+        { text: "Behold your achievements! An impressive collection. Let's see your total XP!", emotion: 'excited' },
+        { text: "Here you can track your total score and level of mastery. Let your accomplishments motivate you!", emotion: 'happy' },
     ],
     '/leaderboard': [
-        { text: "These are the legendary champions of the realm! Canst thou reach the pinnacle and etch thy name here?", emotion: 'excited' },
-        { text: "Compete against fellow knights! Mastery of multiple domains is the key to holding a high rank.", emotion: 'thinking' },
+        { text: "These are the top explorers of the city! Can you reach the pinnacle and place your name here?", emotion: 'excited' },
+        { text: "Compete against fellow interns! Mastery of multiple domains is the key to holding a high rank.", emotion: 'thinking' },
     ],
     '/career': [
-        { text: "A brave choice! This career realm awaits thy exploration. Choose a challenge and prove thy mettle!", emotion: 'excited' },
-        { text: "Each challenge thou completest grants thee precious XP! This helps master the profession.", emotion: 'happy' },
-        { text: "Read the instructions carefully for each simulation. True mastery requires both speed and accuracy.", emotion: 'thinking' },
+        { text: "A wonderful choice! This career domain awaits your exploration. Choose a challenge and see what you can do!", emotion: 'excited' },
+        { text: "Each challenge you complete grants you precious XP! This helps you master the profession.", emotion: 'happy' },
+        { text: "Read the instructions carefully for each simulation. True mastery requires both speed and accuracy.", emotion: 'thinking' }
     ],
 };
 
@@ -39,8 +39,8 @@ const CAREER_DESCRIPTIONS: Record<string, GuideTip[]> = {
         { text: "Real-world advice: Start by mastering the basics—knife skills and heat control. Even the greatest Michelin star chefs started by chopping onions perfectly!", emotion: 'happy' }
     ],
     'information-technology': [
-        { text: "Information Technology forms the mystical infrastructure of our modern world! Programming, networking, and cybersecurity protect our digital realms.", emotion: 'happy' },
-        { text: "A knight of IT uses logic algorithms rather than steel. In the real world, IT professionals are the ultimate problem solvers, building everything from apps to AI.", emotion: 'thinking' },
+        { text: "Information Technology forms the vital infrastructure of our modern world! Programming, networking, and cybersecurity protect our digital spaces.", emotion: 'happy' },
+        { text: "An IT specialist uses logic algorithms rather than physical tools. In the real world, IT professionals are the ultimate problem solvers, building everything from apps to AI.", emotion: 'thinking' },
         { text: "Real-world advice: Learn to read documentation and break big problems into small, testable chunks. Debugging is 90% of the job!", emotion: 'excited' }
     ],
     'law-government': [
@@ -50,7 +50,7 @@ const CAREER_DESCRIPTIONS: Record<string, GuideTip[]> = {
     ],
     'media-communication': [
         { text: "Media & Communication is the art of shaping perception! Journalists, PR specialists, and broadcasters hold the power of information.", emotion: 'happy' },
-        { text: "In this realm, the pen is truly mightier than the sword. Real-world professionals in this field shape how the public understands global events.", emotion: 'thinking' },
+        { text: "In this field, the pen is an incredibly powerful tool. Real-world professionals in this field shape how the public understands global events.", emotion: 'thinking' },
         { text: "Real-world advice: Learn to write clearly and concisely. In an age of endless content, the ability to tell a compelling, truthful story is invaluable.", emotion: 'excited' }
     ],
     'health-sciences': [
@@ -59,18 +59,18 @@ const CAREER_DESCRIPTIONS: Record<string, GuideTip[]> = {
         { text: "Real-world advice: Cultivate immense patience and compassion. Science provides the cure, but humanity provides the healing.", emotion: 'happy' }
     ],
     'education': [
-        { text: "Education is the passing of the torch! Teachers, principals, and counselors shape the knights of tomorrow.", emotion: 'waving' },
+        { text: "Education is the passing of the torch! Teachers, principals, and counselors shape the leaders of tomorrow.", emotion: 'waving' },
         { text: "Patience and adaptability are key. In the real world, educators don't just teach facts; they inspire curiosity and build confidence.", emotion: 'thinking' },
         { text: "Real-world advice: To be a great teacher, you must remain a lifelong student. Every learner is different, so adaptability is your greatest tool.", emotion: 'excited' }
     ],
     'arts-entertainment': [
-        { text: "Arts, Entertainment & Design bring beauty to the realm! Graphic designers, actors, and artists evoke emotion and challenge the status quo.", emotion: 'excited' },
+        { text: "Arts, Entertainment & Design bring beauty to the world! Graphic designers, actors, and artists evoke emotion and challenge the status quo.", emotion: 'excited' },
         { text: "There is no single 'right' answer in art, but there is harmony, composition, and emotional resonance. Real-world artists craft the culture we live in.", emotion: 'happy' },
         { text: "Real-world advice: Accept feedback gracefully but trust your unique voice. Technical skill can be taught, but perspective is entirely your own.", emotion: 'thinking' }
     ],
     'financial-services': [
-        { text: "Financial Services keep the kingdom's treasury flowing! Accountants, analysts, and planners manage wealth and mitigate risk.", emotion: 'thinking' },
-        { text: "Mathematics and forecasting are thy tools here. In the real world, finance professionals help families save for the future and businesses grow safely.", emotion: 'thinking' },
+        { text: "Financial Services keep the city's resources flowing! Accountants, analysts, and planners manage wealth and mitigate risk.", emotion: 'thinking' },
+        { text: "Mathematics and forecasting are your tools here. In the real world, finance professionals help families save for the future and businesses grow safely.", emotion: 'thinking' },
         { text: "Real-world advice: Learn to love spreadsheets and data analysis. Understanding how money moves is a superpower in modern society.", emotion: 'excited' }
     ]
 };
