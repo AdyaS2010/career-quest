@@ -206,8 +206,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         // soft muffled step — a low cushioned thud with a faint tap on top, with
         // a touch of random pitch so a walking run never sounds mechanical.
         const base = 150 + Math.random() * 26;
-        playTone(base, 'sine', 0.04, 0, 0.010);
-        playTone(base * 3.1, 'triangle', 0.018, 0, 0.002);
+        playTone(base, 'sine', 0.04, 0, 0.022);
+        playTone(base * 3.1, 'triangle', 0.018, 0, 0.006);
         break;
       }
     }

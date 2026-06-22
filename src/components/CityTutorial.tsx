@@ -115,7 +115,7 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
       ? 'left-3 sm:left-5 top-24'
       : s.anchor === 'left'
         ? 'left-16 sm:left-20 top-1/2 -translate-y-1/2'
-        : 'left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2';
+        : 'left-1/2 -translate-x-1/2 top-24 sm:top-28';
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none">

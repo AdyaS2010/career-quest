@@ -773,7 +773,7 @@ export function HomePage() {
                           tabIndex={0}
                         >
                           {/* Interactive area wrapper */}
-                          <div className="relative w-48 h-48 lg:w-52 lg:h-52 mx-auto transition-all duration-500 ease-out hover:scale-110 hover:-translate-y-4 hover:rotate-2 animate-float-card" style={{ animationDelay: `${delay}s` }}>
+                          <div className="relative w-48 h-48 lg:w-52 lg:h-52 mx-auto animate-float-card" style={{ animationDelay: `${delay}s` }}>
 
                             {/* Shadow blob */}
                             <div className="absolute top-[85%] left-1/2 -translate-x-1/2 w-[60%] h-[15%] bg-black/60 blur-xl rounded-[100%] transition-all duration-500 group-hover:scale-75 group-hover:opacity-40" />
@@ -782,7 +782,8 @@ export function HomePage() {
                             <div className={`
                               absolute inset-0 flex flex-col items-center justify-center
                               rounded-[3rem] border-2 shadow-[0_10px_40px_rgba(0,0,0,0.5)]
-                              backdrop-blur-md overflow-hidden transition-all duration-300
+                              backdrop-blur-md overflow-hidden transition-all duration-500 ease-out
+                              group-hover:scale-110 group-hover:-translate-y-4 group-hover:rotate-2
                               ${isMastered
                                 ? isDark
                                   ? 'bg-gradient-to-br from-yellow-900/90 via-amber-800/80 to-yellow-900/90 border-yellow-500/60 shadow-[0_0_50px_rgba(234,179,8,0.4)]'
