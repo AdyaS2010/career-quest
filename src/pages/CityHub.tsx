@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
 import { useTheme } from '../contexts/ThemeContext';
 import type { Career, Profile, ColorScheme } from '../lib/database.types';
-import { currentChapter, ENDING, type DialogueLine } from './city/story';
+import { loadSeen, saveSeen, currentChapter, ENDING, type DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
 import { SettingsModal } from '../components/SettingsModal';
 import { CareerQuiz } from '../components/CareerQuiz';
@@ -100,6 +100,21 @@ export function CityHub() {
   const [showSettings, setShowSettings] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const { tutStep, setTutStep } = useTutorial();
+
+  const [seenState, setSeenState] = useState<{ introSeen: boolean; chaptersSeen: string[]; endingSeen: boolean }>({
+    introSeen: false,
+    chaptersSeen: [],
+    endingSeen: false,
+  });
+
+  const showQuestPromptRef = useRef(false);
+
+  // Load Mayoral dialogue seen states from localStorage on user change
+  useEffect(() => {
+    if (user) {
+      setSeenState(loadSeen(user.id));
+    }
+  }, [user]);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -230,16 +245,63 @@ export function CityHub() {
     return () => { alive = false; };
   }, [user]);
 
-  // Dynamically update the Mayor's dialogue lines based on actual story progress
+  // Dynamically update the Mayor's quest prompt visibility
   useEffect(() => {
     if (!ready || !npcRef.current) return;
     const started = Object.values(skills).filter(s => s.status !== 'not_started').length;
     const mastered = Object.values(skills).filter(s => s.status === 'mastered').length;
     const storyProgress = { started, mastered };
     const chapter = currentChapter(storyProgress);
-    const lines = (mastered >= 8) ? ENDING : chapter.intro;
-    npcRef.current.lines = lines;
-  }, [skills, ready]);
+    
+    const hasNewStoryBeat = (mastered >= 8)
+      ? !seenState.endingSeen
+      : !seenState.chaptersSeen.includes(chapter.id);
+      
+    showQuestPromptRef.current = hasNewStoryBeat;
+  }, [skills, ready, seenState]);
+
+  // Helper to dynamically build the Mayor's dialogue
+  const getMayorDialogue = (): DialogueLine[] => {
+    const started = Object.values(skills).filter(s => s.status !== 'not_started').length;
+    const mastered = Object.values(skills).filter(s => s.status === 'mastered').length;
+    const storyProgress = { started, mastered };
+    const chapter = currentChapter(storyProgress);
+
+    if (mastered >= 8) {
+      return ENDING;
+    }
+    
+    // If they haven't seen this chapter's intro, give them the intro
+    if (!seenState.chaptersSeen.includes(chapter.id)) {
+      return chapter.intro;
+    }
+
+    // Otherwise, give them a supportive, engaging counseling tip periodically
+    const tips = [
+      "Keep exploring, intern! Every workstation you try builds your unique skills.",
+      "Need a hint? Check out the Career Compass in your HUD to see what match is right for you.",
+      "Questford is all about trial and discovery. Try a few shifts in Culinary or IT to find your footing!",
+      "A great career is about matching your strengths. Pay attention to what feels most rewarding!",
+      "Every mistake is just a bug to debug or a dish to plate better next time. Keep learning!",
+      "Learning by doing is the secret to Questford. Dive into those simulations!",
+      "You are making great progress! Take your time to walk around and take it all in.",
+      "Every mastered internship earns a reference letter for your file. Let's build that résumé!",
+      "Have you checked the Leaderboard? Friendly competition keeps the mind sharp!",
+      "Cozy city, ambitious goals. You have what it takes to succeed here!"
+    ];
+
+    const xp = profile?.total_score ?? 0;
+    const index = Math.floor(xp / 100) % tips.length;
+    const tip = tips[index];
+
+    return [
+      {
+        speaker: 'Mayor Questopher',
+        portrait: '🧑‍💼',
+        text: tip
+      }
+    ];
+  };
 
   // The city + menus drift along to the serene "Questford Stroll"; a soft
   // day/night ambient bed sits gently underneath it. We leave the music playing
@@ -262,7 +324,7 @@ export function CityHub() {
         const n = nearRef.current;
         if (n === 'npc') {
           playSfx('greet');
-          setDialogue(npcRef.current?.lines || null);
+          setDialogue(getMayorDialogue());
         } else if (n) {
           playSfx('enter');
           navigate(`/career/${n.slug}`);
@@ -369,7 +431,7 @@ export function CityHub() {
           el.style.transform = `translate(-50%,-50%) translate(${Math.round(ssx)}px, ${Math.round(ssy)}px)`;
         }
       }
-      if (npcRef.current) { const wx = (npcRef.current.cx + 0.5) * TS, wy = (npcRef.current.cy + 0.5) * TS; const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = 'npc'; } drawNpc(ctx, wx - cam.x, wy - cam.y, t); }
+      if (npcRef.current) { const wx = (npcRef.current.cx + 0.5) * TS, wy = (npcRef.current.cy + 0.5) * TS; const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = 'npc'; } drawNpc(ctx, wx - cam.x, wy - cam.y, t, showQuestPromptRef.current); }
       nearRef.current = near;
       const key = near === 'npc' ? 'npc' : near ? `d:${near.slug}` : null;
       if (key !== nearKeyRef.current) {
@@ -464,9 +526,30 @@ export function CityHub() {
       {/* live tile coordinate — tell me these numbers to mark a spot */}
       {ready && <div className="absolute bottom-6 right-4 z-20 px-2.5 py-1 rounded-lg text-emerald-200 text-xs font-mono font-bold" style={{ background: 'rgba(10,18,40,0.6)' }}>📍 <span ref={coordElRef}>0, 0</span></div>}
 
-      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') { playSfx('greet'); setDialogue(npcRef.current?.lines || null); } else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
+      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') { playSfx('greet'); setDialogue(getMayorDialogue()); } else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
 
-      {dialogue && <DialogueBox lines={dialogue} onClose={() => setDialogue(null)} />}
+      {dialogue && (
+        <DialogueBox
+          lines={dialogue}
+          onClose={() => {
+            setDialogue(null);
+            if (user) {
+              const started = Object.values(skills).filter(s => s.status !== 'not_started').length;
+              const mastered = Object.values(skills).filter(s => s.status === 'mastered').length;
+              const storyProgress = { started, mastered };
+              const chapter = currentChapter(storyProgress);
+              const updated = { ...seenState };
+              if (mastered >= 8) {
+                updated.endingSeen = true;
+              } else if (!seenState.chaptersSeen.includes(chapter.id)) {
+                updated.chaptersSeen = [...seenState.chaptersSeen, chapter.id];
+              }
+              setSeenState(updated);
+              saveSeen(user.id, updated);
+            }
+          }}
+        />
+      )}
       {quizOpen && <CareerQuiz existing={quizResult} skills={skills} firstTime={false} onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }} onClose={() => setQuizOpen(false)} onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }} />}
       {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
@@ -540,7 +623,7 @@ function drawChar(ctx: CanvasRenderingContext2D, x: number, y: number, _body: st
   ctx.strokeStyle = 'rgba(80,45,30,0.6)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0, -30.5, 2.3, 0.18 * Math.PI, 0.82 * Math.PI); ctx.stroke();
   ctx.restore();
 }
-function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
+function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number, showQuestPrompt: boolean) {
   // A dignified, friendly cozy-city Mayor Questopher:
   // Classy purple counselor coat, gold chain of office with medallion, counselor cap, tidy silver beard.
   const coatColor = '#5b21b6'; // rich violet/purple
@@ -623,10 +706,13 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number)
   ctx.restore();
   
   // Floating quest prompt above the Mayor's head
-  const b = Math.sin(t / 200) * 2;
-  ctx.fillStyle = '#fbbf24'; roundRect(ctx, x - 5, y - 60 + b, 10, 13, 3); ctx.fill();
-  ctx.fillStyle = '#1f2937'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('!', x, y - 53 + b);
+  if (showQuestPrompt) {
+    const b = Math.sin(t / 200) * 2;
+    ctx.fillStyle = '#fbbf24'; roundRect(ctx, x - 5, y - 60 + b, 10, 13, 3); ctx.fill();
+    ctx.fillStyle = '#1f2937'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('!', x, y - 53 + b);
+  }
 }
+
 // A small district banner on a pole — flanks each building entrance in its colour.
 function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number) {
   const wave = Math.sin(t / 260) * 1.6;

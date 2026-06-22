@@ -515,21 +515,32 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       const utterance = new SpeechSynthesisUtterance(cleanText);
       const voices = window.speechSynthesis.getVoices();
       
-      // Look for a rich, friendly, warm English voice (e.g. natural, male, google, david, etc.)
-      const targetVoice = voices.find(v => 
-        v.lang.startsWith('en') && 
-        (v.name.toLowerCase().includes('google') || 
-         v.name.toLowerCase().includes('natural') || 
-         v.name.toLowerCase().includes('david') || 
-         v.name.toLowerCase().includes('male') || 
-         v.name.toLowerCase().includes('counselor') ||
-         v.name.toLowerCase().includes('classic'))
-      ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+      // Filter English voices
+      const enVoices = voices.filter(v => v.lang.toLowerCase().startsWith('en'));
+      
+      // Look for the absolute best natural/online/premium voice:
+      const targetVoice = 
+        // 1. Natural online voices (Edge/Chrome natural cloud voices sound human-like)
+        enVoices.find(v => v.name.toLowerCase().includes('natural') && v.name.toLowerCase().includes('online')) ||
+        enVoices.find(v => v.name.toLowerCase().includes('natural')) ||
+        // 2. Google high-quality voices
+        enVoices.find(v => v.name.toLowerCase().includes('google') && v.name.toLowerCase().includes('us english')) ||
+        enVoices.find(v => v.name.toLowerCase().includes('google')) ||
+        // 3. Apple premium voices (e.g., Samantha, Daniel)
+        enVoices.find(v => v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('daniel')) ||
+        // 4. Microsoft offline natural voices or standard male/counselor-like voices
+        enVoices.find(v => v.name.toLowerCase().includes('david')) ||
+        enVoices.find(v => v.name.toLowerCase().includes('guy')) ||
+        enVoices.find(v => v.name.toLowerCase().includes('aria')) ||
+        // 5. Fallback to any English voice
+        enVoices[0] ||
+        // 6. Default browser voice
+        voices[0];
       
       if (targetVoice) utterance.voice = targetVoice;
       utterance.pitch = 0.95;  // slightly lower pitch for warm counseling feel
       utterance.rate = 0.92;   // slightly slower pace for comforting, clear, cozy speech
-      utterance.volume = 0.85; // comfortable volume
+      utterance.volume = 0.68; // comfortable volume (80% of current 0.85)
       
       window.speechSynthesis.speak(utterance);
     } catch (e) {
@@ -543,6 +554,19 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         window.speechSynthesis.cancel();
       } catch { /* ignore */ }
     }
+  }, []);
+
+  // Pre-populate browser voice cache
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return;
+    const updateVoices = () => {
+      window.speechSynthesis.getVoices();
+    };
+    window.speechSynthesis.addEventListener('voiceschanged', updateVoices);
+    updateVoices();
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', updateVoices);
+    };
   }, []);
 
   // Cleanup on unmount
