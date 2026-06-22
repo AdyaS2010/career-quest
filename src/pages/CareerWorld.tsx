@@ -23,7 +23,7 @@ export function CareerWorld() {
   const { careerSlug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { muted, toggleMute, startBgm } = useAudio();
+  const { muted, toggleMute, startBgm, speak, cancelSpeech } = useAudio();
   const { theme, toggleTheme } = useTheme();
   const { enterSimulation, leaveSimulation } = useSimulation();
 
@@ -327,12 +327,12 @@ export function CareerWorld() {
     ? 'linear-gradient(180deg, #162033 0%, #131a2e 30%, #1a1040 60%, #0f172a 100%)'
     : `linear-gradient(135deg, ${colorScheme.background} 0%, ${colorScheme.accent}20 100%)`;
 
-  // Career briefing content: job description ("What You'll Do") + BLS Quick Facts shown on entry.
   const careerBriefContent: Record<string, {
     title: string;
     subtitle: string;
     lead: string;
     icon: string;
+    speechIntro: string;
     bullets: string[];
     chips: { emoji: string; title: string; subtitle: string }[];
     quickFacts: { label: string; value: string }[];
@@ -343,6 +343,7 @@ export function CareerWorld() {
       subtitle: 'Culinary Arts',
       lead: 'Run service like a real kitchen team: take accurate orders, execute under heat, and plate dishes guests remember.',
       icon: '👨‍🍳',
+      speechIntro: "Welcome to the kitchen, chef! Fire up the stoves, prep your stations, and let's run the perfect dinner rush today!",
       bullets: [
         'Plan menus, source ingredients, and lead a kitchen team.',
         'Run service under time pressure while maintaining quality and safety.',
@@ -369,6 +370,7 @@ export function CareerWorld() {
       subtitle: 'Software Engineering',
       lead: 'Build, debug, and ship reliable systems that solve real business and user problems.',
       icon: '💻',
+      speechIntro: "System check complete! Dive into the code, track down those pesky bugs, and build something legendary today!",
       bullets: [
         'Diagnose bugs, implement fixes, and validate with tests.',
         'Design algorithms and system architecture with performance in mind.',
@@ -392,6 +394,7 @@ export function CareerWorld() {
       subtitle: 'Legal Practice',
       lead: 'Analyze evidence, apply legal standards, and advocate clearly in high-stakes scenarios.',
       icon: '⚖️',
+      speechIntro: "All rise for the court of public service! Review your evidence, sharpen your arguments, and let justice be served!",
       bullets: [
         'Evaluate admissibility and relevance of evidence.',
         'Construct arguments with facts, rules, and precedents.',
@@ -415,6 +418,7 @@ export function CareerWorld() {
       subtitle: 'Journalism',
       lead: 'Verify facts, interview sources, and craft clear stories for public audiences.',
       icon: '🎙️',
+      speechIntro: "We are live in three, two, one! Fact-check the news, interview the sources, and tell a story that makes headlines!",
       bullets: [
         'Fact-check claims against credible sources.',
         'Conduct interviews and capture clear, usable quotes.',
@@ -438,6 +442,7 @@ export function CareerWorld() {
       subtitle: 'Patient Care',
       lead: 'Assess symptoms, prioritize treatment, and make evidence-based decisions for patient safety.',
       icon: '🩺',
+      speechIntro: "Triage team, stand by! Assess the vitals, prioritize treatment, and save lives in the clinic today!",
       bullets: [
         'Gather relevant clinical clues before diagnosis.',
         'Select safe, effective treatments and monitor outcomes.',
@@ -461,6 +466,7 @@ export function CareerWorld() {
       subtitle: 'Banking Analyst',
       lead: 'Balance customer service, risk controls, and analytical judgment in financial operations.',
       icon: '💼',
+      speechIntro: "Markets are open! Balance the books, assess the investment risks, and keep those assets perfectly secure!",
       bullets: [
         'Build balanced budgets and evaluate tradeoffs.',
         'Assess investments with risk-return discipline.',
@@ -484,6 +490,7 @@ export function CareerWorld() {
       subtitle: 'Teaching Lab',
       lead: 'Design instruction, manage classrooms, and support safe learning environments.',
       icon: '🍎',
+      speechIntro: "Welcome to the classroom, educator! Design the perfect lesson plan, guide your students, and lead the way to bright futures!",
       bullets: [
         'Guide classroom behavior and maintain focus.',
         'Plan lessons aligned to clear learning goals.',
@@ -507,6 +514,7 @@ export function CareerWorld() {
       subtitle: 'Creative Studio',
       lead: 'Translate creative vision into polished performances and audience-ready experiences.',
       icon: '🎭',
+      speechIntro: "Showtime! Set the lighting, hit your cues, and paint a masterpiece on stage today!",
       bullets: [
         'Apply color and visual design principles intentionally.',
         'Maintain rhythm, timing, and performance accuracy.',
@@ -532,6 +540,7 @@ export function CareerWorld() {
     subtitle: career.name,
     lead: career.description,
     icon: '🎯',
+    speechIntro: `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!`,
     bullets: [career.description, 'Complete each simulation to build skill.', 'Compare paths and track progress over time.'],
     chips: [
       { emoji: '🎯', title: 'Hands-on', subtitle: 'Step into real on-the-job tasks' },
@@ -547,7 +556,17 @@ export function CareerWorld() {
     source: 'Source: Career Quest curated career learning content.',
   };
 
-  // Station metadata (icon, focus, tips) for each challenge, mirroring a real workplace station.
+  // Trigger speech introduction when the career data finishes loading
+  useEffect(() => {
+    if (!loading && career) {
+      const introText = brief.speechIntro || `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!`;
+      speak(introText);
+    }
+    return () => {
+      cancelSpeech();
+    };
+  }, [loading, career, brief.speechIntro, speak, cancelSpeech]);
+
   const getChallengeMeta = (slug: string, challenge: Challenge) => {
     const raw = String((challenge.config as any)?.subType || '').toLowerCase();
     const key = raw.replace('-challenge', '');

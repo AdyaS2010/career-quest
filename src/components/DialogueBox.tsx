@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DialogueLine } from '../pages/city/story';
+import { useAudio } from '../contexts/AudioContext';
 
 interface DialogueBoxProps {
   lines: DialogueLine[];
@@ -14,10 +15,12 @@ export function DialogueBox({ lines, onClose }: DialogueBoxProps) {
   const [shown, setShown] = useState('');
   const [typing, setTyping] = useState(true);
   const timer = useRef<number>(0);
+  
+  const { speak, cancelSpeech } = useAudio();
 
   const line = lines[idx];
 
-  // Typewriter for the current line.
+  // Typewriter for the current line + speech voiceover
   useEffect(() => {
     if (!line) return;
     setShown('');
@@ -33,8 +36,15 @@ export function DialogueBox({ lines, onClose }: DialogueBoxProps) {
       }
     };
     timer.current = window.setTimeout(tick, 18);
-    return () => window.clearTimeout(timer.current);
-  }, [idx, line]);
+    
+    // Play speech voiceover for the dialogue line
+    speak(line.text);
+
+    return () => {
+      window.clearTimeout(timer.current);
+      cancelSpeech();
+    };
+  }, [idx, line, speak, cancelSpeech]);
 
   const advance = () => {
     if (typing) {

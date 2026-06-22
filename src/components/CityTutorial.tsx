@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Volume2, Sun } from 'lucide-react';
+import { useAudio } from '../contexts/AudioContext';
 
 interface Step {
   title: string;
@@ -60,7 +61,17 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
   const s = STEPS[step];
   if (!s) return null;
 
+  const { speak, cancelSpeech } = useAudio();
   const [highlightRect, setHighlightRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    if (s && s.body) {
+      speak(s.body);
+    }
+    return () => {
+      cancelSpeech();
+    };
+  }, [step, s, speak, cancelSpeech]);
 
   useEffect(() => {
     const updateRect = () => {

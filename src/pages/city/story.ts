@@ -30,9 +30,9 @@ export interface Chapter {
 // "Internship Rotation" — try real internships at eight workplaces, earn
 // references, build a résumé, and land a dream offer.
 const VALE = 'Mayor Questopher';   // Mayor & career-guide counselor
-const VALE_FACE = '👑';
+const VALE_FACE = '🧑‍💼';
 const QUESTOPHER = 'Mayor Questopher';    // unified speaker name
-const Q_FACE = '👑';
+const Q_FACE = '🧑‍💼';
 
 export const CHAPTERS: Chapter[] = [
   {

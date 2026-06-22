@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 
 type SfxType = 'click' | 'success' | 'error' | 'complete' | 'hover' | 'notification' | 'tick' | 'warning'
-  | 'enter' | 'score' | 'star' | 'levelup' | 'coin' | 'chime' | 'footstep';
+  | 'enter' | 'score' | 'star' | 'levelup' | 'coin' | 'chime' | 'footstep' | 'greet';
 
 // Each place in the world gets its own cozy ambient bed — a soft evolving pad
 // plus gentle random "twinkles", all synthesised live (no audio files, fully
@@ -47,6 +47,8 @@ interface AudioContextType {
   stopBgm: () => void;
   ambienceScene: AmbienceScene | null;
   setAmbience: (scene: AmbienceScene | null) => void;
+  speak: (text: string) => void;
+  cancelSpeech: () => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -82,6 +84,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     g.cancelScheduledValues(t);
     g.setValueAtTime(g.value, t);
     if (muted) {
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
+      }
       g.linearRampToValueAtTime(0, t + 0.14);
       window.setTimeout(() => {
         if (mutedRef.current && ctx.state === 'running') ctx.suspend().catch(() => { /* ignore */ });
@@ -210,6 +215,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         playTone(base * 3.1, 'triangle', 0.018, 0, 0.006);
         break;
       }
+      case 'greet':
+        // A warm, polite double-tone chime for dialogue greetings
+        playTone(587.33, 'sine', 0.12, 0, 0.08); // D5
+        playTone(880.00, 'sine', 0.28, 0.08, 0.06); // A5
+        break;
     }
   }, [initAudio, playTone]);
 
@@ -496,19 +506,59 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     setAmbienceScene(scene);
   }, [initAudio, buildAmbience]);
 
+  const speak = useCallback((text: string) => {
+    if (mutedRef.current || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      // Remove emojis from the text so the engine doesn't try to describe them
+      const cleanText = text.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD00-\uDFFF]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Look for a rich, friendly, warm English voice (e.g. natural, male, google, david, etc.)
+      const targetVoice = voices.find(v => 
+        v.lang.startsWith('en') && 
+        (v.name.toLowerCase().includes('google') || 
+         v.name.toLowerCase().includes('natural') || 
+         v.name.toLowerCase().includes('david') || 
+         v.name.toLowerCase().includes('male') || 
+         v.name.toLowerCase().includes('counselor') ||
+         v.name.toLowerCase().includes('classic'))
+      ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+      
+      if (targetVoice) utterance.voice = targetVoice;
+      utterance.pitch = 0.95;  // slightly lower pitch for warm counseling feel
+      utterance.rate = 0.92;   // slightly slower pace for comforting, clear, cozy speech
+      utterance.volume = 0.85; // comfortable volume
+      
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn('Speech synthesis failed', e);
+    }
+  }, []);
+
+  const cancelSpeech = useCallback(() => {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch { /* ignore */ }
+    }
+  }, []);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopBgm();
+      cancelSpeech();
       if (ambienceRef.current) {
         try { ambienceRef.current.stop(); ambienceRef.current.master.disconnect(); } catch { /* ignore */ }
         ambienceRef.current = null;
       }
     };
-  }, [stopBgm]);
+  }, [stopBgm, cancelSpeech]);
 
   return (
-    <AudioContext.Provider value={{ muted, toggleMute: () => setMuted((m: boolean) => !m), playSfx, bgmPlaying, startBgm, stopBgm, ambienceScene, setAmbience }}>
+    <AudioContext.Provider value={{ muted, toggleMute: () => setMuted((m: boolean) => !m), playSfx, bgmPlaying, startBgm, stopBgm, ambienceScene, setAmbience, speak, cancelSpeech }}>
       {children}
     </AudioContext.Provider>
   );

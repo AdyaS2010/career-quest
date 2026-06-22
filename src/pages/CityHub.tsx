@@ -214,6 +214,9 @@ export function CityHub() {
         if (!alive) return;
         doorsRef.current = built; setDoors(built);
         
+        // Force the Mayor's tile (28, 20) to be solid so players collide with him
+        walk[20 * map.w + 28] = false;
+
         // Place Mayor Questopher statically in the center plaza (28, 20)
         npcRef.current = { cx: 28, cy: 20, lines: [] };
 
@@ -255,7 +258,17 @@ export function CityHub() {
       const k = e.key.toLowerCase();
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
       if (busyRef.current) return;
-      if (k === 'e' || k === 'enter') { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } return; }
+      if (k === 'e' || k === 'enter') {
+        const n = nearRef.current;
+        if (n === 'npc') {
+          playSfx('greet');
+          setDialogue(npcRef.current?.lines || null);
+        } else if (n) {
+          playSfx('enter');
+          navigate(`/career/${n.slug}`);
+        }
+        return;
+      }
       keysRef.current.add(k);
     };
     const up = (e: KeyboardEvent) => keysRef.current.delete(e.key.toLowerCase());
@@ -451,7 +464,7 @@ export function CityHub() {
       {/* live tile coordinate — tell me these numbers to mark a spot */}
       {ready && <div className="absolute bottom-6 right-4 z-20 px-2.5 py-1 rounded-lg text-emerald-200 text-xs font-mono font-bold" style={{ background: 'rgba(10,18,40,0.6)' }}>📍 <span ref={coordElRef}>0, 0</span></div>}
 
-      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
+      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') { playSfx('greet'); setDialogue(npcRef.current?.lines || null); } else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
 
       {dialogue && <DialogueBox lines={dialogue} onClose={() => setDialogue(null)} />}
       {quizOpen && <CareerQuiz existing={quizResult} skills={skills} firstTime={false} onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }} onClose={() => setQuizOpen(false)} onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }} />}
