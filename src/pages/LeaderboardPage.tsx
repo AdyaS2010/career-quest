@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, Crown, Moon, Sun, Share2 } from 'lucide-react';
+import { Crown, Share2 } from 'lucide-react';
+import { AppNavbar } from '../components/AppNavbar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { useAudio } from '../contexts/AudioContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { loadPrefs } from '../lib/prefs';
 import type { Profile } from '../lib/database.types';
 
 export function LeaderboardPage() {
-    const navigate = useNavigate();
     const { user } = useAuth();
-    const { playSfx } = useAudio();
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
     const [leaders, setLeaders] = useState<Profile[]>([]);
     const [userRank, setUserRank] = useState<{ rank: number, score: number } | null>(null);
     const [loading, setLoading] = useState(true);
@@ -26,10 +24,19 @@ export function LeaderboardPage() {
                 .from('profiles')
                 .select('*')
                 .order('total_score', { ascending: false })
-                .limit(10);
+                .limit(50);
 
             if (error) throw error;
-            setLeaders(data || []);
+            // Respect each player's "show on leaderboard" choice. Other players are
+            // hidden via the optional show_on_leaderboard column (if present); the
+            // current player is hidden according to their local preference.
+            const hideSelf = user ? !loadPrefs(user.id).showOnLeaderboard : false;
+            const visible = ((data || []) as Profile[]).filter(p => {
+                if ((p as any).show_on_leaderboard === false) return false;
+                if (user && p.id === user.id && hideSelf) return false;
+                return true;
+            }).slice(0, 10);
+            setLeaders(visible);
 
             if (user) {
                 const { data: userData, error: userError } = await supabase
@@ -108,45 +115,7 @@ export function LeaderboardPage() {
             className="min-h-screen"
             style={{ background: 'linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))' }}
         >
-            <nav
-                className="sticky top-0 z-40 backdrop-blur-lg border-b shadow-sm"
-                style={{
-                    backgroundColor: 'var(--nav-bg)',
-                    borderColor: 'var(--nav-border)'
-                }}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <button
-                            onClick={() => {
-                                playSfx('click');
-                                navigate('/');
-                            }}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-                            style={{ color: 'var(--accent-primary)' }}
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            <span className="font-medium">Back to Home</span>
-                        </button>
-
-                        <div className="flex items-center gap-2">
-                            <Trophy className="w-6 h-6 text-yellow-500" />
-                            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Global Leaderboard 🏆</h1>
-                        </div>
-
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg transition-colors"
-                            style={{
-                                backgroundColor: 'var(--surface-card)',
-                                color: 'var(--text-secondary)'
-                            }}
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <AppNavbar />
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div

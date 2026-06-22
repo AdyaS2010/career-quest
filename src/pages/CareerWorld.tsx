@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, Star, Lock, Volume2, VolumeX, Moon, Sun, Sparkles, ExternalLink, X, Play } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Lock, Volume2, VolumeX, Moon, Sun, Sparkles, ExternalLink, X, BarChart3 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSimulation } from '../contexts/SimulationContext';
 import type { Career, Challenge, UserChallengeProgress, ColorScheme } from '../lib/database.types';
-import { interiorFor, RESOURCES, INTERNSHIP_LINKS } from './city/interiors';
-import { scenarioFor } from './city/scenarios';
-import { WorldIntro } from '../components/WorldIntro';
+import { RESOURCES, INTERNSHIP_LINKS } from './city/interiors';
 import { CulinaryArtsGame } from '../games/CulinaryArts';
 import { InformationTechnologyGame } from '../games/InformationTechnology';
 import { LawGovernmentGame } from '../games/LawGovernment';
@@ -22,8 +21,9 @@ export function CareerWorld() {
   const { careerSlug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { muted, toggleMute } = useAudio();
+  const { muted, toggleMute, startBgm } = useAudio();
   const { theme, toggleTheme } = useTheme();
+  const { enterSimulation, leaveSimulation } = useSimulation();
 
   const [career, setCareer] = useState<Career | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -31,22 +31,31 @@ export function CareerWorld() {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [loading, setLoading] = useState(true);
   const [showRes, setShowRes] = useState(false);
-  const [showIntro, setShowIntro] = useState(false);
+  const [showBrief, setShowBrief] = useState(true);
 
   useEffect(() => {
     loadCareerData();
   }, [careerSlug]);
 
-  // First time stepping into a world, play its cold-open scenario (NGPF style).
+  // Inside a career world (and its simulations) the playful 8-bit "Adventure
+  // Theme" takes over; leaving hands the music back to the serene city stroll.
   useEffect(() => {
-    if (!user || !careerSlug || !scenarioFor(careerSlug)) return;
-    try { if (!localStorage.getItem(`questford_entered_${careerSlug}_${user.id}`)) setShowIntro(true); } catch { /* ignore */ }
-  }, [user, careerSlug]);
+    startBgm('chip');
+    return () => startBgm('serene');
+  }, [startBgm]);
 
-  const finishIntro = () => {
-    setShowIntro(false);
-    try { if (user && careerSlug) localStorage.setItem(`questford_entered_${careerSlug}_${user.id}`, '1'); } catch { /* ignore */ }
-  };
+  // Show the career briefing (job description + BLS quick facts) each time a world is entered.
+  useEffect(() => {
+    setShowBrief(Boolean(careerSlug));
+  }, [careerSlug]);
+
+  // While a game is open, surface the simulation control rail (Back / Volume /
+  // Brightness). Back exits straight back to the career world.
+  useEffect(() => {
+    if (selectedChallenge) enterSimulation(() => setSelectedChallenge(null));
+    else leaveSimulation();
+    return () => leaveSimulation();
+  }, [selectedChallenge, enterSimulation, leaveSimulation]);
 
   const loadCareerData = async () => {
     if (!careerSlug) {
@@ -226,24 +235,6 @@ export function CareerWorld() {
     return null;
   }
 
-  // Cold-open scenario takes over the screen on first entry (or on replay).
-  if (showIntro) {
-    const m = interiorFor(careerSlug || '');
-    const cs = career.color_scheme as unknown as ColorScheme;
-    return (
-      <WorldIntro
-        slug={careerSlug || ''}
-        careerName={career.name}
-        roomName={m.room}
-        mentorName={m.mentorName}
-        mentorFace={m.mentorFace}
-        color={{ primary: cs.primary, accent: cs.accent, secondary: cs.secondary }}
-        userId={user?.id ?? null}
-        onDone={finishIntro}
-      />
-    );
-  }
-
   if (selectedChallenge) {
     return (
       <div className="min-h-screen">
@@ -336,12 +327,289 @@ export function CareerWorld() {
   // In dark mode, lighten the career colors for better readability
   const textHighlight = theme === 'dark' ? colorScheme.accent : colorScheme.primary;
   const cardScoreColor = theme === 'dark' ? colorScheme.accent : colorScheme.primary;
-  const btnBg = theme === 'dark' ? colorScheme.accent : colorScheme.primary;
 
   // Adjust colors for dark mode - keep dark mode truly dark for text readability
   const bgGradient = theme === 'dark'
     ? 'linear-gradient(180deg, #162033 0%, #131a2e 30%, #1a1040 60%, #0f172a 100%)'
     : `linear-gradient(135deg, ${colorScheme.background} 0%, ${colorScheme.accent}20 100%)`;
+
+  // Career briefing content: job description ("What You'll Do") + BLS Quick Facts shown on entry.
+  const careerBriefContent: Record<string, {
+    title: string;
+    subtitle: string;
+    lead: string;
+    icon: string;
+    bullets: string[];
+    chips: { emoji: string; title: string; subtitle: string }[];
+    quickFacts: { label: string; value: string }[];
+    source: string;
+  }> = {
+    'culinary-arts': {
+      title: 'Culinary & Food Services',
+      subtitle: 'Culinary Arts',
+      lead: 'Run service like a real kitchen team: take accurate orders, execute under heat, and plate dishes guests remember.',
+      icon: '👨‍🍳',
+      bullets: [
+        'Plan menus, source ingredients, and lead a kitchen team.',
+        'Run service under time pressure while maintaining quality and safety.',
+        'Manage food cost, waste, and supplier relationships.',
+      ],
+      chips: [
+        { emoji: '🍴', title: 'Service Flow', subtitle: 'Front-of-house to pass line coordination' },
+        { emoji: '⏱️', title: 'Speed Under Pressure', subtitle: 'Time windows, ticket pacing, quality control' },
+        { emoji: '👨‍🍳', title: 'Culinary Craft', subtitle: 'Technique, precision, and presentation' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range', value: '$42,000-$98,000 (culinary pathways, line cook to head cook/chef)' },
+        { label: 'Median pay (May 2024)', value: '$60,990/year ($29.32/hour)' },
+        { label: 'Job outlook (2024-34)', value: '7% (much faster than average)' },
+        { label: 'Annual openings', value: '24,400 (projected)' },
+        { label: 'Typical education', value: 'High school diploma or equivalent' },
+        { label: 'Work experience', value: '5 years or more in related occupation' },
+        { label: 'Total U.S. jobs (2024)', value: '197,300' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics, Occupational Outlook Handbook, Chefs and Head Cooks (last modified Aug 28, 2025), bls.gov/ooh/food-preparation-and-serving/chefs-and-head-cooks.htm',
+    },
+    'information-technology': {
+      title: 'Information Technology & Software',
+      subtitle: 'Software Engineering',
+      lead: 'Build, debug, and ship reliable systems that solve real business and user problems.',
+      icon: '💻',
+      bullets: [
+        'Diagnose bugs, implement fixes, and validate with tests.',
+        'Design algorithms and system architecture with performance in mind.',
+        'Collaborate with product and engineering teams to deliver software safely.',
+      ],
+      chips: [
+        { emoji: '🛠️', title: 'Build & Ship', subtitle: 'Turn requirements into working features' },
+        { emoji: '🐞', title: 'Debug Under Pressure', subtitle: 'Reproduce, diagnose, and fix fast' },
+        { emoji: '🏗️', title: 'System Thinking', subtitle: 'Scalability, reliability, and tradeoffs' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$90,000-$185,000 (software engineering, entry to experienced)' },
+        { label: 'Representative role', value: 'Software developers and related roles' },
+        { label: 'Typical education', value: 'Postsecondary pathway; skills-first hiring also growing' },
+        { label: 'Work pattern', value: 'Team-based delivery, iterative releases, on-call in some roles' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Software Developers.',
+    },
+    'law-government': {
+      title: 'Law, Courts & Public Service',
+      subtitle: 'Legal Practice',
+      lead: 'Analyze evidence, apply legal standards, and advocate clearly in high-stakes scenarios.',
+      icon: '⚖️',
+      bullets: [
+        'Evaluate admissibility and relevance of evidence.',
+        'Construct arguments with facts, rules, and precedents.',
+        'Question witnesses to uncover contradictions and strengthen claims.',
+      ],
+      chips: [
+        { emoji: '🧭', title: 'Case Strategy', subtitle: 'Build a theory of the case' },
+        { emoji: '🔎', title: 'Evidence & Rules', subtitle: 'Relevance and admissibility analysis' },
+        { emoji: '🎤', title: 'Persuasion', subtitle: 'Argue clearly under scrutiny' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$80,000-$235,000 (legal practice, early career to senior attorney)' },
+        { label: 'Representative role', value: 'Lawyers and legal support occupations' },
+        { label: 'Typical education', value: 'Professional degree for attorney track; other legal tracks vary' },
+        { label: 'Work pattern', value: 'Research-intensive, deadline-driven, courtroom and advisory settings' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Lawyers.',
+    },
+    'media-communication': {
+      title: 'Media, Journalism & Communication',
+      subtitle: 'Journalism',
+      lead: 'Verify facts, interview sources, and craft clear stories for public audiences.',
+      icon: '🎙️',
+      bullets: [
+        'Fact-check claims against credible sources.',
+        'Conduct interviews and capture clear, usable quotes.',
+        'Structure stories with strong leads and evidence-backed narratives.',
+      ],
+      chips: [
+        { emoji: '✅', title: 'Source & Verify', subtitle: 'Credibility and claim validation' },
+        { emoji: '🎙️', title: 'Interview Craft', subtitle: 'Ask sharp questions, capture quotes' },
+        { emoji: '📰', title: 'Storytelling', subtitle: 'Clarity, structure, and audience focus' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$40,000-$105,000 (journalism and reporting, market-dependent)' },
+        { label: 'Representative role', value: 'News analysts, reporters, and journalists' },
+        { label: 'Typical education', value: 'Bachelor-level preparation is common' },
+        { label: 'Work pattern', value: 'Tight deadlines, cross-platform publishing, field and desk reporting' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, News Analysts, Reporters, and Journalists.',
+    },
+    'health-sciences': {
+      title: 'Health Sciences & Clinical Care',
+      subtitle: 'Patient Care',
+      lead: 'Assess symptoms, prioritize treatment, and make evidence-based decisions for patient safety.',
+      icon: '🩺',
+      bullets: [
+        'Gather relevant clinical clues before diagnosis.',
+        'Select safe, effective treatments and monitor outcomes.',
+        'Triage and stabilize patients under time pressure.',
+      ],
+      chips: [
+        { emoji: '🩺', title: 'Assess & Diagnose', subtitle: 'Clinical clues to differential diagnosis' },
+        { emoji: '🚑', title: 'Triage Under Pressure', subtitle: 'Prioritize severity and act fast' },
+        { emoji: '🛟', title: 'Patient Safety', subtitle: 'Protocol-driven, evidence-based care' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$68,000-$130,000 (patient-care pathways, RN-led benchmark)' },
+        { label: 'Representative role', value: 'Registered nurses and allied clinical occupations' },
+        { label: 'Typical education', value: 'Credentialed clinical training and licensure pathways' },
+        { label: 'Work pattern', value: 'Shift-based care, teamwork, and protocol-driven decisions' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Registered Nurses.',
+    },
+    'financial-services': {
+      title: 'Finance, Banking & Risk',
+      subtitle: 'Banking Analyst',
+      lead: 'Balance customer service, risk controls, and analytical judgment in financial operations.',
+      icon: '💼',
+      bullets: [
+        'Build balanced budgets and evaluate tradeoffs.',
+        'Assess investments with risk-return discipline.',
+        'Detect fraud patterns and protect financial integrity.',
+      ],
+      chips: [
+        { emoji: '📊', title: 'Analyze & Budget', subtitle: 'Allocation strategy and cash discipline' },
+        { emoji: '🛡️', title: 'Risk Control', subtitle: 'Spot anomalies and escalate fast' },
+        { emoji: '🏦', title: 'Client Trust', subtitle: 'Accuracy, verification, and service' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$55,000-$175,000 (banking/finance analyst to senior risk tracks)' },
+        { label: 'Representative role', value: 'Financial analysts, tellers, and compliance/risk roles' },
+        { label: 'Typical education', value: 'Role-dependent; analytical and regulatory literacy is essential' },
+        { label: 'Work pattern', value: 'Data-heavy analysis, customer trust, policy and controls' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Financial Analysts.',
+    },
+    education: {
+      title: 'Education, Teaching & Leadership',
+      subtitle: 'Teaching Lab',
+      lead: 'Design instruction, manage classrooms, and support safe learning environments.',
+      icon: '🍎',
+      bullets: [
+        'Guide classroom behavior and maintain focus.',
+        'Plan lessons aligned to clear learning goals.',
+        'Coordinate responses during school safety scenarios.',
+      ],
+      chips: [
+        { emoji: '📚', title: 'Lesson Design', subtitle: 'Objectives, activities, and assessment' },
+        { emoji: '🏫', title: 'Classroom Flow', subtitle: 'Behavior guidance and attention' },
+        { emoji: '🌱', title: 'Student Growth', subtitle: 'Measure mastery and support learners' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$50,000-$100,000 (teaching and instructional leadership pathways)' },
+        { label: 'Representative role', value: 'Teachers and instructional leaders' },
+        { label: 'Typical education', value: 'Degree + educator preparation; certification requirements vary' },
+        { label: 'Work pattern', value: 'Student-facing instruction, planning, and family communication' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, High School Teachers.',
+    },
+    'arts-entertainment': {
+      title: 'Arts, Performance & Production',
+      subtitle: 'Creative Studio',
+      lead: 'Translate creative vision into polished performances and audience-ready experiences.',
+      icon: '🎭',
+      bullets: [
+        'Apply color and visual design principles intentionally.',
+        'Maintain rhythm, timing, and performance accuracy.',
+        'Coordinate cues and execution in live production contexts.',
+      ],
+      chips: [
+        { emoji: '🎨', title: 'Creative Vision', subtitle: 'Color, mood, and visual storytelling' },
+        { emoji: '🎼', title: 'Performance Timing', subtitle: 'Rhythm, tempo, and precision' },
+        { emoji: '🎬', title: 'Production Craft', subtitle: 'Cue timing and live execution' },
+      ],
+      quickFacts: [
+        { label: 'Expected salary range (U.S.)', value: '$40,000-$120,000 (arts/design production, portfolio-driven)' },
+        { label: 'Representative role', value: 'Designers, performers, and production specialists' },
+        { label: 'Typical education', value: 'Portfolio, training, and apprenticeship pathways vary by role' },
+        { label: 'Work pattern', value: 'Project-based schedules, rehearsals, and performance deadlines' },
+      ],
+      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Graphic Designers and related creative occupations.',
+    },
+  };
+
+  const brief = careerBriefContent[careerSlug || ''] || {
+    title: career.name,
+    subtitle: career.name,
+    lead: career.description,
+    icon: '🎯',
+    bullets: [career.description, 'Complete each simulation to build skill.', 'Compare paths and track progress over time.'],
+    chips: [
+      { emoji: '🎯', title: 'Hands-on', subtitle: 'Step into real on-the-job tasks' },
+      { emoji: '⚡', title: 'Decision Speed', subtitle: 'Act under realistic pressure' },
+      { emoji: '📈', title: 'Track Progress', subtitle: 'Score by subgame and mastery' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: 'Role-dependent; check current local labor market data for precise ranges' },
+      { label: 'Career path', value: 'Hands-on simulation training' },
+      { label: 'Skill focus', value: 'Decision quality, speed, and consistency' },
+      { label: 'Progress model', value: 'Score by subgame and mastery over time' },
+    ],
+    source: 'Source: Career Quest curated career learning content.',
+  };
+
+  // Station metadata (icon, focus, tips) for each challenge, mirroring a real workplace station.
+  const getChallengeMeta = (slug: string, challenge: Challenge) => {
+    const raw = String((challenge.config as any)?.subType || '').toLowerCase();
+    const key = raw.replace('-challenge', '');
+
+    const metaMap: Record<string, Record<string, { icon: string; station: string; focus: string; tips: string[]; accent?: string }>> = {
+      'culinary-arts': {
+        'order-taking': { icon: '🧾', station: 'Front Of House', focus: 'Guest communication and order accuracy', accent: '#f97316', tips: ['Confirm modifiers', 'Repeat order back', 'Prioritize timing'] },
+        cooking: { icon: '🔥', station: 'Hot Line', focus: 'Heat control, sequence, and execution speed', accent: '#ef4444', tips: ['Mise en place', 'Control heat', 'Plate immediately'] },
+        'plate-presentation': { icon: '🍽️', station: 'Pass Station', focus: 'Visual appeal and finishing precision', accent: '#f59e0b', tips: ['Balance colors', 'Clean edges', 'Consistent portions'] },
+      },
+      'information-technology': {
+        'bug-hunt': { icon: '🪲', station: 'Debug Bay', focus: 'Root-cause analysis and code correction', tips: ['Reproduce issue', 'Read stack traces', 'Retest fix'] },
+        'algorithm-builder': { icon: '🧠', station: 'Logic Lab', focus: 'Stepwise reasoning and algorithm design', tips: ['Break into steps', 'Check edge cases', 'Validate output'] },
+        'system-design': { icon: '🏗️', station: 'Architecture Room', focus: 'Scalability, reliability, and tradeoffs', tips: ['Define requirements', 'Map components', 'Balance cost/perf'] },
+      },
+      'law-government': {
+        'evidence-detective': { icon: '🔎', station: 'Evidence Desk', focus: 'Relevance and admissibility analysis', tips: ['Separate fact/opinion', 'Flag inadmissible', 'Document rationale'] },
+        'courtroom-arguments': { icon: '🧾', station: 'Briefing Table', focus: 'Argument structure and precedent use', tips: ['Lead with thesis', 'Cite support', 'Address counterpoints'] },
+        'cross-examination': { icon: '🎤', station: 'Witness Stand', focus: 'Question sequencing and contradiction spotting', tips: ['Ask narrow questions', 'Control pacing', 'Lock admissions'] },
+      },
+      'media-communication': {
+        'fact-check': { icon: '✅', station: 'Verification Desk', focus: 'Source credibility and claim validation', tips: ['Triangulate sources', 'Check timestamps', 'Avoid assumptions'] },
+        'interview-master': { icon: '🎙️', station: 'Interview Booth', focus: 'Question quality and quote extraction', tips: ['Open-ended prompts', 'Follow-up deeply', 'Capture exact quotes'] },
+        'story-crafter': { icon: '📰', station: 'Editorial Room', focus: 'Narrative flow and audience clarity', tips: ['Strong lead', 'Evidence first', 'Tight structure'] },
+      },
+      'health-sciences': {
+        'symptom-detective': { icon: '🩺', station: 'Triage Bay', focus: 'Clinical clues and differential diagnosis', tips: ['Collect key findings', 'Prioritize severity', 'Confirm evidence'] },
+        'treatment-planner': { icon: '💊', station: 'Care Planning', focus: 'Therapeutic safety and effectiveness', tips: ['Check contraindications', 'Match treatment', 'Monitor response'] },
+        'emergency-room-rush': { icon: '🚑', station: 'Emergency Unit', focus: 'Rapid triage and stabilization', tips: ['Treat critical first', 'Track vitals', 'Coordinate handoffs'] },
+      },
+      'financial-services': {
+        'budget-balancer': { icon: '📊', station: 'Budget Office', focus: 'Allocation strategy and cash discipline', tips: ['Protect essentials', 'Limit leakage', 'Review variance'] },
+        'investment-simulator': { icon: '📈', station: 'Portfolio Desk', focus: 'Risk-adjusted investment decisions', tips: ['Diversify', 'Assess risk', 'Rebalance wisely'] },
+        'fraud-detector': { icon: '🛡️', station: 'Risk Control', focus: 'Anomaly detection and escalation', tips: ['Spot patterns', 'Verify anomalies', 'Escalate fast'] },
+        'bank-teller': { icon: '🏦', station: 'Client Counter', focus: 'Accuracy, verification, and trust', tips: ['Verify identity', 'Process precisely', 'Communicate clearly'] },
+      },
+      education: {
+        'classroom-conductor': { icon: '🏫', station: 'Classroom Floor', focus: 'Behavior guidance and attention flow', tips: ['Set expectations', 'Use redirects', 'Keep momentum'] },
+        'lesson-plan-lab': { icon: '📚', station: 'Planning Board', focus: 'Objective alignment and assessment', tips: ['Define outcomes', 'Sequence activities', 'Measure mastery'] },
+        'school-crisis-manager': { icon: '🚨', station: 'Safety Desk', focus: 'Response sequencing and communication', tips: ['Prioritize safety', 'Follow protocol', 'Coordinate roles'] },
+      },
+      'arts-entertainment': {
+        'color-theory-studio': { icon: '🎨', station: 'Palette Room', focus: 'Mood, contrast, and visual storytelling', tips: ['Set mood palette', 'Balance contrast', 'Refine composition'] },
+        'rhythm-sight-reading': { icon: '🎼', station: 'Rehearsal Hall', focus: 'Timing precision and musical fluency', tips: ['Read ahead', 'Keep tempo', 'Correct quickly'] },
+        'broadway-lead': { icon: '🎬', station: 'Stage Deck', focus: 'Cue timing and live performance control', tips: ['Track cues', 'Coordinate teams', 'Hold consistency'] },
+      },
+    };
+
+    const careerMap = metaMap[slug] || {};
+    return careerMap[key] || {
+      icon: brief.icon,
+      station: 'Mission Zone',
+      focus: challenge.description,
+      tips: ['Analyze objective', 'Execute cleanly', 'Review results'],
+    } as { icon: string; station: string; focus: string; tips: string[]; accent?: string };
+  };
 
   return (
     <div
@@ -405,36 +673,44 @@ export function CareerWorld() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
-            Welcome to {career.name}
-          </h2>
-          <p className="text-base sm:text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            {career.description}
-          </p>
-        </div>
-
-        {/* mentor brief — sets the scene like a real workplace */}
-        {(() => { const m = interiorFor(careerSlug || ''); return (
-          <div className="flex items-start gap-3 max-w-2xl mx-auto mb-10 p-4 rounded-2xl shadow-lg"
-            style={{ background: 'var(--surface-card)', border: `1px solid ${colorScheme.primary}33` }}>
-            <div className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ background: `${colorScheme.primary}22` }}>{m.mentorFace}</div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-black uppercase tracking-widest mb-0.5" style={{ color: colorScheme.primary }}>{m.mentorName} · your mentor</div>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{m.mentorLine}</p>
+      <main className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all ${showBrief ? 'pointer-events-none blur-[2px]' : ''}`}>
+        {/* Simulation deck header */}
+        <section className="mb-8">
+          <div className="rounded-3xl border p-6 shadow-xl"
+            style={{
+              background: theme === 'dark'
+                ? `linear-gradient(140deg, ${colorScheme.primary}22, ${colorScheme.secondary}20)`
+                : `linear-gradient(140deg, ${colorScheme.background}, ${colorScheme.accent}22)`,
+              borderColor: `${colorScheme.primary}40`,
+            }}>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-black mb-2" style={{ color: 'var(--text-primary)' }}>
+                  {brief.subtitle} Simulation Deck
+                </h2>
+                <p className="text-base" style={{ color: 'var(--text-secondary)' }}>
+                  {brief.lead}
+                </p>
+              </div>
+              <div className="text-5xl">{brief.icon}</div>
             </div>
-            {scenarioFor(careerSlug || '') && (
-              <button onClick={() => setShowIntro(true)}
-                className="shrink-0 self-center flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-sm text-white transition-transform hover:scale-105 active:scale-95"
-                style={{ background: colorScheme.primary }} title="Replay the opening scenario">
-                <Play className="w-4 h-4 fill-white" /> Scenario
-              </button>
-            )}
-          </div>
-        ); })()}
 
-        <div className="space-y-6">
+            <div className="grid sm:grid-cols-3 gap-3">
+              {brief.chips.map((chip) => (
+                <div key={chip.title} className="rounded-2xl p-4" style={{ backgroundColor: theme === 'dark' ? 'rgba(15,23,42,0.6)' : 'rgba(255,255,255,0.75)' }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-base">{chip.emoji}</span>
+                    <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{chip.title}</span>
+                  </div>
+                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{chip.subtitle}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Station cards */}
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
           {challenges.map((challenge, index) => {
             const challengeProgress = progress[challenge.id];
             const prevOrderIndex = challenge.order_index - 1;
@@ -443,80 +719,87 @@ export function CareerWorld() {
               .some(c => !progress[c.id] || progress[c.id].status !== 'completed');
 
             const isCompleted = challengeProgress?.status === 'completed';
+            const meta = getChallengeMeta(careerSlug || '', challenge);
+            const paneAccent = meta.accent || [colorScheme.primary, colorScheme.secondary, colorScheme.accent][index % 3];
 
             return (
               <div
                 key={challenge.id}
-                className={`rounded-2xl shadow-lg overflow-hidden transition-all ${isLocked ? 'opacity-60' : 'hover:shadow-xl'}`}
-                style={{ backgroundColor: 'var(--surface-card)' }}
+                className={`relative rounded-3xl border overflow-hidden transition-all h-full ${isLocked ? 'opacity-65' : 'hover:shadow-2xl'}`}
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: `${paneAccent}66`,
+                  boxShadow: theme === 'dark'
+                    ? `0 12px 24px rgba(2,6,23,0.45), 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`
+                    : `0 14px 24px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.1), inset 0 1px 0 rgba(255,255,255,0.7)`,
+                }}
               >
                 <div
-                  className="h-2"
-                  style={{
-                    background: `linear-gradient(90deg, ${colorScheme.primary} 0%, ${colorScheme.secondary} 100%)`,
-                  }}
+                  className="pointer-events-none absolute inset-0 rounded-3xl"
+                  style={{ background: 'linear-gradient(165deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 36%, transparent 60%)' }}
                 />
-
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
-                          style={{ backgroundColor: colorScheme.primary }}
-                        >
-                          {index + 1}
-                        </span>
-                        <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                          {challenge.title}
-                        </h3>
-                        {isCompleted && (
-                          <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
-                        )}
-                        {isLocked && (
-                          <Lock className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
-                        )}
-                      </div>
-                      <p className="ml-11" style={{ color: 'var(--text-secondary)' }}>
-                        {challenge.description}
-                      </p>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="text-2xl font-bold" style={{ color: cardScoreColor }}>
-                        {challengeProgress?.best_score || 0}
-                      </div>
-                      <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                        / {challenge.max_score}
-                      </div>
-                    </div>
+                <div
+                  className="pointer-events-none absolute inset-y-0 right-0 w-6"
+                  style={{ background: `linear-gradient(90deg, transparent 0%, ${paneAccent}26 100%)` }}
+                />
+                <div className="flex flex-col h-full">
+                  <div className="p-5 border-b" style={{ background: `linear-gradient(145deg, ${paneAccent}30, ${paneAccent}12)` }}>
+                    <div className="text-4xl mb-3">{meta.icon}</div>
+                    <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--text-secondary)' }}>Station</p>
+                    <p className="text-base font-black mb-3" style={{ color: 'var(--text-primary)' }}>{meta.station}</p>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{meta.focus}</p>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <span>{challenge.challenge_type.replace('_', ' ')}</span>
-                      {challengeProgress && challengeProgress.attempts > 0 && (
-                        <span>{challengeProgress.attempts} attempt{challengeProgress.attempts !== 1 ? 's' : ''}</span>
-                      )}
+                  <div className="p-5 flex-1 flex flex-col">
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="w-7 h-7 rounded-full inline-flex items-center justify-center text-white text-sm font-black" style={{ backgroundColor: paneAccent }}>
+                            {index + 1}
+                          </span>
+                          <h3 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{challenge.title}</h3>
+                          {isCompleted && <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />}
+                          {isLocked && <Lock className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />}
+                        </div>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{challenge.description}</p>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-2xl font-black" style={{ color: cardScoreColor }}>{challengeProgress?.best_score || 0}</div>
+                        <div className="text-xs" style={{ color: 'var(--text-muted)' }}>/ {challenge.max_score}</div>
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => !isLocked && setSelectedChallenge(challenge)}
-                      disabled={isLocked}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110 hover:scale-[1.03] active:scale-95"
-                      style={{
-                        backgroundColor: isLocked ? '#9CA3AF' : btnBg,
-                      }}
-                    >
-                      {isLocked ? <Lock className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
-                      {isCompleted ? 'Play Again' : isLocked ? 'Locked' : 'Start Simulation'}
-                    </button>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {meta.tips.map((tip) => (
+                        <span key={`${challenge.id}-${tip}`} className="px-3 py-1 rounded-full text-xs font-semibold"
+                          style={{ backgroundColor: theme === 'dark' ? 'rgba(51,65,85,0.75)' : '#f1f5f9', color: 'var(--text-secondary)' }}>
+                          {tip}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 mt-auto pt-3">
+                      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {challenge.challenge_type.replace('_', ' ')}
+                        {challengeProgress && challengeProgress.attempts > 0 && ` · ${challengeProgress.attempts} attempt${challengeProgress.attempts !== 1 ? 's' : ''}`}
+                      </div>
+
+                      <button
+                        onClick={() => !isLocked && setSelectedChallenge(challenge)}
+                        disabled={isLocked}
+                        className="px-6 py-2.5 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-110"
+                        style={{ backgroundColor: isLocked ? '#9CA3AF' : paneAccent }}
+                      >
+                        {isCompleted ? 'Play Again' : isLocked ? 'Locked' : 'Start Challenge'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })}
-        </div>
+        </section>
       </main>
 
       {/* Next Steps — real-world project + resources for this field */}
@@ -556,6 +839,65 @@ export function CareerWorld() {
           </div>
         </div>
       ); })()}
+
+      {/* Career briefing — job description + BLS Quick Facts, shown on entry */}
+      {showBrief && (
+        <div className="fixed inset-0 z-[150] bg-black/45 flex items-center justify-center p-4">
+          <div
+            className="w-full max-w-3xl rounded-2xl border shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto"
+            style={{
+              backgroundColor: 'var(--surface-card)',
+              borderColor: `${colorScheme.primary}45`,
+            }}
+          >
+            <div className="h-3" style={{ background: `linear-gradient(90deg, ${colorScheme.primary}, ${colorScheme.secondary})` }} />
+
+            <div className="p-6 md:p-7">
+              <h2 className="text-3xl md:text-4xl font-black mb-1" style={{ color: 'var(--text-primary)' }}>{brief.title}</h2>
+              <p className="text-sm tracking-widest font-bold mb-6 uppercase" style={{ color: 'var(--text-secondary)' }}>{brief.subtitle}</p>
+
+              <div className="mb-7">
+                <h3 className="text-2xl font-black mb-3" style={{ color: textHighlight }}>What You'll Do</h3>
+                <ul className="space-y-1.5 text-base md:text-lg" style={{ color: 'var(--text-secondary)' }}>
+                  {brief.bullets.map((line) => <li key={line}>• {line}</li>)}
+                </ul>
+              </div>
+
+              <div className="mb-6 rounded-xl p-4" style={{ backgroundColor: theme === 'dark' ? 'rgba(30,41,59,0.5)' : `${colorScheme.background}` }}>
+                <div className="flex items-center gap-2 mb-2" style={{ color: textHighlight }}>
+                  <BarChart3 className="w-5 h-5" />
+                  <h3 className="text-xl font-black">BLS Quick Facts</h3>
+                </div>
+                <div className="text-sm md:text-base leading-snug space-y-1" style={{ color: 'var(--text-secondary)' }}>
+                  {brief.quickFacts.map((fact) => (
+                    <p key={fact.label}><span className="font-bold" style={{ color: 'var(--text-primary)' }}>{fact.label}:</span> {fact.value}</p>
+                  ))}
+                </div>
+                <p className="text-[11px] mt-2" style={{ color: 'var(--text-muted)' }}>
+                  {brief.source}
+                </p>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => navigate('/')}
+                  className="px-5 py-2.5 rounded-lg font-semibold"
+                  style={{ backgroundColor: theme === 'dark' ? 'rgba(100,116,139,0.35)' : '#e2e8f0', color: 'var(--text-primary)' }}
+                >
+                  Leave
+                </button>
+                <button
+                  onClick={() => setShowBrief(false)}
+                  className="px-6 py-2.5 rounded-lg font-black tracking-wide text-white"
+                  style={{ backgroundColor: colorScheme.primary }}
+                >
+                  Start Job
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

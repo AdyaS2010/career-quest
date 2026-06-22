@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, MessageSquareHeart, Moon, Sun, Send } from 'lucide-react';
+import { Star, Send } from 'lucide-react';
+import { AppNavbar } from '../components/AppNavbar';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -59,9 +59,8 @@ const PRESET_FEEDBACKS: Feedback[] = [
 ];
 
 export function FeedbackPage() {
-    const navigate = useNavigate();
     const { user } = useAuth();
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
 
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [loading, setLoading] = useState(true);
@@ -135,46 +134,7 @@ export function FeedbackPage() {
             className="min-h-screen"
             style={{ background: 'linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))' }}
         >
-            <nav
-                className="sticky top-0 z-40 backdrop-blur-lg border-b shadow-md"
-                style={{
-                    backgroundColor: 'var(--nav-bg)',
-                    borderColor: 'var(--nav-border)'
-                }}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <button
-                            onClick={() => navigate('/profile')}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl transition-colors"
-                            style={{
-                                color: theme === 'dark' ? 'white' : 'var(--accent-primary)',
-                                backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'transparent'
-                            }}
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            <span className="font-bold">Back to Profile</span>
-                        </button>
-
-                        <div className="flex items-center gap-2">
-                            <MessageSquareHeart className="w-6 h-6 text-pink-500" />
-                            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Community Feedback</h1>
-                        </div>
-
-                        <button
-                            onClick={toggleTheme}
-                            className="p-3 rounded-xl transition-all hover:scale-110 shadow-lg border"
-                            style={{
-                                backgroundColor: 'var(--surface-card)',
-                                borderColor: 'var(--border-default)',
-                                color: 'var(--text-secondary)'
-                            }}
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <AppNavbar />
 
             <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
 

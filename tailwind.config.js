@@ -5,7 +5,7 @@ export default {
     extend: {
       fontFamily: {
         fantasy: ['Cinzel', 'serif'],
-        body: ['Outfit', 'sans-serif'],
+        body: ['var(--font-app)', 'Outfit', 'sans-serif'],
       },
     },
   },

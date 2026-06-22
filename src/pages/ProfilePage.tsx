@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, Star, Award, Target, TrendingUp, Zap, Moon, Sun, Share2, Flame, MessageSquareHeart, BookOpen, Globe, ShieldCheck, BookMarked } from 'lucide-react';
+import { Trophy, Star, Award, Target, TrendingUp, Zap, Share2, Flame, MessageSquareHeart, BookOpen, Globe, ShieldCheck, BookMarked, Pencil } from 'lucide-react';
+import { AppNavbar } from '../components/AppNavbar';
+import { ProfileEditModal } from '../components/ProfileEditModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
@@ -9,7 +11,7 @@ import type { Profile, Career, UserChallengeProgress } from '../lib/database.typ
 export function ProfilePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [careers, setCareers] = useState<Career[]>([]);
   const [challengeProgress, setChallengeProgress] = useState<UserChallengeProgress[]>([]);
@@ -19,6 +21,7 @@ export function ProfilePage() {
   const [careerStartedCount, setCareerStartedCount] = useState<Record<string, number>>({});
   const [userRank, setUserRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     loadProfileData();
@@ -198,48 +201,7 @@ export function ProfilePage() {
       className="min-h-screen"
       style={{ background: 'linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))' }}
     >
-      <nav
-        className="sticky top-0 z-40 backdrop-blur-lg border-b-4 shadow-lg print:hidden"
-        style={{
-          backgroundColor: 'var(--nav-bg)',
-          borderColor: theme === 'dark' ? 'rgba(251, 191, 36, 0.5)' : '#fbbf24'
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl transition-colors"
-              style={{
-                color: 'var(--text-primary)',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme === 'dark' ? 'rgba(251, 191, 36, 0.1)' : '#fef3c7'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-bold">Back to Map</span>
-            </button>
-
-            <h1 className="text-2xl font-bold" style={{ color: theme === 'dark' ? '#fcd34d' : '#d97706' }}>
-              Your Journey
-            </h1>
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg transition-colors border"
-              style={{
-                backgroundColor: 'var(--surface-card)',
-                borderColor: 'var(--border-default)',
-                color: 'var(--text-secondary)'
-              }}
-              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <AppNavbar />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 print:hidden">
         <div
@@ -256,7 +218,16 @@ export function ProfilePage() {
               </div>
 
               <div className="flex-1">
-                <h2 className="text-4xl font-bold mb-2">{profile?.username}</h2>
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-4xl font-bold">{profile?.username}</h2>
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 text-sm font-bold uppercase tracking-wider transition-all"
+                    aria-label="Edit profile"
+                  >
+                    <Pencil className="w-4 h-4" /> Edit
+                  </button>
+                </div>
                 <p className="text-xl text-white/90 mb-4">{profile?.character_name} • Level {currentLevel}</p>
 
                 {profile?.current_streak !== undefined && profile.current_streak > 0 && (
@@ -505,7 +476,15 @@ export function ProfilePage() {
 
       </main>
 
-      {/* PRINT ONLY: Professional Career Report Card */}
+      {editOpen && profile && user && (
+        <ProfileEditModal
+          profile={profile}
+          userId={user.id}
+          onClose={() => setEditOpen(false)}
+          onSaved={(p) => setProfile(prev => prev ? { ...prev, ...p } : prev)}
+        />
+      )}
+
       {/* PRINT ONLY: Professional Career Report Card */}
       <div className="hidden print:block print:m-0 print:p-0 bg-white text-slate-900 font-serif relative overflow-hidden">
         {/* Intricate Border Decor */}
@@ -779,10 +758,12 @@ export function ProfilePage() {
         <style dangerouslySetInnerHTML={{
           __html: `
           @media print {
-            .page-break { display: block; page-break-before: always; }
+            .page-break { display: block; page-break-before: always; break-before: page; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .clip-path-ribbon { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%); }
-            @page { size: auto; margin: 0; }
+            h1, h2, h3, h4 { break-after: avoid; }
+            .break-inside-avoid { break-inside: avoid; }
+            @page { size: A4; margin: 0; }
           }
         ` }} />
       </div>

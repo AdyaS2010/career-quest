@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Trophy, User, LogOut, Compass, Flame, Star, Volume2, VolumeX } from 'lucide-react';
+import { Compass, Star } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -14,14 +14,18 @@ import { DialogueBox } from '../components/DialogueBox';
 import { IntroScreen } from '../components/IntroScreen';
 import { CareerQuiz } from '../components/CareerQuiz';
 import { Outro } from '../components/Outro';
-import { PLAYER_PALETTE, CharacterSprite } from './city/art';
+import { PLAYER_PALETTE } from './city/art';
+import { AppNavbar } from '../components/AppNavbar';
 
 type Status = 'mastered' | 'in_progress' | 'not_started';
 const VB_W = 1200, VB_H = 780;
-// 8 location stops scattered aesthetically across the island (percent of map)
-const NODES = [
-  { x: 17, y: 66 }, { x: 35, y: 78 }, { x: 25, y: 44 }, { x: 47, y: 33 },
-  { x: 67, y: 40 }, { x: 55, y: 67 }, { x: 78, y: 73 }, { x: 86, y: 48 },
+// ===== isometric tile city (Kenney-style modular blocks; buildings sit on the lots) =====
+const TW = 132, TH = 66, OX = 560, OY = 306, SLAB = 24;
+const iso = (c: number, r: number) => ({ x: OX + (c - r) * (TW / 2), y: OY + (c + r) * (TH / 2) });
+// 8 building lots on the tile grid — two per quadrant, off the extreme corners so nothing overhangs
+const LOTS: { c: number; r: number }[] = [
+  { c: 2, r: 0 }, { c: 1, r: 1 }, { c: 4, r: 0 }, { c: 4, r: 1 },
+  { c: 0, r: 3 }, { c: 1, r: 3 }, { c: 4, r: 3 }, { c: 4, r: 4 },
 ];
 function shade(hex: string, p: number) {
   const n = parseInt((hex || '#888888').replace('#', ''), 16);
@@ -29,26 +33,56 @@ function shade(hex: string, p: number) {
   return `rgb(${r},${g},${b})`;
 }
 
-// a charming little themed location (building on a mound) — not just a circle
-function MapLandmark({ color, mastered, near }: { color: string; mastered: boolean; near: boolean }) {
-  const roof = shade(color, -46), wall1 = shade(color, 18), wall2 = shade(color, -14);
-  const ring = mastered ? '#fbbf24' : near ? '#ffffff' : shade(color, -60);
+// a distinctive rooftop landmark per career district (sits on the iso roof)
+function RoofTopper({ slug, accent, mastered }: { slug: string; accent: string; mastered: boolean }) {
+  const flag = mastered ? '#fde047' : accent;
+  switch (slug) {
+    case 'culinary-arts': // chef's toque
+      return (<g><rect x="37" y="21" width="20" height="6" rx="2.5" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.2" /><circle cx="40" cy="17" r="6" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.2" /><circle cx="47" cy="13" r="7.5" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.2" /><circle cx="54" cy="17" r="6" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.2" /></g>);
+    case 'information-technology': // server monitor + signal
+      return (<g><line x1="47" y1="18" x2="47" y2="5" stroke="#94a3b8" strokeWidth="1.6" /><circle cx="47" cy="4" r="2.4" fill={flag} /><rect x="38" y="14" width="18" height="13" rx="2" fill="#0b3b5a" stroke="#7dd3fc" strokeWidth="1.4" /><path d="M41 23 h12 M41 20 h8 M41 17 h10" stroke="#7dd3fc" strokeWidth="1.1" /></g>);
+    case 'health-sciences': // medical cross sign
+      return (<g><line x1="47" y1="26" x2="47" y2="9" stroke="#cbd5e1" strokeWidth="2" /><rect x="38" y="7" width="18" height="14" rx="2.5" fill="#ffffff" stroke="#ef4444" strokeWidth="1.6" /><path d="M45 10 h4 v3 h3 v4 h-3 v3 h-4 v-3 h-3 v-4 h3 z" fill="#ef4444" /></g>);
+    case 'law-government': // courthouse pediment + flag
+      return (<g><path d="M31 26 L47 11 L63 26 Z" fill="#eef2f7" stroke="#94a3b8" strokeWidth="1.6" strokeLinejoin="round" /><line x1="47" y1="11" x2="47" y2="3" stroke="#94a3b8" strokeWidth="1.4" /><path d="M47 3 l11 3 l-11 3 z" fill={flag} /></g>);
+    case 'financial-services': // bank pediment + gold coin
+      return (<g><path d="M33 26 L47 12 L61 26 Z" fill="#f6e7b4" stroke="#caa53e" strokeWidth="1.6" strokeLinejoin="round" /><circle cx="47" cy="21" r="5.2" fill="#fcd34d" stroke="#b8860b" strokeWidth="1.2" /><text x="47" y="24" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7a5c10">$</text></g>);
+    case 'media-communication': // satellite dish + mast
+      return (<g><line x1="46" y1="26" x2="46" y2="8" stroke="#94a3b8" strokeWidth="1.8" /><ellipse cx="53" cy="12" rx="9" ry="5" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="1.4" transform="rotate(-32 53 12)" /><circle cx="53" cy="12" r="1.8" fill="#64748b" /></g>);
+    case 'education': // schoolhouse pennant
+      return (<g><line x1="47" y1="26" x2="47" y2="5" stroke="#94a3b8" strokeWidth="1.6" /><path d="M47 6 q14 3 0 8 z" fill={flag} stroke="#caa53e" strokeWidth="0.8" /></g>);
+    case 'arts-entertainment': // marquee + star
+      return (<g><rect x="36" y="19" width="22" height="8" rx="2.5" fill={accent} stroke="#ffffff" strokeWidth="1.2" /><path d="M47 5 l2.6 5.4 l5.9 .7 l-4.4 4 l1.2 5.8 l-5.3 -2.9 l-5.3 2.9 l1.2 -5.8 l-4.4 -4 l5.9 -.7 z" fill={flag} stroke="#caa53e" strokeWidth="0.6" /></g>);
+    default:
+      return (<g><line x1="47" y1="24" x2="47" y2="6" stroke="#94a3b8" strokeWidth="1.4" /><path d="M47 6 l12 4 l-12 4 z" fill={flag} /></g>);
+  }
+}
+
+// a themed isometric district building (3 shaded faces on a grassy iso mound)
+function MapLandmark({ slug, color, accent, mastered, near }: { slug: string; color: string; accent: string; mastered: boolean; near: boolean }) {
+  const ring = mastered ? '#fbbf24' : near ? '#ffffff' : shade(color, -64);
+  const topF = shade(color, 34), leftF = shade(color, -2), rightF = shade(color, -30);
+  const win = mastered ? '#fff7cc' : '#bfe0ff', winEdge = shade(color, -40);
+  const leftWins = [[26, 42.5], [36, 47.5], [26, 58.5], [36, 63.5]];
+  const rightWins = [[50, 51.5], [60, 46.5], [50, 67.5], [60, 62.5]];
   return (
-    <svg width="94" height="100" viewBox="0 0 94 100" style={{ overflow: 'visible' }}>
-      <ellipse cx="47" cy="92" rx="34" ry="9" fill="rgba(0,0,0,0.28)" />
-      {/* grassy mound */}
-      <ellipse cx="47" cy="86" rx="40" ry="14" fill="#6bbf6e" stroke="#3f8a4c" strokeWidth="2.5" />
-      {/* building */}
-      <rect x="20" y="40" width="54" height="46" rx="7" fill={`url(#lm)`} stroke={ring} strokeWidth="3.5" />
-      <defs><linearGradient id="lm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={wall1} /><stop offset="1" stopColor={wall2} /></linearGradient></defs>
-      {/* roof */}
-      <path d="M12 42 L47 12 L82 42 Z" fill={roof} stroke={ring} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M47 12 L47 0" stroke="#6b7280" strokeWidth="2.5" />
-      <path d="M47 1 l16 5 l-16 5 z" fill={mastered ? '#fde047' : color} stroke={roof} strokeWidth="1.5" />
-      {/* door + windows */}
-      <rect x="40" y="64" width="14" height="22" rx="2" fill={shade(color, -40)} stroke={roof} strokeWidth="1.5" />
-      <rect x="25" y="50" width="12" height="11" rx="2" fill={mastered ? '#fff7cc' : '#dbeafe'} stroke={roof} strokeWidth="1.5" />
-      <rect x="57" y="50" width="12" height="11" rx="2" fill={mastered ? '#fff7cc' : '#dbeafe'} stroke={roof} strokeWidth="1.5" />
+    <svg width="94" height="104" viewBox="0 0 94 104" style={{ overflow: 'visible' }}>
+      <ellipse cx="47" cy="95" rx="33" ry="9" fill="rgba(0,0,0,0.3)" />
+      {/* grassy iso mound */}
+      <path d="M47 74 L80 88 L47 102 L14 88 Z" fill="#6bbf6e" stroke="#3f8a4c" strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M47 80 L72 90 L47 100 L22 90 Z" fill="#7cd07f" opacity="0.55" />
+      {/* iso building: left + right + top faces */}
+      <polygon points="21,40 47,53 47,87 21,74" fill={leftF} stroke={ring} strokeWidth="2.5" strokeLinejoin="round" />
+      <polygon points="73,40 47,53 47,87 73,74" fill={rightF} stroke={ring} strokeWidth="2.5" strokeLinejoin="round" />
+      <polygon points="21,40 47,27 73,40 47,53" fill={topF} stroke={ring} strokeWidth="2.5" strokeLinejoin="round" />
+      {/* windows projected onto each face */}
+      {leftWins.map(([a, y], i) => <polygon key={`L${i}`} points={`${a},${y} ${a + 8},${y + 4} ${a + 8},${y + 15} ${a},${y + 11}`} fill={win} stroke={winEdge} strokeWidth="1" opacity="0.92" />)}
+      {rightWins.map(([b, y], i) => <polygon key={`R${i}`} points={`${b},${y} ${b + 8},${y - 4} ${b + 8},${y + 7} ${b},${y + 11}`} fill={win} stroke={winEdge} strokeWidth="1" opacity="0.92" />)}
+      {/* door on the front corner */}
+      <polygon points="42,72 47,74.5 47,88 42,85.5" fill={shade(color, -46)} stroke={shade(color, -62)} strokeWidth="1" />
+      <polygon points="52,72 47,74.5 47,88 52,85.5" fill={shade(color, -38)} stroke={shade(color, -62)} strokeWidth="1" />
+      {/* distinctive rooftop landmark */}
+      <RoofTopper slug={slug} accent={accent} mastered={mastered} />
     </svg>
   );
 }
@@ -57,21 +91,21 @@ function MapLandmark({ color, mastered, near }: { color: string; mastered: boole
 // it's used automatically; otherwise we fall back to the drawn SVG landmark.
 // Misses are remembered for the session so there's no repeated 404 / flicker.
 const ART_MISSING = new Set<string>();
-function LandmarkArt({ slug, color, accent, mastered, near, Icon }: { slug: string; color: string; accent: string; mastered: boolean; near: boolean; Icon: LucideIcon }) {
+function LandmarkArt({ slug, color, accent, mastered, near, Icon, size = 124 }: { slug: string; color: string; accent: string; mastered: boolean; near: boolean; Icon: LucideIcon; size?: number }) {
   const [missing, setMissing] = useState(ART_MISSING.has(slug));
   if (!missing) {
     return (
       <img src={`/assets/landmarks/${slug}.png`} alt="" draggable={false}
         onError={() => { ART_MISSING.add(slug); setMissing(true); }}
-        style={{ width: 124, height: 124, objectFit: 'contain', objectPosition: 'center bottom', filter: `drop-shadow(0 10px 12px rgba(0,0,0,0.45))${mastered ? ' drop-shadow(0 0 12px #fbbf24)' : ''}` }} />
+        style={{ width: size, height: size, objectFit: 'contain', objectPosition: 'center bottom', filter: `drop-shadow(0 8px 10px rgba(0,0,0,0.4))${mastered ? ' drop-shadow(0 0 12px #fbbf24)' : ''}` }} />
     );
   }
-  // drawn fallback (with the domain icon on the building face)
+  // drawn fallback (themed iso building with the domain icon badge on the front face)
   return (
     <div className="relative">
-      <MapLandmark color={color} mastered={mastered} near={near} />
-      <div className="absolute left-1/2 -translate-x-1/2 rounded-xl flex items-center justify-center shadow-md" style={{ top: 38, width: 30, height: 30, background: `linear-gradient(145deg, ${accent}, ${color})`, border: '2px solid rgba(255,255,255,0.9)' }}>
-        <Icon className="w-4 h-4 text-white drop-shadow" />
+      <MapLandmark slug={slug} color={color} accent={accent} mastered={mastered} near={near} />
+      <div className="absolute left-1/2 -translate-x-1/2 rounded-xl flex items-center justify-center shadow-md" style={{ top: 56, width: 26, height: 26, background: `linear-gradient(145deg, ${accent}, ${color})`, border: '2px solid rgba(255,255,255,0.9)' }}>
+        <Icon className="w-3.5 h-3.5 text-white drop-shadow" />
       </div>
     </div>
   );
@@ -79,14 +113,14 @@ function LandmarkArt({ slug, color, accent, mastered, near, Icon }: { slug: stri
 
 export function WorldMap() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const { muted, toggleMute, startBgm, bgmPlaying } = useAudio();
+  const { user } = useAuth();
+  const { muted, startBgm, bgmPlaying } = useAudio();
   const { showGuide } = useGuide();
 
   const [careers, setCareers] = useState<Career[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [careerXP, setCareerXP] = useState<Record<string, number>>({});
-  const [careerMax, setCareerMax] = useState<Record<string, number>>({});
+  const [, setCareerMax] = useState<Record<string, number>>({});
   const [careerStatus, setCareerStatus] = useState<Record<string, Status>>({});
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -98,7 +132,6 @@ export function WorldMap() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [quizFirst, setQuizFirst] = useState(false);
   const [showOutro, setShowOutro] = useState(false);
-  const [hover, setHover] = useState<string | null>(null);
 
   useEffect(() => {
     if (!bgmPlaying && !muted) { const h = () => { startBgm(); document.removeEventListener('click', h); }; document.addEventListener('click', h, { once: true }); return () => document.removeEventListener('click', h); }
@@ -156,55 +189,73 @@ export function WorldMap() {
   }, [user, profile]);
   const onQuizResult = (r: QuizResult) => { setQuizResult(r); if (user) saveQuiz(user.id, r); };
 
-  const level = Math.floor((profile?.total_score || 0) / 100) + 1;
   const chapter = currentChapter(story);
   const recommended = quizResult?.top;
   const skills: Record<string, { xp: number; status: Status }> = {};
   careers.forEach(c => { skills[c.slug] = { xp: careerXP[c.id] || 0, status: careerStatus[c.id] || 'not_started' }; });
   const topName = (quizResult && QUIZ_DOMAINS[quizResult.top]?.name) || careers.find(c => careerStatus[c.id] === 'mastered')?.name || 'your calling';
-  // avatar stands at the first not-yet-mastered stop
-  const avatarIdx = Math.min(careers.length - 1, Math.max(0, careers.findIndex(c => careerStatus[c.id] !== 'mastered')));
 
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a1228' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">🗺️</div><p className="font-fantasy text-slate-200 text-xl">Unrolling the map…</p></div></div>;
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: 'linear-gradient(180deg,#0a1228,#0f1b3d)' }}>
+    <div className="fixed inset-0 overflow-hidden" style={{ background: '#4a93c6' }}>
       {/* ===== the map ===== */}
       <div className="absolute inset-0">
         <svg viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid slice" className="w-full h-full">
           <defs>
-            <radialGradient id="sea" cx="0.5" cy="0.4" r="0.8"><stop offset="0" stopColor="#2a6fb0" /><stop offset="0.6" stopColor="#1c4f86" /><stop offset="1" stopColor="#143b66" /></radialGradient>
-            <radialGradient id="land" cx="0.45" cy="0.4" r="0.75"><stop offset="0" stopColor="#7ec27a" /><stop offset="0.7" stopColor="#5aa861" /><stop offset="1" stopColor="#3f8a4c" /></radialGradient>
-            <filter id="soft"><feGaussianBlur stdDeviation="6" /></filter>
+            <radialGradient id="contact" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stopColor="#0a1c30" stopOpacity="0.42" /><stop offset="0.65" stopColor="#0a1c30" stopOpacity="0.2" /><stop offset="1" stopColor="#0a1c30" stopOpacity="0" /></radialGradient>
+            <filter id="blur40" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40" /></filter>
           </defs>
-          {/* sea */}
-          <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#sea)" />
-          {/* shimmer */}
-          {Array.from({ length: 26 }).map((_, i) => <line key={i} x1={(i * 53) % VB_W} y1={40 + (i * 71) % VB_H} x2={(i * 53) % VB_W + 26} y2={40 + (i * 71) % VB_H} stroke="#ffffff" strokeWidth="2" opacity="0.08" strokeLinecap="round" />)}
-          {/* island shadow + body */}
-          <path d="M120 250 Q90 120 320 90 Q620 50 760 110 Q1010 70 1080 250 Q1170 430 1010 600 Q900 740 600 720 Q300 760 170 600 Q40 430 120 250 Z" fill="#0c2f4a" opacity="0.5" transform="translate(8,16)" filter="url(#soft)" />
-          <path d="M120 250 Q90 120 320 90 Q620 50 760 110 Q1010 70 1080 250 Q1170 430 1010 600 Q900 740 600 720 Q300 760 170 600 Q40 430 120 250 Z" fill="url(#land)" stroke="#e7d6a8" strokeWidth="8" />
-          {/* beaches */}
-          <path d="M120 250 Q90 120 320 90 Q620 50 760 110 Q1010 70 1080 250 Q1170 430 1010 600 Q900 740 600 720 Q300 760 170 600 Q40 430 120 250 Z" fill="none" stroke="#f0e4bf" strokeWidth="3" opacity="0.6" transform="scale(0.97)" transform-origin="center" />
-          {/* region tints */}
-          <ellipse cx="330" cy="300" rx="150" ry="120" fill="#6fb86e" opacity="0.5" />
-          <ellipse cx="800" cy="260" rx="170" ry="120" fill="#cdbf86" opacity="0.45" />
-          <ellipse cx="760" cy="560" rx="160" ry="120" fill="#4f9a5a" opacity="0.5" />
-          {/* mountains (top-right) */}
-          {[[860, 220], [930, 250], [800, 250]].map(([mx, my], i) => <g key={i}><path d={`M${mx} ${my} l46 -78 l46 78 Z`} fill="#7c8a93" stroke="#4a565e" strokeWidth="3" strokeLinejoin="round" /><path d={`M${mx + 30} ${my - 50} l16 -28 l16 28 Z`} fill="#eef3f6" /></g>)}
-          {/* forest dots */}
-          {[[250, 360], [300, 330], [350, 380], [220, 410], [700, 600], [760, 630], [820, 590]].map(([fx, fy], i) => <g key={i}><circle cx={fx} cy={fy} r="20" fill="#3f9d52" stroke="#256b35" strokeWidth="3" /><circle cx={fx - 6} cy={fy - 6} r="6" fill="#7fe0a0" opacity="0.5" /></g>)}
-          {/* lake */}
-          <ellipse cx="540" cy="470" rx="70" ry="46" fill="#3a86c8" stroke="#e7d6a8" strokeWidth="5" /><ellipse cx="520" cy="458" rx="22" ry="12" fill="#bfe3ff" opacity="0.6" />
-
-          {/* a few deliberately-placed clouds drifting gently in the sea margins */}
-          {[{ x: 240, y: 110, s: 1 }, { x: 980, y: 150, s: 1.25 }, { x: 1050, y: 470, s: 0.85 }].map((c, i) => (
-            <g key={i} opacity="0.9" style={{ transformBox: 'fill-box', transformOrigin: 'center', animation: `qf-bob ${5 + i}s ease-in-out infinite` }}>
-              <ellipse cx={c.x} cy={c.y} rx={50 * c.s} ry={20 * c.s} fill="#ffffff" />
-              <ellipse cx={c.x + 36 * c.s} cy={c.y + 6} rx={34 * c.s} ry={16 * c.s} fill="#ffffff" />
-              <ellipse cx={c.x - 32 * c.s} cy={c.y + 8} rx={28 * c.s} ry={14 * c.s} fill="#f3f7ff" />
-            </g>
-          ))}
+          {/* flat sky */}
+          <rect x="0" y="0" width={VB_W} height={VB_H} fill="#4a93c6" />
+          {/* ===== modular isometric tile city (Kenney-style) ===== */}
+          {(() => {
+            const hw = TW / 2, hh = TH / 2;
+            const ROAD = new Set(['0,2', '1,2', '2,2', '3,2', '4,2', '5,2', '3,0', '3,1', '3,3', '3,4']);
+            const cells: { c: number; r: number; road: boolean }[] = [];
+            for (let r = 0; r <= 4; r++) for (let c = 0; c <= 5; c++) cells.push({ c, r, road: ROAD.has(`${c},${r}`) });
+            const sorted = cells.sort((a, b) => (a.c + a.r) - (b.c + b.r));
+            const trees: [number, number][] = [[1, 0], [0, 1], [2, 4], [5, 3]];
+            const lamps: [number, number][] = [[2, 1], [5, 1], [2, 3]];
+            const cross: [number, number][] = [[2, 2], [4, 2], [3, 1], [3, 3]];
+            const ac = iso(1, 4);
+            const ctr = iso(2.5, 2);
+            return (
+              <g>
+                {/* soft shadow of the whole landmass on the water */}
+                <ellipse cx={ctr.x} cy={ctr.y + 60} rx={400} ry={140} fill="#1d4e74" opacity="0.45" filter="url(#blur40)" />
+                {/* the tiles */}
+                {sorted.map(({ c, r, road }, i) => {
+                  const o = iso(c, r);
+                  return (
+                    <g key={`tile${i}`}>
+                      {/* soil side faces */}
+                      <polygon points={`${o.x - hw},${o.y} ${o.x},${o.y + hh} ${o.x},${o.y + hh + SLAB} ${o.x - hw},${o.y + SLAB}`} fill="#bd8c57" />
+                      <polygon points={`${o.x},${o.y + hh} ${o.x + hw},${o.y} ${o.x + hw},${o.y + SLAB} ${o.x},${o.y + hh + SLAB}`} fill="#9a6e3c" />
+                      {/* darker base lip */}
+                      <polygon points={`${o.x - hw},${o.y + SLAB - 6} ${o.x},${o.y + hh + SLAB - 6} ${o.x},${o.y + hh + SLAB} ${o.x - hw},${o.y + SLAB}`} fill="#7d572e" />
+                      <polygon points={`${o.x},${o.y + hh + SLAB - 6} ${o.x + hw},${o.y + SLAB - 6} ${o.x + hw},${o.y + SLAB} ${o.x},${o.y + hh + SLAB}`} fill="#5f3f1f" />
+                      {/* top face */}
+                      <polygon points={`${o.x},${o.y - hh} ${o.x + hw},${o.y} ${o.x},${o.y + hh} ${o.x - hw},${o.y}`} fill={road ? '#8d9299' : '#d8cdab'} />
+                      <polyline points={`${o.x - hw},${o.y} ${o.x},${o.y - hh} ${o.x + hw},${o.y}`} fill="none" stroke="#ffffff" strokeWidth="1.1" opacity={road ? 0.07 : 0.16} />
+                    </g>
+                  );
+                })}
+                {/* crosswalk stripes */}
+                {cross.map(([c, r], i) => { const o = iso(c, r); const a = c === 3 ? -26.57 : 26.57; return <g key={`cw${i}`}>{[-13, 0, 13].map(d => <rect key={d} x={o.x - 3} y={o.y - 13} width="6" height="26" rx="1" fill="#eef0ec" opacity="0.8" transform={`rotate(${a} ${o.x} ${o.y}) translate(${d} 0)`} />)}</g>; })}
+                {/* trees */}
+                {trees.map(([c, r], i) => { const o = iso(c, r); return <g key={`tr${i}`}><ellipse cx={o.x} cy={o.y + 6} rx="13" ry="6" fill="#1b2f1e" opacity="0.24" /><rect x={o.x - 2.5} y={o.y - 8} width="5" height="14" rx="2.5" fill="#6f4f2e" /><circle cx={o.x} cy={o.y - 18} r="13" fill="#4f9a45" /><circle cx={o.x - 6} cy={o.y - 14} r="9" fill="#3f8438" /><circle cx={o.x + 6} cy={o.y - 15} r="8" fill="#62b257" /></g>; })}
+                {/* light-blue rooftop unit block (matches the sample) */}
+                <g>
+                  <polygon points={`${ac.x},${ac.y - 16} ${ac.x + 20},${ac.y - 6} ${ac.x},${ac.y + 4} ${ac.x - 20},${ac.y - 6}`} fill="#bfe6f5" />
+                  <polygon points={`${ac.x - 20},${ac.y - 6} ${ac.x},${ac.y + 4} ${ac.x},${ac.y + 16} ${ac.x - 20},${ac.y + 6}`} fill="#7fbfdc" />
+                  <polygon points={`${ac.x},${ac.y + 4} ${ac.x + 20},${ac.y - 6} ${ac.x + 20},${ac.y + 6} ${ac.x},${ac.y + 16}`} fill="#5aa6c9" />
+                </g>
+                {/* street lamps */}
+                {lamps.map(([c, r], i) => { const o = iso(c, r); return <g key={`lp${i}`}><line x1={o.x} y1={o.y} x2={o.x} y2={o.y - 30} stroke="#6b7178" strokeWidth="2.4" /><path d={`M${o.x} ${o.y - 30} q9 0 9 7`} fill="none" stroke="#6b7178" strokeWidth="2.4" /><circle cx={o.x + 9} cy={o.y - 21} r="3" fill="#ffe89a" /></g>; })}
+              </g>
+            );
+          })()}
         </svg>
 
         {/* ===== ornate compass rose (HTML overlay so slice-cropping never hides it) ===== */}
@@ -224,64 +275,65 @@ export function WorldMap() {
           </svg>
         </div>
 
-        {/* ===== location nodes (HTML overlay for crisp icons) ===== */}
-        {careers.map((c, i) => {
-          const pos = NODES[i] || NODES[NODES.length - 1];
-          const cs = c.color_scheme as unknown as ColorScheme;
-          const status = careerStatus[c.id] || 'not_started';
-          const xp = careerXP[c.id] || 0; const max = careerMax[c.id] || 100;
-          const pct = Math.min(100, Math.round((xp / max) * 100));
-          const Icon = (LucideIcons[c.icon as keyof typeof LucideIcons] as LucideIcon) || Star;
-          const isRec = recommended === c.slug;
-          return (
-            <button key={c.id} onClick={() => navigate(`/career/${c.slug}`)} onMouseEnter={() => setHover(c.slug)} onMouseLeave={() => setHover(null)}
-              className="absolute -translate-x-1/2 -translate-y-1/2 group focus:outline-none" style={{ left: `${pos.x}%`, top: `${pos.y}%`, zIndex: hover === c.slug ? 30 : 20 }}>
-              <div className="relative flex flex-col items-center transition-transform duration-200 group-hover:scale-[1.07]">
-                {isRec && <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[9px] font-black text-slate-900 whitespace-nowrap shadow-lg z-10" style={{ background: '#34d399' }}>★ BEST FIT</div>}
-                {/* landmark — real sprite if dropped in, else the drawn fallback */}
-                <div className="relative">
-                  <LandmarkArt slug={c.slug} color={cs.primary} accent={cs.accent} mastered={status === 'mastered'} near={isRec} Icon={Icon} />
-                  {status === 'mastered' && <div className="absolute -top-1 -right-0 text-lg drop-shadow">🏆</div>}
-                  <div className="absolute bottom-0 left-0 w-5 h-5 rounded-full bg-slate-900 border-2 border-white text-white text-[10px] font-black flex items-center justify-center shadow">{i + 1}</div>
-                </div>
-                {/* label */}
-                <div className="-mt-1 flex items-center gap-1 whitespace-nowrap px-2 py-0.5 rounded-md text-[11px] font-black text-white shadow" style={{ background: 'rgba(10,18,40,0.85)' }}><Icon className="w-3 h-3" />{c.name}</div>
-                <div className="mt-1 w-16 h-1.5 rounded-full bg-black/40 overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: status === 'mastered' ? '#fbbf24' : cs.accent }} />
-                </div>
-              </div>
-            </button>
-          );
-        })}
+        {/* ===== district buildings (depth-sorted) ===== */}
+        <svg viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full" style={{ zIndex: 20, pointerEvents: 'none' }}>
+          {/* soft contact shadows ground each building to the plaza */}
+          {LOTS.map((lot, i) => { const o = iso(lot.c, lot.r); return <ellipse key={`csh${i}`} cx={o.x} cy={o.y + 18} rx={42} ry={17} fill="url(#contact)" />; })}
+          {careers
+            .map((c, i) => ({ c, i, lot: LOTS[i] || LOTS[LOTS.length - 1] }))
+            .sort((a, b) => (a.lot.c + a.lot.r) - (b.lot.c + b.lot.r))
+            .map(({ c, lot }) => {
+              const o = iso(lot.c, lot.r);
+              const cs = c.color_scheme as unknown as ColorScheme;
+              const status = careerStatus[c.id] || 'not_started';
+              const Icon = (LucideIcons[c.icon as keyof typeof LucideIcons] as LucideIcon) || Star;
+              const isRec = recommended === c.slug;
+              return (
+                <foreignObject key={c.id} x={o.x - 58} y={o.y - 80} width={116} height={108} style={{ overflow: 'visible' }}>
+                  <button onClick={() => navigate(`/career/${c.slug}`)}
+                    className="relative w-full h-full flex items-end justify-center group focus:outline-none cursor-pointer" style={{ pointerEvents: 'auto' }}>
+                    <div className="relative transition-transform duration-200 ease-out group-hover:-translate-y-2">
+                      <LandmarkArt slug={c.slug} color={cs.primary} accent={cs.accent} mastered={status === 'mastered'} near={isRec} Icon={Icon} size={96} />
+                    </div>
+                  </button>
+                </foreignObject>
+              );
+            })}
+        </svg>
 
-        {/* ===== avatar standing at current stop ===== */}
-        {careers[avatarIdx] && (() => { const pos = NODES[avatarIdx] || NODES[0]; return (
-          <div className="absolute -translate-x-1/2 pointer-events-none" style={{ left: `${pos.x}%`, top: `calc(${pos.y}% - 46px)`, zIndex: 25 }}>
-            <div className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] font-bold whitespace-nowrap" style={{ top: -16 }}>{profile?.character_name || profile?.username || 'You'}</div>
-            <div className="qf-bob"><CharacterSprite w={42} dir="down" phase={0} moving={false} palette={PLAYER_PALETTE} hat /></div>
-          </div>
-        ); })()}
+        {/* ===== floating wayfinding signs above each building ===== */}
+        <svg viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full" style={{ zIndex: 22, pointerEvents: 'none' }}>
+          {careers
+            .map((c, i) => ({ c, i, lot: LOTS[i] || LOTS[LOTS.length - 1] }))
+            .sort((a, b) => (a.lot.c + a.lot.r) - (b.lot.c + b.lot.r))
+            .map(({ c, lot }) => {
+              const o = iso(lot.c, lot.r);
+              const cs = c.color_scheme as unknown as ColorScheme;
+              const status = careerStatus[c.id] || 'not_started';
+              const Icon = (LucideIcons[c.icon as keyof typeof LucideIcons] as LucideIcon) || Star;
+              const isRec = recommended === c.slug;
+              return (
+                <foreignObject key={`sg${c.id}`} x={o.x - 110} y={o.y - 172} width={220} height={94} style={{ overflow: 'visible' }}>
+                  <div className="w-full h-full flex flex-col items-center justify-end" style={{ pointerEvents: 'none' }}>
+                    <button onClick={() => navigate(`/career/${c.slug}`)} className="group flex flex-col items-center focus:outline-none" style={{ pointerEvents: 'auto', cursor: 'pointer' }}>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-transform duration-200 group-hover:-translate-y-0.5" style={{ background: `linear-gradient(135deg, ${cs.primary}, ${cs.accent})`, border: '2px solid rgba(255,255,255,0.92)', boxShadow: isRec ? '0 6px 18px rgba(0,0,0,0.45), 0 0 18px rgba(52,211,153,0.85)' : '0 6px 16px rgba(0,0,0,0.45)' }}>
+                        <Icon className="w-4 h-4 text-white shrink-0" strokeWidth={2.5} />
+                        <span className="text-white text-[11px] font-black whitespace-nowrap tracking-tight drop-shadow">{c.name}</span>
+                        {status === 'mastered' && <span className="grid place-items-center w-4 h-4 rounded-full text-[9px] font-black text-amber-900 shrink-0" style={{ background: 'linear-gradient(145deg,#fde68a,#f59e0b)' }}>✓</span>}
+                      </div>
+                      <div style={{ width: 0, height: 0, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: `9px solid ${cs.accent}` }} />
+                      <div className="w-[3px] h-3 rounded-b-full" style={{ background: 'rgba(255,255,255,0.6)' }} />
+                    </button>
+                  </div>
+                </foreignObject>
+              );
+            })}
+        </svg>
+
       </div>
 
-      {/* ===== top HUD ===== */}
-      <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-6 py-3">
-        <div className="flex items-center gap-2 sm:gap-2.5 rounded-2xl px-2.5 sm:px-3 py-2" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
-          <span className="text-xl sm:text-2xl">🗺️</span>
-          <div className="hidden sm:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">World Map</p></div>
-          <div className="flex items-center gap-1.5 ml-0.5 sm:ml-1">
-            <span className="hidden sm:flex"><Chip icon={<Flame className="w-4 h-4 text-orange-400" />} label={`${profile?.current_streak ?? 0}`} /></span>
-            <span className="hidden sm:flex"><Chip icon={<Star className="w-4 h-4 text-amber-300" />} label={`${profile?.total_score ?? 0}`} /></span>
-            <span className="hidden min-[360px]:flex"><Chip icon={<Trophy className="w-4 h-4 text-yellow-300" />} label={`Lv${level}`} /></span>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 sm:gap-1.5">
-          <Btn onClick={() => { setQuizFirst(false); setQuizOpen(true); }} title="Career Compass" a="#34d399"><Compass className="w-5 h-5" /></Btn>
-          <Btn onClick={() => navigate('/leaderboard')} title="Leaderboard" a="#fbbf24"><Trophy className="w-5 h-5" /></Btn>
-          <Btn onClick={() => navigate('/profile')} title="Profile" a="#60a5fa"><User className="w-5 h-5" /></Btn>
-          <Btn onClick={toggleMute} title="Mute">{muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</Btn>
-          <Btn onClick={signOut} title="Sign out" a="#f87171"><LogOut className="w-5 h-5" /></Btn>
-        </div>
-      </header>
+      {/* ===== top HUD (shared, identical on every page) ===== */}
+      <AppNavbar />
 
       {/* quest banner */}
       <div className="absolute left-1/2 -translate-x-1/2 z-30 top-[4.6rem] sm:top-[4.8rem] max-w-[92vw]">
@@ -300,11 +352,4 @@ export function WorldMap() {
       {showOutro && <Outro name={profile?.character_name || profile?.username || 'Champion'} topName={topName} palette={PLAYER_PALETTE} onClose={() => setShowOutro(false)} />}
     </div>
   );
-}
-
-function Chip({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/8 text-white text-xs font-bold">{icon}<span className="tabular-nums">{label}</span></div>;
-}
-function Btn({ onClick, title, a, children }: { onClick: () => void; title: string; a?: string; children: React.ReactNode }) {
-  return <button onClick={onClick} title={title} aria-label={title} className="p-2 sm:p-2.5 rounded-xl text-slate-200 hover:text-white border border-white/12 transition-all" style={{ background: 'rgba(10,18,40,0.7)', backdropFilter: 'blur(8px)' }} onMouseEnter={e => { if (a) e.currentTarget.style.background = `${a}44`; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,18,40,0.7)'; }}>{children}</button>;
 }

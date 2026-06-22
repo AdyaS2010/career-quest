@@ -1,19 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as LucideIcons from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { Star, Coins, Volume2, VolumeX, User, Trophy, Map as MapIcon, LogOut } from 'lucide-react';
+import { Star, Coins, Volume2, VolumeX, User, Trophy, Map as MapIcon, LogOut, Compass, Settings, Flame } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
-import type { Career, ColorScheme } from '../lib/database.types';
+import type { Career, Profile, ColorScheme } from '../lib/database.types';
 import type { DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
+import { SettingsModal } from '../components/SettingsModal';
+import { CareerQuiz } from '../components/CareerQuiz';
+import { MapPreview } from '../components/MapPreview';
+import { CityTutorial, TUTORIAL_STEP_COUNT } from '../components/CityTutorial';
+import { loadQuiz, saveQuiz, type QuizResult } from './city/quiz';
 import { loadWallet } from '../lib/wallet';
+import { loadPrefs, nowInTz } from '../lib/prefs';
 import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, type BaseMap } from './city/pico8';
 
 const SCALE = 6, TS = TILE * SCALE, SPEED = 2.7, REACH = TS * 1.3;
 let cityNarrated = false; // StrictMode-safe one-shot guard
+let savedPos: { x: number; y: number } | null = null; // remembers where the player left off across navigations
 
 type Rect = { x: number; y: number; w: number; h: number };
 // Force WALKABLE (overrides everything, incl. buildings). Read off the 📍 readout.
@@ -28,12 +33,58 @@ const SOFT_WALKABLE: Rect[] = [
 // Force SOLID (e.g. rooftops that read as walkable). Read off the 📍 readout.
 const SOLID_OVERRIDES: Rect[] = [];
 
+// Designer-placed door fronts — the walkable cell directly in front of each
+// building's door, keyed by career slug. Standing here and pressing E enters
+// that domain. Coordinates read off the live 📍 readout.
+const DOOR_COORDS: Record<string, { x: number; y: number }> = {
+  'health-sciences': { x: 8, y: 13 },          // medical
+  'culinary-arts': { x: 13, y: 13 },           // culinary
+  'education': { x: 48, y: 11 },               // education
+  'information-technology': { x: 32, y: 11 },  // IT
+  'arts-entertainment': { x: 25, y: 8 },       // arts & entertainment
+  'media-communication': { x: 24, y: 19 },     // media + communication
+  'law-government': { x: 14, y: 0.5 },           // law
+  'financial-services': { x: 14, y: 29 },      // financial services
+};
+
+// Sign placement is INDEPENDENT of the doormats — each board sits wherever it
+// reads best on its own building (tile centre, fractional ok). Tune freely; a
+// sign never has to keep the same distance from its mat as any other.
+const SIGN_COORDS: Record<string, { x: number; y: number }> = {
+  'health-sciences': { x: 8.5, y: 9.7 },
+  'culinary-arts': { x: 13.55, y: 10.8 },
+  'education': { x: 49, y: 7.4 },
+  'information-technology': { x: 32.5, y: 7.8 },
+  'arts-entertainment': { x: 25, y: 6.4 },
+  'media-communication': { x: 25, y: 16.9 },
+  'law-government': { x: 14.5, y: 0.1 },         // top-edge building — keep the board low so it stays on screen
+  'financial-services': { x: 13, y: 26.8 },
+};
+
+// Each domain is a little establishment on Questford's high street. Every name is
+// plain enough to guess the trade at a glance, with just a wink of wit: a hospital
+// named for its vital signs, a kitchen that's all "Fork & Fire", a school with a
+// wise old owl, a courthouse down at Gavel Hall, the theatre at Center Stage. The
+// typefaces stay within one tasteful family of classic signage faces — elegant
+// serifs and engraved capitals — with a single modern accent for the tech workshop.
+const DOMAIN_SIGN: Record<string, { name: string; style: React.CSSProperties }> = {
+  'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Spectral', serif", fontWeight: 600, fontSize: 11.5, letterSpacing: '0.02em' } },
+  'culinary-arts':          { name: 'Fork & Fire',       style: { fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17 } },
+  'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Marcellus', serif", fontWeight: 400, fontSize: 13, letterSpacing: '0.03em' } },
+  'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: '0.04em' } },
+  'arts-entertainment':     { name: 'Center Stage',       style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700, fontSize: 15 } },
+  'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 13, letterSpacing: '0.06em' } },
+  'law-government':         { name: 'Gavel Hall',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 13 } },
+  'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 16, letterSpacing: '0.03em' } },
+};
+
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
+type Status = 'mastered' | 'in_progress' | 'not_started';
 
 export function CityHub() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { muted, toggleMute } = useAudio();
+  const { muted, toggleMute, playSfx, setAmbience, startBgm } = useAudio();
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -41,6 +92,13 @@ export function CityHub() {
   const [dialogue, setDialogue] = useState<DialogueLine[] | null>(null);
   const [nearLabel, setNearLabel] = useState<string | null>(null);
   const [coins, setCoins] = useState(0);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [skills, setSkills] = useState<Record<string, { xp: number; status: Status }>>({});
+  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  const [tutStep, setTutStep] = useState<number | null>(null); // first-run interactive walkthrough
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -49,6 +107,7 @@ export function CityHub() {
   const sheetRef = useRef<HTMLImageElement | null>(null);
   const posRef = useRef({ x: 0, y: 0 });
   const camRef = useRef({ x: 0, y: 0 });
+  const tzRef = useRef<string>('auto'); // chosen timezone drives the day/night clock
   const keysRef = useRef<Set<string>>(new Set());
   const faceRef = useRef(1);
   const movingRef = useRef(false);
@@ -60,8 +119,42 @@ export function CityHub() {
   const signEls = useRef<Map<string, HTMLDivElement | null>>(new Map());
   const busyRef = useRef(false);
   const rafRef = useRef(0);
+  const tutStepRef = useRef<number | null>(null);
+  useEffect(() => { tutStepRef.current = tutStep; }, [tutStep]);
 
-  busyRef.current = !!dialogue;
+  busyRef.current = !!dialogue || quizOpen || showSettings || showMap;
+
+  // HUD data (streak / level / xp / skills) — loaded separately from the map so
+  // the canvas render loop is never disturbed.
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    setQuizResult(loadQuiz(user.id));
+    tzRef.current = loadPrefs(user.id).tz;
+    (async () => {
+      try {
+        const [pRes, cRes, chRes, prRes] = await Promise.all([
+          supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+          supabase.from('careers').select('id, slug').eq('is_active', true),
+          (supabase.from('challenges') as any).select('id, career_id, max_score'),
+          (supabase.from('user_challenge_progress') as any).select('challenge_id, best_score').eq('user_id', user.id),
+        ]);
+        if (!alive) return;
+        if (pRes.data) setProfile(pRes.data as unknown as Profile);
+        const rows = (cRes.data || []) as { id: string; slug: string }[];
+        const ch = (chRes.data || []) as { id: string; career_id: string; max_score?: number }[];
+        const cp = (prRes.data || []) as { challenge_id: string; best_score: number }[];
+        const toCareer: Record<string, string> = {}; const maxP: Record<string, number> = {};
+        ch.forEach(c => { toCareer[c.id] = c.career_id; maxP[c.career_id] = (maxP[c.career_id] || 0) + (c.max_score || 100); });
+        const xp: Record<string, number> = {}; const started: Record<string, number> = {};
+        cp.forEach(p => { const cid = toCareer[p.challenge_id]; if (cid) { xp[cid] = (xp[cid] || 0) + p.best_score; started[cid] = (started[cid] || 0) + 1; } });
+        const sk: Record<string, { xp: number; status: Status }> = {};
+        rows.forEach(c => { const e = xp[c.id] || 0, mx = maxP[c.id] || 1, st = started[c.id] || 0; let status: Status; if ((c.slug === 'financial-services' && e >= 270) || e >= 0.8 * mx) status = 'mastered'; else if (st > 0) status = 'in_progress'; else status = 'not_started'; sk[c.slug] = { xp: e, status }; });
+        setSkills(sk);
+      } catch (e) { console.error('CityHub HUD load', e); }
+    })();
+    return () => { alive = false; };
+  }, [user]);
 
   useEffect(() => {
     let alive = true;
@@ -105,6 +198,8 @@ export function CityHub() {
         mapRef.current = map; walkRef.current = walk; sheetRef.current = sheet;
         const spawn = findSpawn(map, walk);
         posRef.current = { x: (spawn % map.w + 0.5) * TS, y: (Math.floor(spawn / map.w) + 0.5) * TS };
+        // resume where the player left off (if that spot is still walkable on this map)
+        if (savedPos && walkableAt(map, walk, savedPos.x, savedPos.y)) posRef.current = { x: savedPos.x, y: savedPos.y };
         const reachSet = reachable(map, walk, spawn);
         const need = careers.length + 1;
         const central = (i: number) => { const x = i % map.w, y = Math.floor(i / map.w); return x > 3 && y > 3 && x < map.w - 4 && y < map.h - 4; };
@@ -114,7 +209,7 @@ export function CityHub() {
         const pool = doorFronts.length >= need ? doorFronts : (stepCells.length >= need ? stepCells : (openReach.length ? openReach : [...reachSet]));
         const cells = spreadCells(map, pool, careers.length + 1);
         const npc = cells.shift()!;
-        const built: Door[] = careers.map((c, i) => ({ slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: cells[i]?.x ?? npc.x, cy: cells[i]?.y ?? npc.y, mastered: mastered.has(c.slug) }));
+        const built: Door[] = careers.map((c, i) => { const fixed = DOOR_COORDS[c.slug]; return { slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: fixed?.x ?? (cells[i]?.x ?? npc.x), cy: fixed?.y ?? (cells[i]?.y ?? npc.y), mastered: mastered.has(c.slug) }; });
         if (!alive) return;
         doorsRef.current = built; setDoors(built);
         npcRef.current = { cx: npc.x, cy: npc.y, lines: [
@@ -125,30 +220,49 @@ export function CityHub() {
         setReady(true); setLoading(false);
       } catch (e) { console.error('CityHub load', e); setLoading(false); }
     })();
-    return () => { alive = false; cancelAnimationFrame(rafRef.current); };
+    // NOTE: the animation-frame loop is owned by the [ready] effect below; don't
+    // cancel it here. A Supabase auth refresh changes `user` and re-runs this
+    // effect — cancelling the RAF here (without restarting it) froze the player
+    // after navigating away and back.
+    return () => { alive = false; };
   }, [user]);
 
-  // one-time city welcome
+  // The city + menus drift along to the serene "Questford Stroll"; a soft
+  // day/night ambient bed sits gently underneath it. We leave the music playing
+  // on the way out so the next screen can pick its own theme without a gap.
+  useEffect(() => {
+    startBgm('serene');
+    const hour = new Date().getHours();
+    setAmbience(hour >= 19 || hour < 6 ? 'city-night' : 'city');
+    return () => setAmbience(null);
+  }, [setAmbience, startBgm]);
+
+  // first-run interactive walkthrough (replaces a plain welcome dialogue)
   useEffect(() => {
     if (!ready || cityNarrated) return;
-    const key = `questford_cityhub_${user?.id || 'guest'}`;
+    const key = `questford_onboarded_${user?.id || 'guest'}`;
     let seen = false; try { seen = !!localStorage.getItem(key); } catch { /* ignore */ }
     if (seen) return;
     cityNarrated = true;
-    try { localStorage.setItem(key, '1'); } catch { /* ignore */ }
-    setDialogue([
-      { speaker: 'Questopher', portrait: '🤖', text: `Welcome to Questford — your city of careers! I'm Questopher, your guide.` },
-      { speaker: 'Questopher', portrait: '🤖', text: `Use WASD or the arrow keys to explore. Each signed building is a career — walk to its door and press E to head inside.` },
-      { speaker: 'Questopher', portrait: '🤖', text: `Find one that sparks your curiosity and dive in. Adventure awaits!` },
-    ]);
+    setTutStep(0);
   }, [ready, user]);
+
+  const finishTutorial = () => {
+    setTutStep(null);
+    try { localStorage.setItem(`questford_onboarded_${user?.id || 'guest'}`, '1'); } catch { /* ignore */ }
+  };
+  const advanceTutorial = () => setTutStep(s => {
+    const n = (s ?? 0) + 1;
+    if (n >= TUTORIAL_STEP_COUNT) { finishTutorial(); return null; }
+    return n;
+  });
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
       if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
       if (busyRef.current) return;
-      if (k === 'e' || k === 'enter') { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) navigate(`/career/${n.slug}`); return; }
+      if (k === 'e' || k === 'enter') { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } return; }
       keysRef.current.add(k);
     };
     const up = (e: KeyboardEvent) => keysRef.current.delete(e.key.toLowerCase());
@@ -168,6 +282,9 @@ export function CityHub() {
 
   useEffect(() => {
     if (!ready) return;
+    let prevT = performance.now();
+    let firstFrame = true;
+    let lastStep = 0;
     const loop = (t: number) => {
       rafRef.current = requestAnimationFrame(loop);
       const cv = canvasRef.current, wrap = wrapRef.current, map = mapRef.current, sheet = sheetRef.current, walk = walkRef.current;
@@ -187,9 +304,21 @@ export function CityHub() {
           if (walkableAt(map, walk, pos.x + dx, pos.y)) pos.x = Math.max(2, Math.min(worldW - 2, pos.x + dx));
           if (walkableAt(map, walk, pos.x, pos.y + dy)) pos.y = Math.max(2, Math.min(worldH - 2, pos.y + dy)); }
       }
+
+      // tutorial: the "take a stroll" beat advances the moment the player moves
+      if (tutStepRef.current === 1 && movingRef.current) { tutStepRef.current = -1; setTutStep(2); }
+
+      // soft, rhythmic footstep tick while strolling (subtle; respects mute)
+      if (movingRef.current) { if (t - lastStep > 300) { playSfx('footstep'); lastStep = t; } }
+      else { lastStep = 0; }
+
+      // ===== camera: gentle centered follow (lowkey, lightly smoothed) =====
+      const dt = Math.min(0.05, Math.max(0.001, (t - prevT) / 1000)); prevT = t;
       const cam = camRef.current;
-      cam.x = clamp(pos.x - vw / 2, 0, Math.max(0, worldW - vw));
-      cam.y = clamp(pos.y - vh / 2, 0, Math.max(0, worldH - vh));
+      const tx = clamp(pos.x - vw / 2, 0, Math.max(0, worldW - vw));
+      const ty = clamp(pos.y - vh / 2, 0, Math.max(0, worldH - vh));
+      if (firstFrame) { cam.x = tx; cam.y = ty; firstFrame = false; }
+      else { const follow = 1 - Math.pow(0.0006, dt); cam.x += (tx - cam.x) * follow; cam.y += (ty - cam.y) * follow; }
 
       ctx.clearRect(0, 0, vw, vh);
       const c0 = Math.max(0, Math.floor(cam.x / TS)), c1 = Math.min(map.w - 1, Math.ceil((cam.x + vw) / TS));
@@ -215,19 +344,45 @@ export function CityHub() {
         const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = d; }
         drawBanner(ctx, sx - TS * 0.8, sy + 3, d.color.primary, t);            // district banners flank the entrance
         drawBanner(ctx, sx + TS * 0.8, sy + 3, d.color.secondary || d.color.primary, t + 240);
-        drawDoormat(ctx, sx, sy, d.color.primary, d.mastered, t);
+        drawDoormat(ctx, sx, sy, d.color.primary, d.mastered);
         const el = signEls.current.get(d.slug);
-        if (el) { const on = sx > -120 && sx < vw + 120 && sy > -80 && sy < vh + 80; el.style.opacity = on ? '1' : '0'; el.style.transform = `translate(-50%,-100%) translate(${sx}px, ${sy - 40}px)`; }
+        if (el) {
+          // signs live on their own coordinates — never tied to the mat's spot
+          const sc = SIGN_COORDS[d.slug];
+          let ssx = sc ? (sc.x + 0.5) * TS - cam.x : sx;
+          let ssy = sc ? (sc.y + 0.5) * TS - cam.y : sy - TS * 1.42;
+          // Edge buildings (law-government hugs the top row, financial-services the
+          // bottom) can't host a plate "off the map", and the camera clamps there —
+          // so once the building is on screen we gently keep its nameplate inside the
+          // viewport. SIGN_COORDS still nudges it freely; it just never gets shoved
+          // off-screen or down onto the doormat. Interior buildings never trip this.
+          const doorOn = sx > -TS && sx < vw + TS && sy > -TS && sy < vh + TS;
+          if (doorOn) { const mx = 74, my = 58; ssx = Math.max(mx, Math.min(vw - mx, ssx)); ssy = Math.max(my, Math.min(vh - my, ssy)); }
+          const on = ssx > -180 && ssx < vw + 180 && ssy > -120 && ssy < vh + 120;
+          el.style.opacity = on ? '1' : '0';
+          el.style.transform = `translate(-50%,-50%) translate(${Math.round(ssx)}px, ${Math.round(ssy)}px)`;
+        }
       }
       if (npcRef.current) { const wx = (npcRef.current.cx + 0.5) * TS, wy = (npcRef.current.cy + 0.5) * TS; const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = 'npc'; } drawNpc(ctx, wx - cam.x, wy - cam.y, t); }
       nearRef.current = near;
       const key = near === 'npc' ? 'npc' : near ? `d:${near.slug}` : null;
-      if (key !== nearKeyRef.current) { nearKeyRef.current = key; setNearLabel(near === 'npc' ? 'Talk to Mayor Vale' : near ? `Enter ${near.name}` : null); }
+      if (key !== nearKeyRef.current) {
+        // a gentle chime the moment you step onto a new doormat
+        if (key && key.startsWith('d:')) playSfx('chime');
+        nearKeyRef.current = key;
+        setNearLabel(near === 'npc' ? 'Talk to Mayor Vale' : near ? `Enter ${near.name}` : null);
+      }
 
       drawChar(ctx, pos.x - cam.x, pos.y - cam.y, '#22c55e', t, faceRef.current, movingRef.current);
 
+      // ===== day/night cycle — ambient wash driven by the player's chosen clock =====
+      const sky = daylight(nowInTz(tzRef.current));
+      ctx.fillStyle = `rgba(${sky.r | 0},${sky.g | 0},${sky.b | 0},${sky.a})`;
+      ctx.fillRect(0, 0, vw, vh);
+
       // live tile-coordinate readout (so the player can point me to spots)
       if (coordElRef.current) coordElRef.current.textContent = `${Math.floor(pos.x / TS)}, ${Math.floor(pos.y / TS)}`;
+      savedPos = { x: pos.x, y: pos.y }; // remember position so we resume here after leaving the tab/page
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(rafRef.current); };
@@ -239,34 +394,44 @@ export function CityHub() {
       {/* soft vignette for depth */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(6,10,24,0.42) 100%)' }} />
 
-      {/* building signs (crisp HTML, positioned by the loop) */}
-      {doors.map((d, di) => { const Icon = (LucideIcons[d.icon as keyof typeof LucideIcons] as LucideIcon) || Star; return (
-        <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .15s' }}>
-          {/* mounting bar + chains → looks bolted to the building */}
-          <div style={{ width: 58, height: 4, background: '#5a3a22', borderRadius: 2, boxShadow: '0 1px 0 #3d2715' }} />
-          <div className="flex gap-9"><div style={{ width: 2, height: 6, background: '#6b4a28' }} /><div style={{ width: 2, height: 6, background: '#6b4a28' }} /></div>
-          {/* wooden shingle board (gently swaying) */}
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md whitespace-nowrap" style={{ background: 'linear-gradient(#ccab6e,#a8844b)', border: '2px solid #6b4a28', boxShadow: '0 3px 7px rgba(0,0,0,0.5)', transformOrigin: 'top center', animation: `qf-sway ${3.6 + (di % 3) * 0.5}s ease-in-out ${(di % 4) * -0.6}s infinite` }}>
-            <span className="w-4 h-4 rounded flex items-center justify-center shadow-sm" style={{ background: d.color.primary }}><Icon className="w-3 h-3 text-white" /></span>
-            <span className="text-[12px]" style={{ color: '#3a2614', fontFamily: "'Comfortaa', cursive", fontWeight: 700, letterSpacing: '-0.01em', textShadow: '0 1px 0 rgba(255,255,255,0.25)' }}>{d.name}</span>
-            {d.mastered && <span className="text-xs">🏆</span>}
+      {/* building signs — bespoke storefront nameplates, one typeface per trade */}
+      {doors.map((d) => {
+        const sign = DOMAIN_SIGN[d.slug] ?? { name: d.name, style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5 } as React.CSSProperties };
+        return (
+          <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .12s' }}>
+            {/* slim hanger — a single ring + stem, as if the plate hangs from a bracket */}
+            <span style={{ width: 6, height: 6, borderRadius: '50%', border: '1.5px solid rgba(38,28,18,0.6)', background: 'rgba(255,250,240,0.55)' }} />
+            <span style={{ width: 2, height: 5, background: 'rgba(38,28,18,0.6)' }} />
+            {/* painted nameplate — neutral board, domain colour only in the frame + accent rule */}
+            <div style={{ position: 'relative', padding: '5px 16px 6px', borderRadius: 7, background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', border: `1.5px solid ${d.color.primary}`, boxShadow: `0 5px 13px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 2.5px rgba(255,255,255,0.6)` }}>
+              <span style={{ display: 'block', whiteSpace: 'nowrap', lineHeight: 1.08, color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)', ...sign.style }}>{sign.name}</span>
+              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.color.primary}, transparent)` }} />
+            </div>
           </div>
-        </div>
-      ); })}
+        );
+      })}
 
       {loading && <div className="absolute inset-0 flex items-center justify-center" style={{ background: '#0a1228' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">🏙️</div><p className="font-fantasy text-slate-200 text-xl">Waking up the city…</p></div></div>}
 
       {/* HUD */}
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">
-        <div className="flex items-center gap-2 px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
-          <span className="text-xl">🏙️</span><div className="hidden sm:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">City of Careers</p></div>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 text-amber-300 text-xs font-black ml-1"><Coins className="w-4 h-4" />{coins}</div>
+        <div className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
+          <span className="text-xl">🏙️</span>
+          <div className="hidden md:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">Where Futures Begin</p></div>
+          <div className="flex items-center gap-1 ml-0.5 sm:ml-1">
+            <Chip icon={<Flame className="w-4 h-4 text-orange-400" />} label={`${profile?.current_streak ?? 0}`} title="Daily streak" />
+            <Chip icon={<Trophy className="w-4 h-4 text-yellow-300" />} label={`Lv${Math.floor((profile?.total_score ?? 0) / 100) + 1}`} title="Level" />
+            <span className="hidden min-[420px]:flex"><Chip icon={<Star className="w-4 h-4 text-amber-300" />} label={`${profile?.total_score ?? 0}`} title="Total XP" /></span>
+            <Chip icon={<Coins className="w-4 h-4 text-amber-300" />} label={`${coins}`} title="Coins" />
+          </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-1.5">
-          <Btn onClick={() => navigate('/map')} title="World map" a="#34d399"><MapIcon className="w-5 h-5" /></Btn>
+          <Btn onClick={() => setShowMap(true)} title="Quest map" a="#34d399"><MapIcon className="w-5 h-5" /></Btn>
+          <Btn onClick={() => setQuizOpen(true)} title="Career Compass" a="#34d399"><Compass className="w-5 h-5" /></Btn>
           <Btn onClick={() => navigate('/leaderboard')} title="Leaderboard" a="#fbbf24"><Trophy className="w-5 h-5" /></Btn>
           <Btn onClick={() => navigate('/profile')} title="Profile" a="#60a5fa"><User className="w-5 h-5" /></Btn>
-          <Btn onClick={toggleMute} title="Mute">{muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</Btn>
+          <Btn onClick={toggleMute} title={muted ? 'Unmute' : 'Mute'} a="#a78bfa">{muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</Btn>
+          <Btn onClick={() => setShowSettings(true)} title="Settings" a="#fbbf24"><Settings className="w-5 h-5" /></Btn>
           <Btn onClick={signOut} title="Sign out" a="#f87171"><LogOut className="w-5 h-5" /></Btn>
         </div>
       </header>
@@ -280,15 +445,41 @@ export function CityHub() {
       {/* live tile coordinate — tell me these numbers to mark a spot */}
       {ready && <div className="absolute bottom-6 right-4 z-20 px-2.5 py-1 rounded-lg text-emerald-200 text-xs font-mono font-bold" style={{ background: 'rgba(10,18,40,0.6)' }}>📍 <span ref={coordElRef}>0, 0</span></div>}
 
-      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) navigate(`/career/${n.slug}`); }} />}
+      {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') setDialogue(npcRef.current?.lines || null); else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
 
       {dialogue && <DialogueBox lines={dialogue} onClose={() => setDialogue(null)} />}
+      {quizOpen && <CareerQuiz existing={quizResult} skills={skills} firstTime={false} onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }} onClose={() => setQuizOpen(false)} onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }} />}
+      {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {tutStep !== null && <CityTutorial step={tutStep} onAdvance={advanceTutorial} onSkip={finishTutorial} />}
     </div>
   );
 }
 
 // ===== helpers =====
 function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
+// ===== day/night cycle: tint + window-glow strength keyframed across a real 24h clock =====
+type Sky = { r: number; g: number; b: number; a: number; glow: number };
+const SKY_KEYS: { h: number; s: Sky }[] = [
+  { h: 0,    s: { r: 18,  g: 26,  b: 70,  a: 0.50, glow: 1.00 } }, // deep night — blue with warm windows
+  { h: 5,    s: { r: 26,  g: 34,  b: 82,  a: 0.44, glow: 0.95 } }, // last of the night
+  { h: 6.5,  s: { r: 255, g: 168, b: 86,  a: 0.26, glow: 0.42 } }, // sunrise — warm gold
+  { h: 8,    s: { r: 255, g: 206, b: 130, a: 0.13, glow: 0.10 } }, // soft golden morning
+  { h: 12,   s: { r: 255, g: 250, b: 235, a: 0.03, glow: 0.00 } }, // bright neutral noon
+  { h: 15.5, s: { r: 255, g: 244, b: 214, a: 0.05, glow: 0.00 } }, // clear afternoon
+  { h: 17.5, s: { r: 255, g: 138, b: 58,  a: 0.22, glow: 0.30 } }, // amber evening
+  { h: 19,   s: { r: 226, g: 96,  b: 62,  a: 0.30, glow: 0.62 } }, // orange dusk
+  { h: 20.5, s: { r: 40,  g: 50,  b: 102, a: 0.42, glow: 0.92 } }, // nightfall
+  { h: 24,   s: { r: 18,  g: 26,  b: 70,  a: 0.50, glow: 1.00 } }, // wrap back to deep night
+];
+function daylight(now: Date): Sky {
+  const h = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+  let a = SKY_KEYS[0], b = SKY_KEYS[SKY_KEYS.length - 1];
+  for (let i = 0; i < SKY_KEYS.length - 1; i++) { if (h >= SKY_KEYS[i].h && h <= SKY_KEYS[i + 1].h) { a = SKY_KEYS[i]; b = SKY_KEYS[i + 1]; break; } }
+  const span = b.h - a.h || 1, f = (h - a.h) / span, e = f * f * (3 - 2 * f); // smoothstep for gentle transitions
+  const mix = (x: number, y: number) => x + (y - x) * e;
+  return { r: mix(a.s.r, b.s.r), g: mix(a.s.g, b.s.g), b: mix(a.s.b, b.s.b), a: mix(a.s.a, b.s.a), glow: mix(a.s.glow, b.s.glow) };
+}
 function shadeHex(hex: string, p: number) { const n = parseInt((hex || '#888').replace('#', ''), 16); const r = Math.max(0, Math.min(255, (n >> 16) + p)), g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + p)), b = Math.max(0, Math.min(255, (n & 0xff) + p)); return `rgb(${r},${g},${b})`; }
 function walkableAt(map: BaseMap, walk: boolean[], wx: number, wy: number) { const cx = Math.floor(wx / TS), cy = Math.floor(wy / TS); if (cx < 0 || cy < 0 || cx >= map.w || cy >= map.h) return false; return walk[cy * map.w + cx]; }
 function hexA(hex: string, a: number) { const n = parseInt((hex || '#888').replace('#', ''), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
@@ -348,21 +539,34 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
   ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -30); ctx.closePath(); ctx.fill();
   ctx.restore();
 }
-// A welcome mat + pulsing up-arrow right on the doorstep — clearly "enter here".
-function drawDoormat(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, done: boolean, t: number) {
-  const pulse = (Math.sin(t / 300) + 1) / 2, col = done ? '#fbbf24' : color;
+// A simple rectangular welcome mat on the doorstep. Mastered domains get a
+// golden border; the rest wear their own domain colour. A gentle "E"/"✓" prompt
+// floats above so it always reads as "enter here".
+function drawDoormat(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, done: boolean) {
+  const col = done ? '#fbbf24' : color;
+  y = y - TS * 0.26; // sit at the threshold, lowered toward the approach cell
+  const w = TS * 0.78, h = TS * 0.42, rx = x - w / 2, ry = y - h / 2;
   ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.18)'; roundRect(ctx, x - 14, y - 5, 28, 15, 4); ctx.fill();
-  ctx.fillStyle = col; roundRect(ctx, x - 13, y - 6, 26, 14, 4); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.85)'; roundRect(ctx, x - 9, y - 3, 18, 8, 2); ctx.fill();
-  ctx.fillStyle = col; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(done ? '✓' : 'E', x, y + 1.5);
-  // pulsing arrow toward the door
-  ctx.globalAlpha = 0.5 + 0.5 * pulse; ctx.fillStyle = col; const ay = y - 16 - pulse * 3;
-  ctx.beginPath(); ctx.moveTo(x, ay - 6); ctx.lineTo(x - 6, ay); ctx.lineTo(x + 6, ay); ctx.closePath(); ctx.fill();
+  // contact shadow under the mat
+  ctx.fillStyle = 'rgba(0,0,0,0.22)'; roundRect(ctx, rx + 1.5, ry + 2.5, w, h, 5); ctx.fill();
+  // woven mat body
+  ctx.fillStyle = hexA(col, 0.22); roundRect(ctx, rx, ry, w, h, 5); ctx.fill();
+  // faint weave lines
+  ctx.save(); roundRect(ctx, rx, ry, w, h, 5); ctx.clip();
+  ctx.strokeStyle = hexA(col, 0.18); ctx.lineWidth = 1;
+  for (let lx = rx + 3; lx < rx + w; lx += 4) { ctx.beginPath(); ctx.moveTo(lx, ry); ctx.lineTo(lx, ry + h); ctx.stroke(); }
+  ctx.restore();
+  // outer border — gold if mastered, domain colour otherwise
+  ctx.lineWidth = 2.4; ctx.strokeStyle = col; roundRect(ctx, rx, ry, w, h, 5); ctx.stroke();
+  // inner border line
+  ctx.lineWidth = 1; ctx.strokeStyle = hexA(col, 0.7); roundRect(ctx, rx + 3.5, ry + 3.5, w - 7, h - 7, 3); ctx.stroke();
   ctx.restore();
 }
 function Btn({ onClick, title, a, children }: { onClick: () => void; title: string; a?: string; children: React.ReactNode }) {
   return <button onClick={onClick} title={title} aria-label={title} className="p-2 sm:p-2.5 rounded-xl text-slate-200 hover:text-white border border-white/12 transition-all" style={{ background: 'rgba(10,18,40,0.7)', backdropFilter: 'blur(8px)' }} onMouseEnter={e => { if (a) e.currentTarget.style.background = `${a}44`; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(10,18,40,0.7)'; }}>{children}</button>;
+}
+function Chip({ icon, label, title }: { icon: React.ReactNode; label: string; title?: string }) {
+  return <div title={title} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 text-white text-xs font-black"><span aria-hidden>{icon}</span><span className="tabular-nums">{label}</span></div>;
 }
 function DPad({ onPress, onAction }: { onPress: (k: string, on: boolean) => void; onAction: () => void }) {
   const btn = (k: string, label: string, cls: string) => (<button className={`absolute w-12 h-12 rounded-xl text-white text-xl font-black flex items-center justify-center ${cls}`} style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.2)', touchAction: 'none' }} onPointerDown={e => { e.preventDefault(); onPress(k, true); }} onPointerUp={e => { e.preventDefault(); onPress(k, false); }} onPointerLeave={() => onPress(k, false)} onContextMenu={e => e.preventDefault()}>{label}</button>);

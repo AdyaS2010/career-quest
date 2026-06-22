@@ -1,6 +1,5 @@
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, Palette, Users, Accessibility, Smartphone, Zap, Shield, Globe, Heart } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext';
+import { Palette, Users, Accessibility, Smartphone, Zap, Shield, Heart } from 'lucide-react';
+import { AppNavbar } from '../components/AppNavbar';
 import { motion } from 'framer-motion';
 
 const DESIGN_SECTIONS = [
@@ -87,46 +86,13 @@ const JOURNEY_STEPS = [
 ];
 
 export function AboutPage() {
-    const navigate = useNavigate();
-    const { theme, toggleTheme } = useTheme();
 
     return (
         <div
             className="min-h-screen"
             style={{ background: 'linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))' }}
         >
-            <nav
-                className="sticky top-0 z-40 backdrop-blur-lg border-b shadow-md"
-                style={{ backgroundColor: 'var(--nav-bg)', borderColor: 'var(--nav-border)' }}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <button
-                            onClick={() => navigate('/profile')}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-                            style={{ color: 'var(--accent-primary)' }}
-                            aria-label="Back to Profile"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            <span className="font-medium">Back to Profile</span>
-                        </button>
-
-                        <div className="flex items-center gap-2">
-                            <Globe className="w-6 h-6 text-indigo-500" />
-                            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>About & UX Design</h1>
-                        </div>
-
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg transition-colors"
-                            style={{ backgroundColor: 'var(--surface-card)', color: 'var(--text-secondary)' }}
-                            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <AppNavbar />
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
 

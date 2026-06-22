@@ -1069,9 +1069,9 @@ function TopBar(props: {
       {/* right cluster: actions, grouped */}
       <div className="flex items-center gap-1 pointer-events-auto rounded-2xl border border-white/15 shadow-xl px-1.5 py-1.5"
         style={{ background: 'linear-gradient(180deg, rgba(17,24,39,0.92), rgba(17,24,39,0.78))', backdropFilter: 'blur(10px)' }}>
-        <HudBtn onClick={props.onCompass} title="Career Compass" accent="#34d399"><Compass className="w-5 h-5" /></HudBtn>
-        <HudBtn onClick={props.onLeaderboard} title="Leaderboard" accent="#fbbf24"><Trophy className="w-5 h-5" /></HudBtn>
         <HudBtn onClick={props.onClassicMap} title="Classic island map" accent="#a78bfa"><MapIcon className="w-5 h-5" /></HudBtn>
+        <HudBtn onClick={props.onLeaderboard} title="Leaderboard" accent="#fbbf24"><Trophy className="w-5 h-5" /></HudBtn>
+        <HudBtn onClick={props.onCompass} title="Career Compass" accent="#34d399"><Compass className="w-5 h-5" /></HudBtn>
         <HudBtn onClick={props.onProfile} title="Profile" accent="#60a5fa"><User className="w-5 h-5" /></HudBtn>
         <span className="w-px h-6 bg-white/15 mx-0.5" />
         <HudBtn onClick={props.onMute} title={props.muted ? 'Unmute' : 'Mute'}>{props.muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</HudBtn>

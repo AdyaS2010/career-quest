@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, Compass, Target, Trophy, Zap, Star, Flame, BookOpen, Sparkles } from 'lucide-react';
+import { Compass, Target, Trophy, Zap, Star, Flame, Sparkles } from 'lucide-react';
+import { AppNavbar } from '../components/AppNavbar';
 import { useTheme } from '../contexts/ThemeContext';
 import { motion } from 'framer-motion';
 
@@ -37,8 +37,7 @@ const EASTER_EGGS = [
 ];
 
 export function HowToPlayPage() {
-    const navigate = useNavigate();
-    const { theme, toggleTheme } = useTheme();
+    const { theme } = useTheme();
     const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
     const [easterEggIndex, setEasterEggIndex] = useState(-1);
     const [sparkleCount, setSparkleCount] = useState(0);
@@ -61,36 +60,7 @@ export function HowToPlayPage() {
             className="min-h-screen"
             style={{ background: 'linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary))' }}
         >
-            <nav
-                className="sticky top-0 z-40 backdrop-blur-lg border-b shadow-md"
-                style={{ backgroundColor: 'var(--nav-bg)', borderColor: 'var(--nav-border)' }}
-            >
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <button
-                            onClick={() => navigate('/profile')}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-                            style={{ color: 'var(--accent-primary)' }}
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            <span className="font-medium">Back to Profile</span>
-                        </button>
-
-                        <div className="flex items-center gap-2">
-                            <BookOpen className="w-6 h-6 text-blue-500" />
-                            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>How to Play</h1>
-                        </div>
-
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg transition-colors"
-                            style={{ backgroundColor: 'var(--surface-card)', color: 'var(--text-secondary)' }}
-                        >
-                            {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <AppNavbar />
 
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
 
