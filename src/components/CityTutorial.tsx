@@ -1,25 +1,57 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Volume2, Sun } from 'lucide-react';
 
 interface Step {
   title: string;
   body: string;
-  cta: string | null;        // null => advances on player action (movement)
-  anchor: 'center' | 'top' | 'left';
+  cta: string | null;        // null => advances on player action/movement/navigation
+  anchor: 'center' | 'top-left' | 'left';
 }
 
-// A short, friendly first-run walkthrough hosted by Questopher. It is mostly
-// button-driven, with one genuinely interactive beat (step 2) that only
-// advances once the player actually moves — so newcomers learn the controls by
-// doing. The overlay never blocks input: only the coach card is interactive, so
-// the player can walk around underneath it.
 const STEPS: Step[] = [
-  { title: 'Welcome to Questford!', body: "I'm Questopher, your guide. This cosy little town is full of careers waiting for you to try. Let me show you around — it'll only take a moment.", cta: 'Show me', anchor: 'center' },
-  { title: 'Take a stroll', body: 'Use W A S D or the arrow keys to walk around town. Go on — give it a try!', cta: null, anchor: 'center' },
-  { title: 'Step inside a shop', body: 'Every signed building is a different career. Walk up to a door and press E to head inside and start playing.', cta: 'Got it', anchor: 'center' },
-  { title: 'Track your progress', body: 'Up here you can always see your stars, coins, level and daily streak as they grow.', cta: 'Next', anchor: 'top' },
-  { title: 'Always within reach', body: 'These controls follow you onto every screen — head back, mute the sound, or switch between light and dark.', cta: 'Next', anchor: 'left' },
-  { title: "You're all set!", body: 'Open the Map or Career Compass whenever you like to plan your path. Now go explore Questford — your adventure starts here!', cta: "Let's go", anchor: 'center' },
+  {
+    title: 'Welcome to Questford!',
+    body: "I'm Questopher, your guide. This cosy little town is full of careers waiting for you to try. Let me show you around — it'll only take a moment.",
+    cta: 'Show me',
+    anchor: 'center'
+  },
+  {
+    title: 'Take a stroll',
+    body: 'Use W A S D or the arrow keys to walk around town. Go on — give it a try!',
+    cta: null,
+    anchor: 'center'
+  },
+  {
+    title: 'Track your progress',
+    body: 'Up here you can always see your stars, coins, level and daily streak as they grow.',
+    cta: 'Next',
+    anchor: 'top-left'
+  },
+  {
+    title: 'Step inside a shop',
+    body: 'Every signed building is a career domain. Walk up to a door and press E to head inside, or open the Map/Compass to jump straight to one.',
+    cta: null,
+    anchor: 'center'
+  },
+  {
+    title: 'Welcome to the Career Hub!',
+    body: 'This is the career domain workspace. Click on any unlocked challenge card on the deck to enter a career simulation.',
+    cta: null,
+    anchor: 'center'
+  },
+  {
+    title: 'Always within reach',
+    body: 'Look to the left! In every simulation, you can use these floating controls to head back, mute sounds, or dim the screen.',
+    cta: 'Next',
+    anchor: 'left'
+  },
+  {
+    title: "You're all set!",
+    body: 'Outstanding! You have learned the basics of the kingdom. Complete challenges to earn stars and coins. Now go explore and have fun!',
+    cta: "Let's go",
+    anchor: 'center'
+  }
 ];
 
 export const TUTORIAL_STEP_COUNT = STEPS.length;
@@ -28,31 +60,80 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
   const s = STEPS[step];
   if (!s) return null;
 
+  const [highlightRect, setHighlightRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+
+  useEffect(() => {
+    const updateRect = () => {
+      let targetId = '';
+      if (s.anchor === 'top-left') {
+        targetId = 'tutorial-hud-progress';
+      } else if (s.anchor === 'left') {
+        targetId = 'tutorial-screen-controls';
+      }
+
+      if (targetId) {
+        const el = document.getElementById(targetId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          // Only update state if coordinates actually changed (avoids rendering loops)
+          setHighlightRect((prev) => {
+            if (
+              prev &&
+              prev.left === rect.left &&
+              prev.top === rect.top &&
+              prev.width === rect.width &&
+              prev.height === rect.height
+            ) {
+              return prev;
+            }
+            return {
+              left: rect.left,
+              top: rect.top,
+              width: rect.width,
+              height: rect.height,
+            };
+          });
+          return;
+        }
+      }
+      setHighlightRect(null);
+    };
+
+    updateRect();
+    const timer = setTimeout(updateRect, 100);
+    const interval = setInterval(updateRect, 400);
+    window.addEventListener('resize', updateRect);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+      window.removeEventListener('resize', updateRect);
+    };
+  }, [step, s.anchor]);
+
   const cardPos =
-    s.anchor === 'top'
-      ? 'left-1/2 -translate-x-1/2 top-20 sm:top-24'
+    s.anchor === 'top-left'
+      ? 'left-3 sm:left-5 top-24'
       : s.anchor === 'left'
         ? 'left-16 sm:left-20 top-1/2 -translate-y-1/2'
         : 'left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2';
 
   return (
-    <div className="fixed inset-0 z-[70] pointer-events-none">
+    <div className="fixed inset-0 z-[100] pointer-events-none">
       {/* soft scrim to focus attention without hiding the town */}
       <div className="absolute inset-0" style={{ background: 'rgba(6,10,24,0.30)' }} />
 
-      {/* contextual highlight rings */}
-      {s.anchor === 'top' && (
+      {/* contextual dynamic highlight rings */}
+      {highlightRect && (
         <motion.div
-          className="absolute left-1/2 -translate-x-1/2 top-2 rounded-2xl"
-          style={{ width: 'min(680px, 92vw)', height: 56, border: '2px solid rgba(250,204,21,0.85)', boxShadow: '0 0 22px rgba(250,204,21,0.5)' }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.6, repeat: Infinity }}
-        />
-      )}
-      {s.anchor === 'left' && (
-        <motion.div
-          className="absolute left-1 top-1/2 -translate-y-1/2 rounded-full"
-          style={{ width: 52, height: 150, border: '2px solid rgba(250,204,21,0.85)', boxShadow: '0 0 22px rgba(250,204,21,0.5)' }}
+          className="absolute rounded-2xl"
+          style={{
+            left: highlightRect.left - 4,
+            top: highlightRect.top - 4,
+            width: highlightRect.width + 8,
+            height: highlightRect.height + 8,
+            border: '2px solid rgba(250,204,21,0.85)',
+            boxShadow: '0 0 22px rgba(250,204,21,0.5)',
+          }}
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.6, repeat: Infinity }}
         />
@@ -78,7 +159,7 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
           </div>
 
           {/* the interactive movement beat shows live key hints instead of a button */}
-          {s.cta === null && (
+          {s.cta === null && step === 1 && (
             <div className="mt-4 flex items-center justify-center gap-1.5">
               {['W', 'A', 'S', 'D'].map((k, i) => (
                 <motion.span
@@ -94,7 +175,7 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
             </div>
           )}
 
-          {/* mini control previews for the relevant steps */}
+          {/* mini control previews for the settings step */}
           {s.anchor === 'left' && (
             <div className="mt-4 flex items-center justify-center gap-2 text-slate-300">
               <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)' }}><ArrowLeft className="w-4 h-4" /></span>

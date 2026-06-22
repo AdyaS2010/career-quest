@@ -757,11 +757,12 @@ export function HomePage() {
                   )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl w-full relative z-10">
-                    {careers.map((career) => {
+                    {careers.map((career, index) => {
                       const status = careerStatus[career.id] || 'not_started';
                       const isMastered = status === 'mastered';
                       const isInProgress = status === 'in_progress';
                       const earnedScore = careerXP[career.id] || 0;
+                      const delay = index * 0.25;
 
                       return (
                         <button
@@ -772,7 +773,7 @@ export function HomePage() {
                           tabIndex={0}
                         >
                           {/* Interactive area wrapper */}
-                          <div className="relative w-48 h-48 lg:w-52 lg:h-52 mx-auto transition-all duration-500 ease-out hover:scale-110 hover:-translate-y-4 hover:rotate-2">
+                          <div className="relative w-48 h-48 lg:w-52 lg:h-52 mx-auto transition-all duration-500 ease-out hover:scale-110 hover:-translate-y-4 hover:rotate-2 animate-float-card" style={{ animationDelay: `${delay}s` }}>
 
                             {/* Shadow blob */}
                             <div className="absolute top-[85%] left-1/2 -translate-x-1/2 w-[60%] h-[15%] bg-black/60 blur-xl rounded-[100%] transition-all duration-500 group-hover:scale-75 group-hover:opacity-40" />

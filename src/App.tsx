@@ -3,6 +3,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AudioProvider } from './contexts/AudioContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { SimulationProvider } from './contexts/SimulationContext';
+import { TutorialProvider, useTutorial } from './contexts/TutorialContext';
+import { CityTutorial } from './components/CityTutorial';
 import { GuideProvider } from './context/GuideContext';
 import { CharacterGuide } from './components/CharacterGuide';
 import { PageTransition } from './components/PageTransition';
@@ -63,6 +65,7 @@ function AppRoutes() {
   const { user, loading } = useAuth();
   const { dimmed } = useTheme();
   const location = useLocation();
+  const { tutStep, advanceTutorial, skipTutorial } = useTutorial();
   // The immersive walkable city + worlds have their own in-scene guide, so hide
   // the global helper there to keep the screen clean.
   const hideGuide = location.pathname === '/' || location.pathname.startsWith('/world');
@@ -92,6 +95,10 @@ function AppRoutes() {
       {user && <ScreenControls />}
       {/* Global Guide Component - rendered here to persist across routes */}
       {user && !hideGuide && <CharacterGuide />}
+      {/* Global Onboarding Tutorial Dialogue */}
+      {user && tutStep !== null && (
+        <CityTutorial step={tutStep} onAdvance={advanceTutorial} onSkip={skipTutorial} />
+      )}
     </>
   );
 }
@@ -103,9 +110,11 @@ function App() {
         <ThemeProvider>
           <AudioProvider>
             <SimulationProvider>
-              <GuideProvider>
-                <AppRoutes />
-              </GuideProvider>
+              <TutorialProvider>
+                <GuideProvider>
+                  <AppRoutes />
+                </GuideProvider>
+              </TutorialProvider>
             </SimulationProvider>
           </AudioProvider>
         </ThemeProvider>

@@ -20,7 +20,7 @@ export function ScreenControls() {
   const bg: React.CSSProperties = { background: 'rgba(10,18,40,0.78)', backdropFilter: 'blur(8px)', boxShadow: '0 4px 14px rgba(0,0,0,0.4)' };
 
   return (
-    <div className="fixed left-2 sm:left-3 top-1/2 -translate-y-1/2 z-[90] flex flex-col gap-2.5 pointer-events-none">
+    <div id="tutorial-screen-controls" className="fixed left-2 sm:left-3 top-1/2 -translate-y-1/2 z-[90] flex flex-col gap-2.5 pointer-events-none">
       <button onClick={exit} title="Back" aria-label="Back" className={btn} style={bg}>
         <ArrowLeft className="w-5 h-5" />
       </button>

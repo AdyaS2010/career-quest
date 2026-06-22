@@ -299,3 +299,17 @@ body {
 .qf-flag    { animation: qf-flag 2.2s ease-in-out infinite; transform-origin: left center; }
 .qf-bob     { animation: qf-bob 2.4s ease-in-out infinite; }
 .qf-blink   { animation: qf-blink 4s ease-in-out infinite; transform-origin: center; }
+
+/* ===== Staggered Float Animation for Career Cards ===== */
+.animate-float-card {
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

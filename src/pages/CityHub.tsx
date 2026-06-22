@@ -10,14 +10,13 @@ import { DialogueBox } from '../components/DialogueBox';
 import { SettingsModal } from '../components/SettingsModal';
 import { CareerQuiz } from '../components/CareerQuiz';
 import { MapPreview } from '../components/MapPreview';
-import { CityTutorial, TUTORIAL_STEP_COUNT } from '../components/CityTutorial';
+import { useTutorial } from '../contexts/TutorialContext';
 import { loadQuiz, saveQuiz, type QuizResult } from './city/quiz';
 import { loadWallet } from '../lib/wallet';
 import { loadPrefs, nowInTz } from '../lib/prefs';
 import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, type BaseMap } from './city/pico8';
 
 const SCALE = 6, TS = TILE * SCALE, SPEED = 2.7, REACH = TS * 1.3;
-let cityNarrated = false; // StrictMode-safe one-shot guard
 let savedPos: { x: number; y: number } | null = null; // remembers where the player left off across navigations
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -98,7 +97,7 @@ export function CityHub() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showMap, setShowMap] = useState(false);
-  const [tutStep, setTutStep] = useState<number | null>(null); // first-run interactive walkthrough
+  const { tutStep, setTutStep } = useTutorial();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -237,25 +236,7 @@ export function CityHub() {
     return () => setAmbience(null);
   }, [setAmbience, startBgm]);
 
-  // first-run interactive walkthrough (replaces a plain welcome dialogue)
-  useEffect(() => {
-    if (!ready || cityNarrated) return;
-    const key = `questford_onboarded_${user?.id || 'guest'}`;
-    let seen = false; try { seen = !!localStorage.getItem(key); } catch { /* ignore */ }
-    if (seen) return;
-    cityNarrated = true;
-    setTutStep(0);
-  }, [ready, user]);
-
-  const finishTutorial = () => {
-    setTutStep(null);
-    try { localStorage.setItem(`questford_onboarded_${user?.id || 'guest'}`, '1'); } catch { /* ignore */ }
-  };
-  const advanceTutorial = () => setTutStep(s => {
-    const n = (s ?? 0) + 1;
-    if (n >= TUTORIAL_STEP_COUNT) { finishTutorial(); return null; }
-    return n;
-  });
+  // Global tutorial events are handled by TutorialContext
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -415,7 +396,7 @@ export function CityHub() {
 
       {/* HUD */}
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">
-        <div className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
+        <div id="tutorial-hud-progress" className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
           <span className="text-xl">🏙️</span>
           <div className="hidden md:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">Where Futures Begin</p></div>
           <div className="flex items-center gap-1 ml-0.5 sm:ml-1">
@@ -451,7 +432,6 @@ export function CityHub() {
       {quizOpen && <CareerQuiz existing={quizResult} skills={skills} firstTime={false} onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }} onClose={() => setQuizOpen(false)} onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }} />}
       {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
-      {tutStep !== null && <CityTutorial step={tutStep} onAdvance={advanceTutorial} onSkip={finishTutorial} />}
     </div>
   );
 }
