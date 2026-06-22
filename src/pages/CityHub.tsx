@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
+import { useTheme } from '../contexts/ThemeContext';
 import type { Career, Profile, ColorScheme } from '../lib/database.types';
 import type { DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
@@ -62,20 +63,18 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 };
 
 // Each domain is a little establishment on Questford's high street. Every name is
-// plain enough to guess the trade at a glance, with just a wink of wit: a hospital
-// named for its vital signs, a kitchen that's all "Fork & Fire", a school with a
-// wise old owl, a courthouse down at Gavel Hall, the theatre at Center Stage. The
-// typefaces stay within one tasteful family of classic signage faces — elegant
-// serifs and engraved capitals — with a single modern accent for the tech workshop.
+// plain enough to guess the trade at a glance, with just a wink of wit.
+// The signage fonts are adjusted thematically to look playful and on-point for
+// each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; style: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Spectral', serif", fontWeight: 600, fontSize: 11.5, letterSpacing: '0.02em' } },
-  'culinary-arts':          { name: 'Fork & Fire',       style: { fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17 } },
-  'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Marcellus', serif", fontWeight: 400, fontSize: 13, letterSpacing: '0.03em' } },
-  'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: 13, letterSpacing: '0.04em' } },
-  'arts-entertainment':     { name: 'Center Stage',       style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 700, fontSize: 15 } },
-  'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 13, letterSpacing: '0.06em' } },
-  'law-government':         { name: 'Gavel Hall',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 13 } },
-  'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 16, letterSpacing: '0.03em' } },
+  'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em' } },
+  'culinary-arts':          { name: 'Fork & Fire',       style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 15.5, lineHeight: 1 } },
+  'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11 } },
+  'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em' } },
+  'arts-entertainment':     { name: 'Center Stage',       style: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 13, letterSpacing: '0.02em' } },
+  'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5 } },
+  'law-government':         { name: 'Gavel Hall',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
+  'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em' } },
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -85,6 +84,7 @@ export function CityHub() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { muted, toggleMute, playSfx, setAmbience, startBgm } = useAudio();
+  const { dyslexicFriendly } = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -378,7 +378,10 @@ export function CityHub() {
 
       {/* building signs — bespoke storefront nameplates, one typeface per trade */}
       {doors.map((d) => {
-        const sign = DOMAIN_SIGN[d.slug] ?? { name: d.name, style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5 } as React.CSSProperties };
+        const sign = DOMAIN_SIGN[d.slug] ?? { name: d.name, style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5 } };
+        const signStyle = dyslexicFriendly
+          ? { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 'normal', fontStyle: 'normal' }
+          : sign.style;
         return (
           <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .12s' }}>
             {/* slim hanger — a single ring + stem, as if the plate hangs from a bracket */}
@@ -386,7 +389,7 @@ export function CityHub() {
             <span style={{ width: 2, height: 5, background: 'rgba(38,28,18,0.6)' }} />
             {/* painted nameplate — neutral board, domain colour only in the frame + accent rule */}
             <div style={{ position: 'relative', padding: '5px 16px 6px', borderRadius: 7, background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', border: `1.5px solid ${d.color.primary}`, boxShadow: `0 5px 13px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 2.5px rgba(255,255,255,0.6)` }}>
-              <span style={{ display: 'block', whiteSpace: 'nowrap', lineHeight: 1.08, color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)', ...sign.style }}>{sign.name}</span>
+              <span style={{ display: 'block', whiteSpace: 'nowrap', lineHeight: 1.08, color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)', ...signStyle }}>{sign.name}</span>
               <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.color.primary}, transparent)` }} />
             </div>
           </div>
