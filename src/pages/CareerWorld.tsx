@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trophy, Star, Lock, Volume2, VolumeX, Moon, Sun, Sparkles, ExternalLink, X, BarChart3 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -220,15 +221,7 @@ export function CareerWorld() {
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: 'var(--bg-primary)' }}
-      >
-        <div
-          className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin"
-          style={{ borderColor: 'var(--accent-primary)', borderTopColor: 'transparent' }}
-        />
-      </div>
+      <div className="min-h-screen" style={{ background: '#05070f' }} />
     );
   }
 
@@ -602,7 +595,6 @@ export function CareerWorld() {
         'broadway-lead': { icon: '🎬', station: 'Stage Deck', focus: 'Cue timing and live performance control', tips: ['Track cues', 'Coordinate teams', 'Hold consistency'] },
       },
     };
-
     const careerMap = metaMap[slug] || {};
     return careerMap[key] || {
       icon: brief.icon,
@@ -613,7 +605,10 @@ export function CareerWorld() {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
       className="min-h-screen"
       style={{ background: theme === 'dark' ? `#0f172a ${bgGradient}` : bgGradient }}
     >
@@ -726,19 +721,15 @@ export function CareerWorld() {
             return (
               <div
                 key={challenge.id}
-                className="animate-float-card h-full"
-                style={{ animationDelay: `${index * 0.22}s` }}
+                className={`relative rounded-3xl border overflow-hidden transition-all duration-500 ease-out hover:scale-[1.03] hover:-translate-y-2 h-full ${isLocked ? 'opacity-65' : 'hover:shadow-2xl'}`}
+                style={{
+                  backgroundColor: 'var(--surface-card)',
+                  borderColor: `${paneAccent}66`,
+                  boxShadow: theme === 'dark'
+                    ? `0 12px 24px rgba(2,6,23,0.45), 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`
+                    : `0 14px 24px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.1), inset 0 1px 0 rgba(255,255,255,0.7)`,
+                }}
               >
-                <div
-                  className={`relative rounded-3xl border overflow-hidden transition-all duration-500 ease-out hover:scale-[1.03] hover:-translate-y-2 h-full ${isLocked ? 'opacity-65' : 'hover:shadow-2xl'}`}
-                  style={{
-                    backgroundColor: 'var(--surface-card)',
-                    borderColor: `${paneAccent}66`,
-                    boxShadow: theme === 'dark'
-                      ? `0 12px 24px rgba(2,6,23,0.45), 0 3px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`
-                      : `0 14px 24px rgba(15,23,42,0.12), 0 4px 10px rgba(15,23,42,0.1), inset 0 1px 0 rgba(255,255,255,0.7)`,
-                  }}
-                >
                 <div
                   className="pointer-events-none absolute inset-0 rounded-3xl"
                   style={{ background: 'linear-gradient(165deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 36%, transparent 60%)' }}
@@ -802,7 +793,6 @@ export function CareerWorld() {
                   </div>
                 </div>
               </div>
-            </div>
           );
         })}
         </section>
@@ -906,6 +896,6 @@ export function CareerWorld() {
         </div>,
         document.body
       )}
-    </div>
+    </motion.div>
   );
 }

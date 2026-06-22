@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Trophy, User, LogOut, Compass, Flame, Star, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -161,14 +162,18 @@ export function Arcade() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0b1024' }}>
-        <div className="text-center"><div className="text-5xl mb-4 animate-bounce">🏙️</div><p className="font-fantasy text-slate-200 text-xl">Loading Questford…</p></div>
-      </div>
+      <div className="min-h-screen" style={{ background: '#0b1024' }} />
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #0b1024 0%, #141e3c 45%, #1b2b52 100%)' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #0b1024 0%, #141e3c 45%, #1b2b52 100%)' }}
+    >
       {/* ambient glow + stars */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 12%, rgba(96,165,250,0.18), transparent 40%), radial-gradient(circle at 82% 8%, rgba(167,139,250,0.16), transparent 38%)' }} />
       <div className="absolute inset-0 pointer-events-none opacity-[0.5]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
@@ -269,7 +274,7 @@ export function Arcade() {
       {showIntro && <IntroScreen defaultName={profile?.character_name || profile?.username || 'Intern'} onBegin={beginGame} />}
       {quizOpen && <CareerQuiz existing={quizFirst ? null : quizResult} skills={skills} firstTime={quizFirst} onResult={onQuizResult} onClose={() => { setQuizOpen(false); setQuizFirst(false); }} onStartHere={(slug) => { setQuizOpen(false); setQuizFirst(false); navigate(`/career/${slug}`); }} />}
       {showOutro && <Outro name={profile?.character_name || profile?.username || 'Champion'} topName={topName} palette={PLAYER_PALETTE} onClose={() => setShowOutro(false)} />}
-    </div>
+    </motion.div>
   );
 }
 

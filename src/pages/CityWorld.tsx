@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trophy, User, LogOut, Volume2, VolumeX, Moon, Sun, Flame, Coins, Map as MapIcon, Zap, Navigation, MessageCircle, Compass } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -506,12 +507,7 @@ export function CityWorld() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0b1220' }}>
-        <div className="text-center">
-          <div className="text-5xl mb-4 animate-bounce">🏙️</div>
-          <p className="text-xl font-fantasy text-slate-200">Waking up Questford…</p>
-        </div>
-      </div>
+      <div className="min-h-screen" style={{ backgroundColor: '#0b1220' }} />
     );
   }
 
@@ -566,7 +562,13 @@ export function CityWorld() {
   }
 
   return (
-    <div className="fixed inset-0 overflow-hidden select-none" style={{ background: skyBottom }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="fixed inset-0 overflow-hidden select-none"
+      style={{ background: skyBottom }}
+    >
       {/* sky tint that shifts smoothly with the in-game clock */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse at 50% -10%, ${skyTop}, ${skyBottom} 70%)` }} />
 
@@ -761,7 +763,7 @@ export function CityWorld() {
           onClose={() => setShowOutro(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

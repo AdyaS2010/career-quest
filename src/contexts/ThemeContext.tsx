@@ -5,8 +5,6 @@ interface ThemeContextType {
     toggleTheme: () => void;
     dimmed: boolean;
     toggleDim: () => void;
-    normalFont: boolean;
-    toggleNormalFont: () => void;
     highContrast: boolean;
     toggleHighContrast: () => void;
     dyslexicFriendly: boolean;
@@ -27,17 +25,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const [dyslexicFriendly, setDyslexicFriendly] = useState(() => localStorage.getItem('dyslexicFriendly') === 'true');
     const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem('reducedMotion') === 'true');
     const [dimmed, setDimmed] = useState(() => localStorage.getItem('screenDimmed') === 'true');
-    const [normalFont, setNormalFont] = useState(() => localStorage.getItem('normalFont') === 'true');
 
     useEffect(() => {
         localStorage.setItem('screenDimmed', String(dimmed));
     }, [dimmed]);
-
-    useEffect(() => {
-        localStorage.setItem('normalFont', String(normalFont));
-        if (normalFont) document.documentElement.classList.add('normal-font');
-        else document.documentElement.classList.remove('normal-font');
-    }, [normalFont]);
 
     useEffect(() => {
         localStorage.setItem('theme', theme);
@@ -64,7 +55,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
     const toggleDim = () => setDimmed(prev => !prev);
-    const toggleNormalFont = () => setNormalFont(prev => !prev);
     const toggleHighContrast = () => setHighContrast(prev => !prev);
     const toggleDyslexicFriendly = () => setDyslexicFriendly(prev => !prev);
     const toggleReducedMotion = () => setReducedMotion(prev => !prev);
@@ -73,7 +63,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         <ThemeContext.Provider value={{
             theme, toggleTheme,
             dimmed, toggleDim,
-            normalFont, toggleNormalFont,
             highContrast, toggleHighContrast,
             dyslexicFriendly, toggleDyslexicFriendly,
             reducedMotion, toggleReducedMotion

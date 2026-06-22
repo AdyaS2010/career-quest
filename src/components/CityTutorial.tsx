@@ -6,7 +6,7 @@ interface Step {
   title: string;
   body: string;
   cta: string | null;        // null => advances on player action/movement/navigation
-  anchor: 'center' | 'top-left' | 'left';
+  anchor: 'center' | 'top-left' | 'left' | 'center-lower' | 'right';
 }
 
 const STEPS: Step[] = [
@@ -14,7 +14,7 @@ const STEPS: Step[] = [
     title: 'Welcome to Questford!',
     body: "I'm Questopher, your guide. This cosy little town is full of careers waiting for you to try. Let me show you around — it'll only take a moment.",
     cta: 'Show me',
-    anchor: 'center'
+    anchor: 'center-lower'
   },
   {
     title: 'Take a stroll',
@@ -50,7 +50,7 @@ const STEPS: Step[] = [
     title: "You're all set!",
     body: 'Outstanding! You have learned the basics of the kingdom. Complete challenges to earn stars and coins. Now go explore and have fun!',
     cta: "Let's go",
-    anchor: 'center'
+    anchor: 'right'
   }
 ];
 
@@ -115,7 +115,11 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
       ? 'left-3 sm:left-5 top-24'
       : s.anchor === 'left'
         ? 'left-16 sm:left-20 top-1/2 -translate-y-1/2'
-        : 'left-1/2 -translate-x-1/2 top-24 sm:top-28';
+        : s.anchor === 'right'
+          ? 'right-4 sm:right-8 lg:right-16 top-1/2 -translate-y-1/2'
+          : s.anchor === 'center-lower'
+            ? 'left-1/2 -translate-x-1/2 top-48 sm:top-56'
+            : 'left-1/2 -translate-x-1/2 top-24 sm:top-28';
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none">

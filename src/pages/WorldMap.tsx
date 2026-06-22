@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Compass, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -195,10 +196,16 @@ export function WorldMap() {
   careers.forEach(c => { skills[c.slug] = { xp: careerXP[c.id] || 0, status: careerStatus[c.id] || 'not_started' }; });
   const topName = (quizResult && QUIZ_DOMAINS[quizResult.top]?.name) || careers.find(c => careerStatus[c.id] === 'mastered')?.name || 'your calling';
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a1228' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">🗺️</div><p className="font-fantasy text-slate-200 text-xl">Unrolling the map…</p></div></div>;
+  if (loading) return <div className="min-h-screen" style={{ background: '#0a1228' }} />;
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: '#4a93c6' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 overflow-hidden"
+      style={{ background: '#4a93c6' }}
+    >
       {/* ===== the map ===== */}
       <div className="absolute inset-0">
         <svg viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid slice" className="w-full h-full">
@@ -350,6 +357,6 @@ export function WorldMap() {
       {showIntro && <IntroScreen defaultName={profile?.character_name || profile?.username || 'Intern'} onBegin={beginGame} />}
       {quizOpen && <CareerQuiz existing={quizFirst ? null : quizResult} skills={skills} firstTime={quizFirst} onResult={onQuizResult} onClose={() => { setQuizOpen(false); setQuizFirst(false); }} onStartHere={(slug) => { setQuizOpen(false); setQuizFirst(false); navigate(`/career/${slug}`); }} />}
       {showOutro && <Outro name={profile?.character_name || profile?.username || 'Champion'} topName={topName} palette={PLAYER_PALETTE} onClose={() => setShowOutro(false)} />}
-    </div>
+    </motion.div>
   );
 }

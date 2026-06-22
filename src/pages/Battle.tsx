@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Heart, Coins, Zap, ArrowLeft, Sparkles, Trophy } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { Career, ColorScheme } from '../lib/database.types';
@@ -116,14 +117,20 @@ export function Battle() {
   const retry = () => { setEnemyHP(100); setPlayerHP(maxHP); setStreak(0); setCorrect(0); setWrong(0); setStep(0); setPicked(null); setPhase('fight'); };
 
   if (phase === 'loading' || !def) {
-    return <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0a0613' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">⚔️</div><p className="font-fantasy text-slate-200 text-xl">Entering battle…</p></div></div>;
+    return <div className="fixed inset-0" style={{ background: '#0a0613' }} />;
   }
 
   const enemyPct = enemyHP, playerPct = Math.round((playerHP / maxHP) * 100);
   const palette = paletteFromWallet(wallet);
 
   return (
-    <div className={`fixed inset-0 overflow-hidden select-none ${arenaFx}`} style={{ background: `radial-gradient(ellipse at 50% 0%, ${cs.secondary}, #0a0613 75%)` }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed inset-0 overflow-hidden select-none ${arenaFx}`}
+      style={{ background: `radial-gradient(ellipse at 50% 0%, ${cs.secondary}, #0a0613 75%)` }}
+    >
       {/* arena grid */}
       <div className="absolute inset-x-0 bottom-0" style={{ height: '46%', background: `linear-gradient(180deg, transparent, ${cs.primary}22)`, backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 
@@ -224,7 +231,7 @@ export function Battle() {
           </div>
         </Overlay>
       )}
-    </div>
+    </motion.div>
   );
 }
 

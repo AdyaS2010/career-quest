@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, User, LogOut, Compass, Coins, Volume2, VolumeX } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -251,7 +252,7 @@ export function ArcadeWorld() {
   const topName = (quizResult && QUIZ_DOMAINS[quizResult.top]?.name) || careers.find(c => careerStatus[c.id] === 'mastered')?.name || 'your calling';
   const onQuizResult = (r: QuizResult) => { setQuizResult(r); if (user) saveQuiz(user.id, r); };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: '#0b1024' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">🕹️</div><p className="font-fantasy text-slate-200 text-xl">Powering up the arcade…</p></div></div>;
+  if (loading) return <div className="min-h-screen" style={{ background: '#0b1024' }} />;
 
   const p = player.current;
   const scale = Math.min(viewport.w / W, (viewport.h - 56) / H) * 0.98;
@@ -259,7 +260,13 @@ export function ArcadeWorld() {
   const recSlug = quizResult?.top;
 
   return (
-    <div className="fixed inset-0 overflow-hidden select-none" style={{ background: scene === 'exterior' ? 'radial-gradient(ellipse at 50% -10%, #20305f, #0a0f24 75%)' : 'radial-gradient(ellipse at 50% 0%, #2a1846, #120b24 75%)' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 overflow-hidden select-none"
+      style={{ background: scene === 'exterior' ? 'radial-gradient(ellipse at 50% -10%, #20305f, #0a0f24 75%)' : 'radial-gradient(ellipse at 50% 0%, #2a1846, #120b24 75%)' }}
+    >
       {/* top bar */}
       <div className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-2.5" style={{ background: 'linear-gradient(180deg, rgba(11,16,36,0.92), transparent)' }}>
         <div className="flex items-center gap-2 min-w-0">
@@ -323,7 +330,7 @@ export function ArcadeWorld() {
       {showIntro && <IntroScreen defaultName={profile?.character_name || profile?.username || 'Intern'} onBegin={beginGame} />}
       {quizOpen && <CareerQuiz existing={quizFirst ? null : quizResult} skills={skills} firstTime={quizFirst} onResult={onQuizResult} onClose={() => { setQuizOpen(false); setQuizFirst(false); }} onStartHere={() => { setQuizOpen(false); setQuizFirst(false); }} />}
       {showOutro && <Outro name={profile?.character_name || profile?.username || 'Champion'} topName={topName} palette={paletteFromWallet(wallet)} onClose={() => setShowOutro(false)} />}
-    </div>
+    </motion.div>
   );
 }
 

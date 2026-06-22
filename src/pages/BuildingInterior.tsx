@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Trophy, DoorOpen, Sparkles, ExternalLink, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import type { Career, Challenge, UserChallengeProgress } from '../lib/database.types';
 import { interiorFor, ROOM_W, ROOM_H, ROOM_SPAWN, ROOM_EXIT, FLOOR_PATTERN, RESOURCES, INTERNSHIP_LINKS, type Furniture } from './city/interiors';
@@ -210,9 +211,7 @@ function CareerInterior() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0b1220' }}>
-        <div className="text-center"><div className="text-5xl mb-3 animate-bounce">🚪</div><p className="font-fantasy text-slate-200 text-xl">Entering {def.room}…</p></div>
-      </div>
+      <div className="fixed inset-0" style={{ background: '#0b1220' }} />
     );
   }
 
@@ -226,7 +225,13 @@ function CareerInterior() {
   const res = RESOURCES[careerSlug || ''];
 
   return (
-    <div className="fixed inset-0 overflow-hidden select-none" style={{ background: 'radial-gradient(circle at 50% 0%, #1f2937, #0b1220 70%)' }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 overflow-hidden select-none"
+      style={{ background: 'radial-gradient(circle at 50% 0%, #1f2937, #0b1220 70%)' }}
+    >
       {/* header */}
       <div className="absolute top-0 inset-x-0 z-40 flex items-center justify-between px-4 py-2.5"
         style={{ background: 'linear-gradient(180deg, rgba(11,18,32,0.95), rgba(11,18,32,0.4) 90%, transparent)' }}>
@@ -414,7 +419,7 @@ function CareerInterior() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

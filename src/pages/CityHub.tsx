@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star, Coins, Volume2, VolumeX, User, Trophy, Map as MapIcon, LogOut, Compass, Settings, Flame } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -392,7 +393,17 @@ export function CityHub() {
         );
       })}
 
-      {loading && <div className="absolute inset-0 flex items-center justify-center" style={{ background: '#0a1228' }}><div className="text-center"><div className="text-5xl mb-3 animate-bounce">🏙️</div><p className="font-fantasy text-slate-200 text-xl">Waking up the city…</p></div></div>}
+      {/* Cinematic dark transition overlay */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            className="absolute inset-0 z-50 bg-[#0a1228]"
+          />
+        )}
+      </AnimatePresence>
 
       {/* HUD */}
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">

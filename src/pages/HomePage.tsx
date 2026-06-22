@@ -558,7 +558,7 @@ export function HomePage() {
                   </div>
                   <div>
                     <p className="font-bold" style={{ color: 'var(--text-primary)' }}>Inclusive Font</p>
-                    <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Easy-to-read typeface</p>
+                    <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{dyslexicFriendly ? 'Classic Outfit typeface' : 'Default Questford typeface'}</p>
                   </div>
                 </div>
                 <button

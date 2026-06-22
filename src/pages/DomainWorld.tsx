@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Volume2, VolumeX, ExternalLink, X, Coins } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
@@ -257,9 +258,17 @@ export function DomainWorld() {
     <div ref={wrapRef} className="fixed inset-0 overflow-hidden select-none" style={{ background: '#0a1228', touchAction: 'none' }}>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'pixelated' }} />
 
-      {loading && <div className="absolute inset-0 flex items-center justify-center" style={{ background: '#0a1228' }}>
-        <div className="text-center"><div className="text-5xl mb-3 animate-bounce">🏙️</div><p className="font-fantasy text-slate-200 text-xl">Entering the district…</p></div>
-      </div>}
+      {/* Cinematic dark transition overlay */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            className="absolute inset-0 z-50 bg-[#0a1228]"
+          />
+        )}
+      </AnimatePresence>
 
       {/* top HUD */}
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">

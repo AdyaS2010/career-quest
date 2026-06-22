@@ -182,7 +182,7 @@
   }
 
   .dyslexic-friendly {
-    --font-app: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+    --font-app: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif !important;
   }
 
   .reduced-motion * {
@@ -219,9 +219,6 @@
    variable so a single class on <html> reskins the whole app. */
 :root {
   --font-app: 'Space Grotesk', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-}
-.normal-font {
-  --font-app: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
 }
 
 body {
