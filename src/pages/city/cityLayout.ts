@@ -44,10 +44,8 @@ export const BUILDINGS: BuildingDef[] = CAREERS.map(c => ({
 // the same building art but open a shop interior instead of a career sim.
 interface AmenityMeta { slug: string; label: string; blurb: string; emoji: string; color: string; roof: string; awning: string; storefront: string; icon: string; row: number; lot: number; }
 const AMENITY_META: AmenityMeta[] = [
-  { slug: 'market', label: 'Questmart', blurb: 'Stock up on energy and snacks.', emoji: '🛒', color: '#0d9488', roof: '#115e59', awning: '#5eead4', storefront: '🛒', icon: 'ShoppingCart', row: 2, lot: 0 },
-  { slug: 'shop', label: 'Style Studio', blurb: 'Restyle your look.', emoji: '🛍️', color: '#9333ea', roof: '#6b21a8', awning: '#d8b4fe', storefront: '🛍️', icon: 'Shirt', row: 2, lot: 4 },
-  { slug: 'gym', label: 'Iron Quest Gym', blurb: 'Train to boost your stamina.', emoji: '💪', color: '#e11d48', roof: '#9f1239', awning: '#fda4af', storefront: '🏋️', icon: 'Dumbbell', row: 2, lot: 6 },
-  { slug: 'home', label: 'Cozy Cottage', blurb: 'Head home to relax and restyle.', emoji: '🏠', color: '#0ea5e9', roof: '#0369a1', awning: '#7dd3fc', storefront: '🏠', icon: 'Home', row: 1, lot: 6 },
+  { slug: 'market', label: 'Questmart', blurb: 'Stock up on energy and upgrades.', emoji: '🛒', color: '#0d9488', roof: '#115e59', awning: '#5eead4', storefront: '🛒', icon: 'ShoppingCart', row: 2, lot: 0 },
+  { slug: 'home', label: 'Cottage Noir', blurb: 'Head home to relax and restyle.', emoji: '🏠', color: '#0ea5e9', roof: '#0369a1', awning: '#7dd3fc', storefront: '🏠', icon: 'Home', row: 1, lot: 6 },
 ];
 export const AMENITIES: BuildingDef[] = AMENITY_META.map(a => ({
   slug: a.slug, label: a.label, blurb: a.blurb, emoji: a.emoji, color: a.color, roof: a.roof, awning: a.awning, storefront: a.storefront,

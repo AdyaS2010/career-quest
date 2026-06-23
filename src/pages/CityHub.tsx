@@ -51,8 +51,6 @@ const DOOR_COORDS: Record<string, { x: number; y: number }> = {
   'financial-services': { x: 14, y: 29 },      // financial services
   'market': { x: 37, y: 10 },
   'home': { x: 28, y: 4 },
-  'shop': { x: 30, y: 18 },
-  'gym': { x: 9, y: 1 }
 };
 
 // Sign placement is INDEPENDENT of the doormats — each board sits wherever it
@@ -69,8 +67,6 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'financial-services': { x: 13, y: 26.8 },
   'market': { x: 37.5, y: 7.8 },
   'home': { x: 28.55, y: 1.7 },
-  'shop': { x: 30.55, y: 15.8 },
-  'gym': { x: 9.5, y: -0.2 }
 };
 
 // Each domain is a little establishment on Questford's high street. Every name is
@@ -87,9 +83,7 @@ const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties
   'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
   'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
   'market':                 { name: 'Questmart',          textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0d9488' } },
-  'home':                   { name: 'Cozy Cottage',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
-  'shop':                   { name: 'Style Studio',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#9333ea' } },
-  'gym':                    { name: 'Iron Quest Gym',     textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#e11d48' } }
+  'home':                   { name: 'Cottage Noir',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
