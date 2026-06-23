@@ -909,15 +909,14 @@ function drawBannerLight(ctx: CanvasRenderingContext2D, x: number, y: number, co
   ctx.ellipse(0, 1, 36, 11, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // C. Light bulb glow / bloom at the lantern center (0, -39.5) - radius 16
-  const bulbGrad = ctx.createRadialGradient(0, -39.5, 0, 0, -39.5, 16);
-  bulbGrad.addColorStop(0, `rgba(255, 255, 255, ${1.0 * skyGlow})`);
-  bulbGrad.addColorStop(0.25, `rgba(254, 240, 138, ${0.98 * skyGlow})`);
-  bulbGrad.addColorStop(0.6, `rgba(253, 224, 71, ${0.75 * skyGlow})`);
+  // C. Light bulb glow / bloom at the lantern center (0, -39.5) - softer and smaller (radius 8)
+  const bulbGrad = ctx.createRadialGradient(0, -39.5, 0, 0, -39.5, 8);
+  bulbGrad.addColorStop(0, `rgba(255, 255, 255, ${0.75 * skyGlow})`);
+  bulbGrad.addColorStop(0.3, `rgba(254, 240, 138, ${0.45 * skyGlow})`);
   bulbGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
   ctx.fillStyle = bulbGrad;
   ctx.beginPath();
-  ctx.arc(0, -39.5, 16, 0, Math.PI * 2);
+  ctx.arc(0, -39.5, 8, 0, Math.PI * 2);
   ctx.fill();
 
   // D. Thematic neon glowing flag effect
