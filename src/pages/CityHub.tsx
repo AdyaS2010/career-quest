@@ -394,6 +394,7 @@ export function CityHub() {
       else { const follow = 1 - Math.pow(0.0006, dt); cam.x += (tx - cam.x) * follow; cam.y += (ty - cam.y) * follow; }
 
       ctx.clearRect(0, 0, vw, vh);
+      const sky = daylight(nowInTz(tzRef.current));
       const c0 = Math.max(0, Math.floor(cam.x / TS)), c1 = Math.min(map.w - 1, Math.ceil((cam.x + vw) / TS));
       const r0 = Math.max(0, Math.floor(cam.y / TS)), r1 = Math.min(map.h - 1, Math.ceil((cam.y + vh) / TS));
       for (let ry = r0; ry <= r1; ry++) for (let cx2 = c0; cx2 <= c1; cx2++) {
@@ -415,8 +416,8 @@ export function CityHub() {
       for (const d of doorsRef.current) {
         const wx = (d.cx + 0.5) * TS, wy = (d.cy + 0.5) * TS, sx = wx - cam.x, sy = wy - cam.y;
         const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = d; }
-        drawBanner(ctx, sx - TS * 0.8, sy + 3, d.color.primary, t);            // district banners flank the entrance
-        drawBanner(ctx, sx + TS * 0.8, sy + 3, d.color.secondary || d.color.primary, t + 240);
+        drawBanner(ctx, sx - TS * 0.8, sy + 3, d.color.primary, t, sky.glow);            // district banners flank the entrance
+        drawBanner(ctx, sx + TS * 0.8, sy + 3, d.color.secondary || d.color.primary, t + 240, sky.glow);
         drawDoormat(ctx, sx, sy, d.color.primary, d.mastered);
         const el = signEls.current.get(d.slug);
         if (el) {
@@ -449,7 +450,6 @@ export function CityHub() {
       drawChar(ctx, pos.x - cam.x, pos.y - cam.y, '#22c55e', t, faceRef.current, movingRef.current);
 
       // ===== day/night cycle — ambient wash driven by the player's chosen clock =====
-      const sky = daylight(nowInTz(tzRef.current));
       ctx.fillStyle = `rgba(${sky.r | 0},${sky.g | 0},${sky.b | 0},${sky.a})`;
       ctx.fillRect(0, 0, vw, vh);
 
@@ -831,7 +831,8 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number,
 }
 
 // A small district banner on a pole — flanks each building entrance in its colour.
-function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number) {
+// At night, the finial glows and casts a warm street light cone downward.
+function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number, skyGlow = 0) {
   const wave = Math.sin(t / 260) * 1.6;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y));
   ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(0, 1, 4, 2, 0, 0, 7); ctx.fill();
@@ -839,6 +840,39 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
   ctx.fillStyle = '#e7d6a8'; ctx.beginPath(); ctx.arc(0, -36, 2, 0, 7); ctx.fill(); // finial
   ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -25); ctx.closePath(); ctx.fill(); // pennant
   ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -30); ctx.closePath(); ctx.fill();
+
+  // night glow street light effect
+  if (skyGlow > 0.05) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    
+    // Light bulb glow at the finial top
+    const bulbGrad = ctx.createRadialGradient(0, -36, 0, 0, -36, 6);
+    bulbGrad.addColorStop(0, `rgba(255, 253, 207, ${0.9 * skyGlow})`);
+    bulbGrad.addColorStop(1, 'rgba(255, 253, 207, 0)');
+    ctx.fillStyle = bulbGrad;
+    ctx.beginPath();
+    ctx.arc(0, -36, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Cast light cone downwards
+    const coneGrad = ctx.createLinearGradient(0, -36, 0, 0);
+    coneGrad.addColorStop(0, `rgba(253, 224, 71, ${0.35 * skyGlow})`);
+    coneGrad.addColorStop(0.5, `rgba(253, 224, 71, ${0.12 * skyGlow})`);
+    coneGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+    ctx.fillStyle = coneGrad;
+
+    // Draw cone triangle pointing down to ground
+    ctx.beginPath();
+    ctx.moveTo(0, -36);
+    ctx.lineTo(-24, 0);
+    ctx.lineTo(24, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 // A simple rectangular welcome mat on the doorstep. Mastered domains get a
