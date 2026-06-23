@@ -84,12 +84,23 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
 
   // Route-change auto-advancement:
   // Step 3 (Step inside a shop) -> Step 4 (Welcome to Career Hub)
-  // triggers when location changes to /career/:careerSlug
+  // triggers when location changes to /career/:careerSlug.
+  // If a new user starts directly in a career district (e.g. via Career Compass),
+  // they automatically jump to Step 4 of the tutorial.
   useEffect(() => {
-    if (tutStep === 3 && location.pathname.startsWith('/career/')) {
-      setTutStepState(4);
+    if (location.pathname.startsWith('/career/')) {
+      const key = getStorageKey();
+      let seen = false;
+      try {
+        seen = !!localStorage.getItem(key);
+      } catch {
+        // ignore
+      }
+      if (!seen && (tutStep === null || tutStep < 4)) {
+        setTutStepState(4);
+      }
     }
-  }, [location.pathname, tutStep]);
+  }, [location.pathname, tutStep, user]);
 
   // Simulation-change auto-advancement:
   // Step 4 (Career Hub briefing) -> Step 5 (Settings in simulation)

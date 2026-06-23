@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useAudio } from '../contexts/AudioContext';
 import { useTheme } from '../contexts/ThemeContext';
 import type { Career, Profile, ColorScheme } from '../lib/database.types';
-import { loadSeen, saveSeen, currentChapter, ENDING, type DialogueLine } from './city/story';
+import { loadSeen, saveSeen, currentChapter, CHAPTERS, ENDING, type DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
 import { IntroScreen } from '../components/IntroScreen';
 import { SettingsModal } from '../components/SettingsModal';
@@ -70,12 +70,12 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; style: React.CSSProperties }> = {
   'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em' } },
-  'culinary-arts':          { name: 'Hearthside Bistro', style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14, lineHeight: 1 } },
+  'culinary-arts':          { name: 'The Copper Skillet', style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14, lineHeight: 1 } },
   'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11 } },
   'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em' } },
   'arts-entertainment':     { name: 'Spotlight Studios',  style: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 11.5, letterSpacing: '0.02em' } },
   'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5 } },
-  'law-government':         { name: 'Courthouse',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
+  'law-government':         { name: 'Citizen Court',      style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
   'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em' } },
 };
 
@@ -100,6 +100,7 @@ export function CityHub() {
   const [quizOpen, setQuizOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [showOnboardingChoice, setShowOnboardingChoice] = useState(false);
   const { tutStep, setTutStep } = useTutorial();
 
   const [seenState, setSeenState] = useState<{ introSeen: boolean; chaptersSeen: string[]; endingSeen: boolean }>({
@@ -114,6 +115,7 @@ export function CityHub() {
   useEffect(() => {
     if (user) {
       setSeenState(loadSeen(user.id));
+      savedPos = null; // Reset spawn memory on login/re-login/user change
     }
   }, [user]);
 
@@ -140,7 +142,7 @@ export function CityHub() {
   useEffect(() => { tutStepRef.current = tutStep; }, [tutStep]);
 
   const showIntro = ready && !seenState.introSeen;
-  busyRef.current = showIntro || !!dialogue || quizOpen || showSettings || showMap;
+  busyRef.current = showIntro || showOnboardingChoice || !!dialogue || quizOpen || showSettings || showMap;
 
   // HUD data (streak / level / xp / skills) — loaded separately from the map so
   // the canvas render loop is never disturbed.
@@ -541,17 +543,22 @@ export function CityHub() {
               const mastered = Object.values(skills).filter(s => s.status === 'mastered').length;
               const storyProgress = { started, mastered };
               const chapter = currentChapter(storyProgress);
-              const updated = { ...seenState };
-              if (mastered >= 8) {
-                updated.endingSeen = true;
-              } else if (!seenState.chaptersSeen.includes(chapter.id)) {
-                updated.chaptersSeen = [...seenState.chaptersSeen, chapter.id];
-                if (chapter.id === 'orientation') {
-                  setTutStep(0);
+              
+              setSeenState(prev => {
+                const next = { ...prev };
+                if (mastered >= 8) {
+                  next.endingSeen = true;
+                } else if (!prev.chaptersSeen.includes(chapter.id)) {
+                  next.chaptersSeen = [...prev.chaptersSeen, chapter.id];
+                  if (chapter.id === 'orientation') {
+                    setTimeout(() => {
+                      setShowOnboardingChoice(true);
+                    }, 0);
+                  }
                 }
-              }
-              setSeenState(updated);
-              saveSeen(user.id, updated);
+                saveSeen(user.id, next);
+                return next;
+              });
             }
           }}
         />
@@ -568,21 +575,76 @@ export function CityHub() {
                 .eq('id', user.id);
               if (error) throw error;
               setProfile(prev => prev ? { ...prev, character_name: name } : null);
-              const updatedSeen = { ...seenState, introSeen: true };
-              setSeenState(updatedSeen);
-              saveSeen(user.id, updatedSeen);
-              setDialogue(getMayorDialogue());
+              
+              setSeenState(prev => {
+                const next = { ...prev, introSeen: true };
+                saveSeen(user.id, next);
+                return next;
+              });
+              
+              setDialogue(CHAPTERS[0].intro);
             } catch (e) {
               console.error('Error saving character name:', e);
-              const updatedSeen = { ...seenState, introSeen: true };
-              setSeenState(updatedSeen);
-              saveSeen(user.id, updatedSeen);
-              setDialogue(getMayorDialogue());
+              setSeenState(prev => {
+                const next = { ...prev, introSeen: true };
+                saveSeen(user.id, next);
+                return next;
+              });
+              setDialogue(CHAPTERS[0].intro);
             }
           }}
         />
       )}
-      {quizOpen && <CareerQuiz existing={quizResult} skills={skills} firstTime={false} onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }} onClose={() => setQuizOpen(false)} onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }} />}
+      {quizOpen && (
+        <CareerQuiz
+          existing={quizResult}
+          skills={skills}
+          firstTime={!quizResult}
+          onResult={r => { setQuizResult(r); if (user) saveQuiz(user.id, r); }}
+          onClose={() => {
+            setQuizOpen(false);
+            const onboarded = localStorage.getItem('questford_onboarded_' + user?.id) === '1';
+            if (!onboarded && tutStep === null) {
+              setTutStep(0);
+            }
+          }}
+          onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }}
+        />
+      )}
+      {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showOnboardingChoice && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border-2 border-emerald-500/30 p-6 text-center text-white shadow-2xl relative animate-bounce-in" style={{ background: 'linear-gradient(160deg, #101b33 0%, #0c1224 100%)' }}>
+            <div className="text-5xl mb-3">🧭</div>
+            <h3 className="text-2xl font-black mb-2 text-emerald-400">Discover Your Path</h3>
+            <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+              Welcome to Questford! Would you like to align your Career Compass to find your top recommended fields, or would you prefer a quick tour of the city streets?
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowOnboardingChoice(false);
+                  setQuizOpen(true);
+                }}
+                className="w-full py-3.5 rounded-2xl font-black text-slate-900 shadow-xl transition-all hover:scale-[1.02] active:scale-95"
+                style={{ background: 'linear-gradient(90deg, #34d399, #10b981)' }}
+              >
+                Find My Match (Career Compass)
+              </button>
+              <button
+                onClick={() => {
+                  setShowOnboardingChoice(false);
+                  setTutStep(0);
+                }}
+                className="w-full py-3.5 rounded-2xl font-bold bg-white/10 hover:bg-white/15 border border-white/20 transition-all hover:scale-[1.02] active:scale-95 text-white"
+              >
+                Stroll and Tour Town
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
