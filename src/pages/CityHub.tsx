@@ -27,6 +27,7 @@ type Rect = { x: number; y: number; w: number; h: number };
 // Force WALKABLE (overrides everything, incl. buildings). Read off the 📍 readout.
 const WALKABLE_OVERRIDES: Rect[] = [
   { x: 22, y: 13, w: 7, h: 3 }, // open courtyard / sidewalk (22,13)–(28,15)
+  { x: 28, y: 11, w: 7, h: 5 }, // rooftop (28,11)–(34,15)
   { x: 27, y: 19, w: 3, h: 3 }, // Mayor's Plaza / Center Court walkable path around 28, 20
 ];
 // Walkable EXCEPT solid buildings (e.g. an open sand area dotted with houses).
@@ -78,12 +79,12 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
   'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 600, fontSize: 12.5, letterSpacing: '0.02em', color: '#2ea47d' } }, // clinical forest green
-  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#c2410c' } }, // rich warm terracotta rust
+  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 700, fontSize: 13.5, color: '#c2410c' } }, // rich warm terracotta rust
   'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#1e3a8a' } },
   'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
   'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#7e22ce' } }, // vibrant purple
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
-  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
+  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
   'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
   'market':                 { name: 'Questmart',          textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0d9488' } },
   'home':                   { name: 'Cozy Cottage',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
