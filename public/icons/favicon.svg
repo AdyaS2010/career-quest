@@ -1,12 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#5b8fd6"/>
-  <circle cx="50" cy="15" r="6" fill="#ffe39a"/>
-  <path d="M0 64 V48 Q32 40 64 48 V64 Z" fill="#4f9a5a"/>
-  <ellipse cx="32" cy="51" rx="16" ry="3" fill="#3f8a4c"/>
-  <rect x="20" y="30" width="24" height="20" rx="2" fill="#f6e7c6"/>
-  <path d="M16 31 L32 16 L48 31 Z" fill="#e07a5f"/>
-  <rect x="28" y="40" width="8" height="10" rx="1" fill="#8a5a3c"/>
-  <rect x="22.5" y="34" width="6" height="6" rx="1" fill="#bfe3ff"/>
-  <rect x="35.5" y="34" width="6" height="6" rx="1" fill="#bfe3ff"/>
-  <path d="M32 16 V11 M32 11 L40 13.5 L32 16" stroke="#8a8f98" stroke-width="1.5" fill="#ffd166"/>
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e295d" />
+      <stop offset="100%" stop-color="#0a0f24" />
+    </linearGradient>
+    
+    <!-- Active Gold Gradient -->
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    
+    <!-- Active Emerald Gradient -->
+    <linearGradient id="emerald-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer circular frame with a glowing gold border -->
+  <circle cx="32" cy="32" r="28" fill="url(#bg-grad)" stroke="url(#gold-grad)" stroke-width="2.5" />
+  
+  <!-- Subtle inner track -->
+  <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(251, 191, 36, 0.15)" stroke-width="1" />
+
+  <!-- Compass Directions / Accents -->
+  <!-- N, S, E, W dots -->
+  <circle cx="32" cy="8" r="1.5" fill="#fbbf24" />
+  <circle cx="32" cy="56" r="1.5" fill="#d97706" />
+  <circle cx="8" cy="32" r="1.5" fill="#d97706" />
+  <circle cx="56" cy="32" r="1.5" fill="#d97706" />
+
+  <!-- Fine dial ticks -->
+  <line x1="32" y1="12" x2="32" y2="52" stroke="rgba(251, 191, 36, 0.1)" stroke-width="1" stroke-dasharray="1, 3" />
+  <line x1="12" y1="32" x2="52" y2="32" stroke="rgba(251, 191, 36, 0.1)" stroke-width="1" stroke-dasharray="1, 3" />
+
+  <!-- Compass Needle (Pointing Northeast for Ambition/Future) -->
+  <!-- NE Needle: Left side (Emerald) -->
+  <path d="M32 32 L27 27 L50 14 Z" fill="url(#emerald-grad)" />
+  <!-- NE Needle: Right side (Gold) -->
+  <path d="M32 32 L37 37 L50 14 Z" fill="url(#gold-grad)" />
+
+  <!-- SW Needle (Shadow/Back-end): Left side (Gold translucent) -->
+  <path d="M32 32 L27 27 L14 50 Z" fill="url(#gold-grad)" opacity="0.35" />
+  <!-- SW Needle (Shadow/Back-end): Right side (Emerald translucent) -->
+  <path d="M32 32 L37 37 L14 50 Z" fill="url(#emerald-grad)" opacity="0.35" />
+
+  <!-- Center Hub / Pivot Cap -->
+  <circle cx="32" cy="32" r="4" fill="#0f172a" />
+  <circle cx="32" cy="32" r="2" fill="#fbbf24" />
 </svg>
