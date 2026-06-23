@@ -18,6 +18,7 @@ import { loadQuiz, saveQuiz, type QuizResult } from './city/quiz';
 import { loadWallet } from '../lib/wallet';
 import { loadPrefs, nowInTz } from '../lib/prefs';
 import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, type BaseMap } from './city/pico8';
+import { AMENITIES } from './city/cityLayout';
 
 const SCALE = 6, TS = TILE * SCALE, SPEED = 2.7, REACH = TS * 1.3;
 let savedPos: { x: number; y: number } | null = null; // remembers where the player left off across navigations
@@ -48,6 +49,10 @@ const DOOR_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 24, y: 19 },     // media + communication
   'law-government': { x: 14, y: 0.5 },           // law
   'financial-services': { x: 14, y: 29 },      // financial services
+  'market': { x: 9, y: 1 },
+  'home': { x: 0, y: 12 },
+  'shop': { x: 12, y: 28 },
+  'gym': { x: 13, y: 28 }
 };
 
 // Sign placement is INDEPENDENT of the doormats — each board sits wherever it
@@ -62,6 +67,10 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 25, y: 16.9 },
   'law-government': { x: 14.5, y: 0.1 },         // top-edge building — keep the board low so it stays on screen
   'financial-services': { x: 13, y: 26.8 },
+  'market': { x: 9.5, y: -0.2 },
+  'home': { x: 0.55, y: 9.7 },
+  'shop': { x: 11.55, y: 25.8 },
+  'gym': { x: 14.55, y: 25.8 }
 };
 
 // Each domain is a little establishment on Questford's high street. Every name is
@@ -77,6 +86,10 @@ const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
   'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
   'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
+  'market':                 { name: 'Questmart',          textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0d9488' } },
+  'home':                   { name: 'Your Apartment',     textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
+  'shop':                   { name: 'Style Studio',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#9333ea' } },
+  'gym':                    { name: 'Iron Quest Gym',     textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#e11d48' } }
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -230,7 +243,9 @@ export function CityHub() {
         const pool = doorFronts.length >= need ? doorFronts : (stepCells.length >= need ? stepCells : (openReach.length ? openReach : [...reachSet]));
         const cells = spreadCells(map, pool, careers.length + 1);
         const npc = cells.shift()!;
-        const built: Door[] = careers.map((c, i) => { const fixed = DOOR_COORDS[c.slug]; return { slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: fixed?.x ?? (cells[i]?.x ?? npc.x), cy: fixed?.y ?? (cells[i]?.y ?? npc.y), mastered: mastered.has(c.slug) }; });
+        const builtCareers: Door[] = careers.map((c, i) => { const fixed = DOOR_COORDS[c.slug]; return { slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: fixed?.x ?? (cells[i]?.x ?? npc.x), cy: fixed?.y ?? (cells[i]?.y ?? npc.y), mastered: mastered.has(c.slug) }; });
+        const builtAmenities: Door[] = AMENITIES.map((a) => { const fixed = DOOR_COORDS[a.slug]; return { slug: a.slug, name: a.label, color: { primary: a.color, secondary: a.awning } as unknown as ColorScheme, icon: a.emoji, cx: fixed?.x ?? npc.x, cy: fixed?.y ?? npc.y, mastered: false }; });
+        const built = [...builtCareers, ...builtAmenities];
         if (!alive) return;
         doorsRef.current = built; setDoors(built);
         
@@ -355,6 +370,11 @@ export function CityHub() {
 
   useEffect(() => {
     if (!ready) return;
+    const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
+    const speedLvl = wallet.speedLvl || 0;
+    const speedMultiplier = 1 + speedLvl * 0.18;
+    const currentSpeed = SPEED * speedMultiplier;
+
     let prevT = performance.now();
     let firstFrame = true;
     let lastStep = 0;
@@ -373,7 +393,7 @@ export function CityHub() {
         const K = keysRef.current; let dx = 0, dy = 0;
         if (K.has('a') || K.has('arrowleft')) dx -= 1; if (K.has('d') || K.has('arrowright')) dx += 1;
         if (K.has('w') || K.has('arrowup')) dy -= 1; if (K.has('s') || K.has('arrowdown')) dy += 1;
-        if (dx || dy) { movingRef.current = true; const len = Math.hypot(dx, dy) || 1; dx = dx / len * SPEED; dy = dy / len * SPEED; if (dx) faceRef.current = dx < 0 ? -1 : 1;
+        if (dx || dy) { movingRef.current = true; const len = Math.hypot(dx, dy) || 1; dx = dx / len * currentSpeed; dy = dy / len * currentSpeed; if (dx) faceRef.current = dx < 0 ? -1 : 1;
           if (walkableAt(map, walk, pos.x + dx, pos.y)) pos.x = Math.max(2, Math.min(worldW - 2, pos.x + dx));
           if (walkableAt(map, walk, pos.x, pos.y + dy)) pos.y = Math.max(2, Math.min(worldH - 2, pos.y + dy)); }
       }

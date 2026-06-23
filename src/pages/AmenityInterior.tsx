@@ -81,7 +81,9 @@ export function AmenityInterior({ slug }: { slug: string }) {
         iy = (k.has('s') || k.has('arrowdown') ? 1 : 0) - (k.has('w') || k.has('arrowup') ? 1 : 0) + touch.current.y;
       }
       const l = Math.hypot(ix, iy);
-      let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * SPEED; ty = iy / l * SPEED; }
+      const speedMultiplier = 1 + (wallet.speedLvl || 0) * 0.18;
+      const currentSpeed = SPEED * speedMultiplier;
+      let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * currentSpeed; ty = iy / l * currentSpeed; }
       const s = 1 - Math.exp(-ACCEL_K * dt);
       p.vx += (tx - p.vx) * s; p.vy += (ty - p.vy) * s;
       const hit = (x: number, y: number) => solids.some(r => x - HALF < r.x + r.w && x + HALF > r.x && y - HALF < r.y + r.h && y + HALF > r.y);
@@ -89,7 +91,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
       if (!hit(nx, p.y)) p.x = Math.max(40, Math.min(ROOM_W - 40, nx)); else p.vx = 0;
       if (!hit(p.x, ny)) p.y = Math.max(120, Math.min(ROOM_H - 36, ny)); else p.vy = 0;
       const sp = Math.hypot(p.vx, p.vy); p.moving = sp > 10;
-      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += sp / SPEED * dt * 12; }
+      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += sp / currentSpeed * dt * 12; }
       const nc = p.x > COUNTER.x - NEAR && p.x < COUNTER.x + COUNTER.w + NEAR && p.y > COUNTER.y && p.y < COUNTER.y + COUNTER.h + NEAR;
       if (nc !== nearRef.current) { nearRef.current = nc; setNearCounter(nc); }
       setFrame(f => (f + 1) % 1e6);
@@ -97,7 +99,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
     };
     raf.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf.current);
-  }, []);
+  }, [wallet.speedLvl]);
 
   const buy = (item: ShopItem) => {
     setWallet(w => {

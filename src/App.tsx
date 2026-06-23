@@ -12,7 +12,7 @@ import { ScreenControls } from './components/ScreenControls';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { WorldMap } from './pages/WorldMap';
 import { CityHub } from './pages/CityHub';
-import { CareerWorld } from './pages/CareerWorld';
+import { BuildingInterior } from './pages/BuildingInterior';
 import { DomainWorld } from './pages/DomainWorld';
 import { LandingPage } from './pages/LandingPage';
 import { ProfilePage } from './pages/ProfilePage';
@@ -48,7 +48,7 @@ function AnimatedRoutes() {
           <Route path="/" element={<ProtectedRoute><CityHub /></ProtectedRoute>} />
           <Route path="/map" element={<ProtectedRoute><WorldMap /></ProtectedRoute>} />
           <Route path="/world/:careerSlug" element={<ProtectedRoute><DomainWorld /></ProtectedRoute>} />
-          <Route path="/career/:careerSlug" element={<ProtectedRoute><PageTransition><CareerWorld /></PageTransition></ProtectedRoute>} />
+          <Route path="/career/:careerSlug" element={<ProtectedRoute><PageTransition><BuildingInterior /></PageTransition></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute><PageTransition><LeaderboardPage /></PageTransition></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><PageTransition><ProfilePage /></PageTransition></ProtectedRoute>} />
           <Route path="/feedback" element={<ProtectedRoute><PageTransition><FeedbackPage /></PageTransition></ProtectedRoute>} />

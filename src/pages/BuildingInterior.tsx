@@ -14,7 +14,7 @@ import { CharacterSprite, PLAYER_PALETTE, type Palette } from './city/art';
 import { FurnitureSprite, SeatedNpc, PatientSprite, WallPanel, JobStation } from './city/interiorArt';
 import { AMENITY_SLUGS } from './city/cityLayout';
 import { AmenityInterior } from './AmenityInterior';
-import { awardCoins } from '../lib/wallet';
+import { awardCoins, loadWallet } from '../lib/wallet';
 
 const SPEED = 260, ACCEL_K = 16, HALF = 14, NEAR = 66;
 
@@ -139,6 +139,11 @@ function CareerInterior() {
   // ---- movement loop ----
   useEffect(() => {
     if (loading) return;
+    const wallet = loadWallet(user?.id || 'anon');
+    const speedLvl = wallet.speedLvl || 0;
+    const speedMultiplier = 1 + speedLvl * 0.18;
+    const currentSpeed = SPEED * speedMultiplier;
+
     const step = (ts: number) => {
       const dt = last.current ? Math.min((ts - last.current) / 1000, 0.05) : 0;
       last.current = ts;
@@ -151,7 +156,7 @@ function CareerInterior() {
       }
       const l = Math.hypot(ix, iy);
       let tx = 0, ty = 0;
-      if (l > 0.01) { tx = (ix / l) * SPEED; ty = (iy / l) * SPEED; }
+      if (l > 0.01) { tx = (ix / l) * currentSpeed; ty = (iy / l) * currentSpeed; }
       const s = 1 - Math.exp(-ACCEL_K * dt);
       p.vx += (tx - p.vx) * s; p.vy += (ty - p.vy) * s;
       const nx = p.x + p.vx * dt, ny = p.y + p.vy * dt;
@@ -160,7 +165,7 @@ function CareerInterior() {
       if (!blocked(p.x, ny)) p.y = Math.max(118, Math.min(ROOM_H - 36, ny)); else p.vy = 0;
       const sp = Math.hypot(p.vx, p.vy);
       p.moving = sp > 10;
-      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += (sp / SPEED) * dt * 12; }
+      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += (sp / currentSpeed) * dt * 12; }
 
       // nearest interactable
       let best: typeof near = null, bd = NEAR;
