@@ -229,13 +229,13 @@ const careerBriefContent: Record<string, {
 
 const DOMAIN_FONT_FAMILY: Record<string, string> = {
   'health-sciences':        "'Fredoka', sans-serif",
-  'culinary-arts':          "'Kalam', cursive",
-  'education':              "'Comfortaa', cursive",
+  'culinary-arts':          "'Fredoka', sans-serif",
+  'education':              "'Bricolage Grotesque', sans-serif",
   'information-technology': "'Orbitron', sans-serif",
   'arts-entertainment':     "'Righteous', cursive",
   'media-communication':    "'Playfair Display', serif",
-  'law-government':         "'Cinzel Decorative', serif",
-  'financial-services':     "'Cinzel', serif",
+  'law-government':         "'Cinzel', serif",
+  'financial-services':     "'Outfit', sans-serif",
 };
 
 function getCareerBrief(careerSlug: string | undefined, career: Career | null) {
