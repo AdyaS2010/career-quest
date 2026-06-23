@@ -125,7 +125,12 @@ export function LeaderboardPage() {
                         borderColor: 'var(--border-default)'
                     }}
                 >
-                    <div className="p-8 bg-indigo-600 text-white text-center rounded-t-3xl">
+                    <div 
+                        className="p-8 text-white text-center rounded-t-3xl"
+                        style={{
+                            background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%)'
+                        }}
+                    >
                         <h2 className="text-3xl font-bold mb-2">Ranking Top 10</h2>
                         <p className="text-indigo-100">See how you compare with other players globally!</p>
 
