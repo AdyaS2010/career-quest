@@ -34,7 +34,19 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     }
-    if (!seen) {
+    
+    // Only auto-start the tutorial if they've seen the intro sequence first
+    let storySeen = false;
+    try {
+      const raw = localStorage.getItem(`questford_story_${user.id}`);
+      if (raw) {
+        storySeen = JSON.parse(raw).introSeen;
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!seen && storySeen) {
       setTutStepState(0);
     } else {
       setTutStepState(null);

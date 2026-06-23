@@ -166,7 +166,7 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
           style={{ background: '#0f1733', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.16)', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
         >
           <div className="flex items-start gap-3">
-            <div className="text-3xl sm:text-4xl shrink-0 animate-bounce" style={{ animationDuration: '2.4s' }}>🤖</div>
+            <div className="text-3xl sm:text-4xl shrink-0 animate-bounce" style={{ animationDuration: '2.4s' }}>🧑‍💼</div>
             <div className="min-w-0">
               <h3 className="font-fantasy text-lg sm:text-xl text-amber-200 leading-tight">{s.title}</h3>
               <p className="mt-1.5 text-sm sm:text-[15px] text-slate-200/90 leading-relaxed">{s.body}</p>

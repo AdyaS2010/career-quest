@@ -9,6 +9,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import type { Career, Profile, ColorScheme } from '../lib/database.types';
 import { loadSeen, saveSeen, currentChapter, ENDING, type DialogueLine } from './city/story';
 import { DialogueBox } from '../components/DialogueBox';
+import { IntroScreen } from '../components/IntroScreen';
 import { SettingsModal } from '../components/SettingsModal';
 import { CareerQuiz } from '../components/CareerQuiz';
 import { MapPreview } from '../components/MapPreview';
@@ -138,7 +139,8 @@ export function CityHub() {
   const tutStepRef = useRef<number | null>(null);
   useEffect(() => { tutStepRef.current = tutStep; }, [tutStep]);
 
-  busyRef.current = !!dialogue || quizOpen || showSettings || showMap;
+  const showIntro = ready && !seenState.introSeen;
+  busyRef.current = showIntro || !!dialogue || quizOpen || showSettings || showMap;
 
   // HUD data (streak / level / xp / skills) — loaded separately from the map so
   // the canvas render loop is never disturbed.
@@ -213,7 +215,8 @@ export function CityHub() {
 
         mapRef.current = map; walkRef.current = walk; sheetRef.current = sheet;
         const spawn = findSpawn(map, walk);
-        posRef.current = { x: (spawn % map.w + 0.5) * TS, y: (Math.floor(spawn / map.w) + 0.5) * TS };
+        // Default spawning place at coordinate (28, 14)
+        posRef.current = { x: (28 + 0.5) * TS, y: (14 + 0.5) * TS };
         // resume where the player left off (if that spot is still walkable on this map)
         if (savedPos && walkableAt(map, walk, savedPos.x, savedPos.y)) posRef.current = { x: savedPos.x, y: savedPos.y };
         const reachSet = reachable(map, walk, spawn);
@@ -543,9 +546,38 @@ export function CityHub() {
                 updated.endingSeen = true;
               } else if (!seenState.chaptersSeen.includes(chapter.id)) {
                 updated.chaptersSeen = [...seenState.chaptersSeen, chapter.id];
+                if (chapter.id === 'orientation') {
+                  setTutStep(0);
+                }
               }
               setSeenState(updated);
               saveSeen(user.id, updated);
+            }
+          }}
+        />
+      )}
+      {showIntro && (
+        <IntroScreen
+          defaultName={profile?.character_name || profile?.username || 'Intern'}
+          onBegin={async (name) => {
+            if (!user) return;
+            try {
+              const { error } = await supabase
+                .from('profiles')
+                .update({ character_name: name } as never)
+                .eq('id', user.id);
+              if (error) throw error;
+              setProfile(prev => prev ? { ...prev, character_name: name } : null);
+              const updatedSeen = { ...seenState, introSeen: true };
+              setSeenState(updatedSeen);
+              saveSeen(user.id, updatedSeen);
+              setDialogue(getMayorDialogue());
+            } catch (e) {
+              console.error('Error saving character name:', e);
+              const updatedSeen = { ...seenState, introSeen: true };
+              setSeenState(updatedSeen);
+              saveSeen(user.id, updatedSeen);
+              setDialogue(getMayorDialogue());
             }
           }}
         />

@@ -1,6 +1,7 @@
-import { Settings, Sun, Moon, Eye, Accessibility, Wind, Sunset, X } from 'lucide-react';
+import { Settings, Sun, Moon, Eye, Accessibility, Wind, Sunset, X, Volume2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAudio } from '../contexts/AudioContext';
 
 // Accessibility + appearance settings, opened from the in-game HUD.
 export function SettingsModal({ onClose }: { onClose: () => void }) {
@@ -12,12 +13,15 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     reducedMotion, toggleReducedMotion,
   } = useTheme();
 
+  const { voiceoverEnabled, toggleVoiceover } = useAudio();
+
   const rows: { icon: React.ReactNode; tint: string; title: string; sub: string; on: boolean; toggle: () => void }[] = [
     { icon: theme === 'light' ? <Sun className="w-6 h-6 text-amber-600" /> : <Moon className="w-6 h-6 text-amber-400" />, tint: '#fbbf24', title: 'Appearance', sub: theme === 'light' ? 'Light Mode' : 'Dark Mode', on: theme === 'dark', toggle: toggleTheme },
     { icon: <Sunset className="w-6 h-6 text-indigo-400" />, tint: '#818cf8', title: 'Dim Screen', sub: 'Soften the brightness', on: dimmed, toggle: toggleDim },
     { icon: <Eye className="w-6 h-6 text-purple-500" />, tint: '#8b5cf6', title: 'High Contrast', sub: 'Maximum legibility', on: highContrast, toggle: toggleHighContrast },
     { icon: <Accessibility className="w-6 h-6 text-emerald-500" />, tint: '#10b981', title: 'Inclusive Font', sub: dyslexicFriendly ? 'Classic Outfit typeface' : 'Default Questford typeface', on: dyslexicFriendly, toggle: toggleDyslexicFriendly },
     { icon: <Wind className="w-6 h-6 text-blue-500" />, tint: '#3b82f6', title: 'Reduced Motion', sub: 'Minimize animations', on: reducedMotion, toggle: toggleReducedMotion },
+    { icon: <Volume2 className="w-6 h-6 text-indigo-500" />, tint: '#6366f1', title: 'Narrator Voice', sub: voiceoverEnabled ? 'Voiceover Enabled' : 'Voiceover Muted', on: voiceoverEnabled, toggle: toggleVoiceover },
   ];
 
   return createPortal(

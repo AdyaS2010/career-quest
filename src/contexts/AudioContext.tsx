@@ -41,6 +41,8 @@ const SCENES: Record<AmbienceScene, ScenePreset> = {
 interface AudioContextType {
   muted: boolean;
   toggleMute: () => void;
+  voiceoverEnabled: boolean;
+  toggleVoiceover: () => void;
   playSfx: (type: SfxType) => void;
   bgmPlaying: boolean;
   startBgm: (variant?: 'serene' | 'chip') => void;
@@ -58,17 +60,32 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem('audio_muted');
     return saved ? JSON.parse(saved) : false;
   });
+  const [voiceoverEnabled, setVoiceoverEnabled] = useState(() => {
+    const saved = localStorage.getItem('audio_voiceover_enabled');
+    return saved ? JSON.parse(saved) : true;
+  });
   const [bgmPlaying, setBgmPlaying] = useState(false);
   const [ambienceScene, setAmbienceScene] = useState<AmbienceScene | null>(null);
 
   const audioContextRef = useRef<globalThis.AudioContext | null>(null);
   const masterOutRef = useRef<GainNode | null>(null);
   const mutedRef = useRef(muted);
+  const voiceoverEnabledRef = useRef(voiceoverEnabled);
   const bgmNodesRef = useRef<{ gainNode: GainNode; oscillators: OscillatorNode[] } | null>(null);
   const bgmIntervalRef = useRef<number | null>(null);
   const bgmVariantRef = useRef<'serene' | 'chip' | null>(null);
   const ambienceRef = useRef<{ scene: AmbienceScene; master: GainNode; level: number; stop: () => void } | null>(null);
   const noiseBufferRef = useRef<AudioBuffer | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('audio_voiceover_enabled', JSON.stringify(voiceoverEnabled));
+    voiceoverEnabledRef.current = voiceoverEnabled;
+    if (!voiceoverEnabled) {
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch { /* ignore */ }
+      }
+    }
+  }, [voiceoverEnabled]);
 
   useEffect(() => {
     localStorage.setItem('audio_muted', JSON.stringify(muted));
@@ -507,7 +524,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [initAudio, buildAmbience]);
 
   const speak = useCallback((text: string) => {
-    if (mutedRef.current || !('speechSynthesis' in window)) return;
+    if (mutedRef.current || !voiceoverEnabledRef.current || !('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
       // Remove emojis from the text so the engine doesn't try to describe them
@@ -540,7 +557,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (targetVoice) utterance.voice = targetVoice;
       utterance.pitch = 0.95;  // slightly lower pitch for warm counseling feel
       utterance.rate = 0.92;   // slightly slower pace for comforting, clear, cozy speech
-      utterance.volume = 0.68; // comfortable volume (80% of current 0.85)
+      utterance.volume = 0.56; // adjusted volume
       
       window.speechSynthesis.speak(utterance);
     } catch (e) {
@@ -582,7 +599,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [stopBgm, cancelSpeech]);
 
   return (
-    <AudioContext.Provider value={{ muted, toggleMute: () => setMuted((m: boolean) => !m), playSfx, bgmPlaying, startBgm, stopBgm, ambienceScene, setAmbience, speak, cancelSpeech }}>
+    <AudioContext.Provider value={{ muted, toggleMute: () => setMuted((m: boolean) => !m), voiceoverEnabled, toggleVoiceover: () => setVoiceoverEnabled((v: boolean) => !v), playSfx, bgmPlaying, startBgm, stopBgm, ambienceScene, setAmbience, speak, cancelSpeech }}>
       {children}
     </AudioContext.Provider>
   );
