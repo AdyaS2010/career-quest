@@ -551,7 +551,7 @@ export function CityHub() {
             <Chip icon={<Coins className="w-4 h-4 text-amber-300" />} label={`${coins}`} title="Coins" />
           </div>
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5">
+        <div id="tutorial-hud-actions" className="flex items-center gap-1 sm:gap-1.5">
           <Btn onClick={() => setShowMap(true)} title="Quest map" a="#34d399"><MapIcon className="w-5 h-5" /></Btn>
           <Btn onClick={() => setQuizOpen(true)} title="Career Compass" a="#34d399"><Compass className="w-5 h-5" /></Btn>
           <Btn onClick={() => navigate('/leaderboard')} title="Leaderboard" a="#fbbf24"><Trophy className="w-5 h-5" /></Btn>

@@ -70,7 +70,7 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
     setTutStepState((s) => {
       if (s === null) return null;
       const n = s + 1;
-      if (n >= 7) { // 7 steps (0 to 6)
+      if (n >= 8) { // 8 steps (0 to 7)
         try {
           localStorage.setItem(getStorageKey(), '1');
         } catch {
@@ -96,18 +96,18 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
       } catch {
         // ignore
       }
-      if (!seen && (tutStep === null || tutStep < 4)) {
-        setTutStepState(4);
+      if (!seen && (tutStep === null || tutStep < 5)) {
+        setTutStepState(5);
       }
     }
   }, [location.pathname, tutStep, user]);
 
   // Simulation-change auto-advancement:
-  // Step 4 (Career Hub briefing) -> Step 5 (Settings in simulation)
+  // Step 5 (Career Hub briefing) -> Step 6 (Settings in simulation)
   // triggers when simActive becomes true
   useEffect(() => {
-    if (tutStep === 4 && simActive) {
-      setTutStepState(5);
+    if (tutStep === 5 && simActive) {
+      setTutStepState(6);
     }
   }, [simActive, tutStep]);
 

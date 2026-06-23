@@ -7,7 +7,7 @@ interface Step {
   title: string;
   body: string;
   cta: string | null;        // null => advances on player action/movement/navigation
-  anchor: 'center' | 'top-left' | 'left' | 'center-lower' | 'right';
+  anchor: 'center' | 'top-left' | 'left' | 'center-lower' | 'right' | 'top-right';
 }
 
 const STEPS: Step[] = [
@@ -28,6 +28,12 @@ const STEPS: Step[] = [
     body: 'Up here you can always see your stars, coins, level and daily streak as they grow.',
     cta: 'Next',
     anchor: 'top-left'
+  },
+  {
+    title: 'Quick menu actions',
+    body: "Use the top-right icons to: 🗺️ view the Quest Map, 🧭 take the Career Compass quiz, 🏆 check the Leaderboard, 👤 view your Profile, 🔊 toggle sound, and ⚙️ edit Settings. Note: you can return to the city plaza whenever you click the 'Questford' header on the top-left!",
+    cta: 'Next',
+    anchor: 'top-right'
   },
   {
     title: 'Step inside a shop',
@@ -78,6 +84,8 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
       let targetId = '';
       if (s.anchor === 'top-left') {
         targetId = 'tutorial-hud-progress';
+      } else if (s.anchor === 'top-right') {
+        targetId = 'tutorial-hud-actions';
       } else if (s.anchor === 'left') {
         targetId = 'tutorial-screen-controls';
       }
@@ -124,13 +132,15 @@ export function CityTutorial({ step, onAdvance, onSkip }: { step: number; onAdva
   const cardPos =
     s.anchor === 'top-left'
       ? 'left-3 sm:left-5 top-24'
-      : s.anchor === 'left'
-        ? 'left-16 sm:left-20 top-1/2 -translate-y-1/2'
-        : s.anchor === 'right'
-          ? 'right-4 sm:right-8 lg:right-16 top-1/2 -translate-y-1/2'
-          : s.anchor === 'center-lower'
-            ? 'left-1/2 -translate-x-1/2 top-48 sm:top-56'
-            : 'left-1/2 -translate-x-1/2 top-24 sm:top-28';
+      : s.anchor === 'top-right'
+        ? 'right-3 sm:right-5 top-24'
+        : s.anchor === 'left'
+          ? 'left-16 sm:left-20 top-1/2 -translate-y-1/2'
+          : s.anchor === 'right'
+            ? 'right-4 sm:right-8 lg:right-16 top-1/2 -translate-y-1/2'
+            : s.anchor === 'center-lower'
+              ? 'left-1/2 -translate-x-1/2 top-48 sm:top-56'
+              : 'left-1/2 -translate-x-1/2 top-24 sm:top-28';
 
   return (
     <div className="fixed inset-0 z-[100] pointer-events-none">
