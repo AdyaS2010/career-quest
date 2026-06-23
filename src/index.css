@@ -218,12 +218,12 @@
 }
 
 /* ===== App typeface ===== */
-/* Questford wears a crisp, characterful "Space Grotesk" face by default — neat and
+/* Questford wears a crisp, characterful "Bricolage Grotesque" face by default — neat and
    a touch distinctive, pairing nicely with the Cinzel headings. The "Normal font"
    accessibility setting restores the original Outfit. Everything reads from one
    variable so a single class on <html> reskins the whole app. */
 :root {
-  --font-app: 'Space Grotesk', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-app: 'Bricolage Grotesque', 'Space Grotesk', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
 }
 
 body {

@@ -68,15 +68,15 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // plain enough to guess the trade at a glance, with just a wink of wit.
 // The signage fonts are adjusted thematically to look playful and on-point for
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
-const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties; boardStyle?: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em', color: '#0891b2' }, boardStyle: { background: '#ffffff', borderColor: '#06b6d4' } },
-  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#fffaf0' }, boardStyle: { background: '#1e293b', borderColor: '#f59e0b' } },
-  'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#ffffff' }, boardStyle: { background: '#1e40af', borderColor: '#fbbf24' } },
-  'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#34d399', textShadow: '0 0 3px rgba(52,211,153,0.5)' }, boardStyle: { background: '#020617', borderColor: '#10b981' } },
-  'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#f472b6', textShadow: '0 0 4px #ec4899' }, boardStyle: { background: '#0f0728', borderColor: '#ec4899' } },
-  'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' }, boardStyle: { background: '#f5ece1', borderColor: '#78350f' } },
-  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#0f172a' }, boardStyle: { background: 'linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%)', borderColor: '#475569' } },
-  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#fef08a' }, boardStyle: { background: '#1e3a8a', borderColor: '#fbbf24' } },
+const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
+  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em', color: '#0891b2' } },
+  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#7c2d12' } },
+  'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#1e3a8a' } },
+  'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
+  'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#be185d' } },
+  'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
+  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#0f172a' } },
+  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#1e3a8a' } },
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -476,9 +476,7 @@ export function CityHub() {
         const textStyle = dyslexicFriendly
           ? { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 'normal', fontStyle: 'normal', color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)' }
           : sign.textStyle;
-        const boardStyle = dyslexicFriendly
-          ? { background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', borderColor: d.color.primary }
-          : { background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', borderColor: d.color.primary, ...sign.boardStyle };
+        const boardStyle = { background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', borderColor: d.color.primary };
 
         return (
           <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .12s' }}>
@@ -503,7 +501,7 @@ export function CityHub() {
                 textShadow: '0 1px 0 rgba(255,255,255,0.55)', 
                 ...textStyle 
               }}>{sign.name}</span>
-              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${boardStyle.borderColor || d.color.primary}, transparent)` }} />
+              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.color.primary}, transparent)` }} />
             </div>
           </div>
         );
