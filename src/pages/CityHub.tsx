@@ -69,14 +69,14 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // The signage fonts are adjusted thematically to look playful and on-point for
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em', color: '#be123c' } }, // medical crimson
+  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em', color: '#15803d' } }, // clinical forest green
   'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#c2410c' } }, // rich warm terracotta rust
   'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#1e3a8a' } },
   'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
   'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#7e22ce' } }, // vibrant purple
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
-  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#0f172a' } },
-  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#e11d48' } }, // pinkish red
+  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
+  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
