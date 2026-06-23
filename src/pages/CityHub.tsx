@@ -68,15 +68,15 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // plain enough to guess the trade at a glance, with just a wink of wit.
 // The signage fonts are adjusted thematically to look playful and on-point for
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
-const DOMAIN_SIGN: Record<string, { name: string; style: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em' } },
-  'culinary-arts':          { name: 'The Copper Skillet', style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14, lineHeight: 1 } },
-  'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11 } },
-  'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em' } },
-  'arts-entertainment':     { name: 'Spotlight Studios',  style: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 11.5, letterSpacing: '0.02em' } },
-  'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5 } },
-  'law-government':         { name: 'Citizen Court',      style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
-  'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em' } },
+const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties; boardStyle?: React.CSSProperties }> = {
+  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em', color: '#0891b2' }, boardStyle: { background: '#ffffff', borderColor: '#06b6d4' } },
+  'culinary-arts':          { name: 'Relish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#fffaf0' }, boardStyle: { background: '#1e293b', borderColor: '#f59e0b' } },
+  'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#ffffff' }, boardStyle: { background: '#1e40af', borderColor: '#fbbf24' } },
+  'information-technology': { name: 'Pixel Works',        textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#34d399', textShadow: '0 0 3px rgba(52,211,153,0.5)' }, boardStyle: { background: '#020617', borderColor: '#10b981' } },
+  'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#f472b6', textShadow: '0 0 4px #ec4899' }, boardStyle: { background: '#0f0728', borderColor: '#ec4899' } },
+  'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' }, boardStyle: { background: '#f5ece1', borderColor: '#78350f' } },
+  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#0f172a' }, boardStyle: { background: 'linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%)', borderColor: '#475569' } },
+  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#fef08a' }, boardStyle: { background: '#1e3a8a', borderColor: '#fbbf24' } },
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -469,19 +469,41 @@ export function CityHub() {
 
       {/* building signs — bespoke storefront nameplates, one typeface per trade */}
       {doors.map((d) => {
-        const sign = DOMAIN_SIGN[d.slug] ?? { name: d.name, style: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5 } };
-        const signStyle = dyslexicFriendly
-          ? { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 'normal', fontStyle: 'normal' }
-          : sign.style;
+        const sign = DOMAIN_SIGN[d.slug] ?? { 
+          name: d.name, 
+          textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5 }
+        };
+        const textStyle = dyslexicFriendly
+          ? { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: 'normal', fontStyle: 'normal', color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)' }
+          : sign.textStyle;
+        const boardStyle = dyslexicFriendly
+          ? { background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', borderColor: d.color.primary }
+          : { background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', borderColor: d.color.primary, ...sign.boardStyle };
+
         return (
           <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .12s' }}>
             {/* slim hanger — a single ring + stem, as if the plate hangs from a bracket */}
             <span style={{ width: 6, height: 6, borderRadius: '50%', border: '1.5px solid rgba(38,28,18,0.6)', background: 'rgba(255,250,240,0.55)' }} />
             <span style={{ width: 2, height: 5, background: 'rgba(38,28,18,0.6)' }} />
             {/* painted nameplate — neutral board, domain colour only in the frame + accent rule */}
-            <div style={{ position: 'relative', padding: '5px 16px 6px', borderRadius: 7, background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', border: `1.5px solid ${d.color.primary}`, boxShadow: `0 5px 13px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 2.5px rgba(255,255,255,0.6)` }}>
-              <span style={{ display: 'block', whiteSpace: 'nowrap', lineHeight: 1.08, color: '#2a2014', textShadow: '0 1px 0 rgba(255,255,255,0.55)', ...signStyle }}>{sign.name}</span>
-              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.color.primary}, transparent)` }} />
+            <div style={{ 
+              position: 'relative', 
+              padding: '5px 16px 6px', 
+              borderRadius: 7, 
+              boxShadow: `0 5px 13px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.95), inset 0 0 0 2.5px rgba(255,255,255,0.6)`,
+              borderWidth: '1.5px',
+              borderStyle: 'solid',
+              ...boardStyle 
+            }}>
+              <span style={{ 
+                display: 'block', 
+                whiteSpace: 'nowrap', 
+                lineHeight: 1.08, 
+                color: '#2a2014', 
+                textShadow: '0 1px 0 rgba(255,255,255,0.55)', 
+                ...textStyle 
+              }}>{sign.name}</span>
+              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${boardStyle.borderColor || d.color.primary}, transparent)` }} />
             </div>
           </div>
         );

@@ -227,6 +227,17 @@ const careerBriefContent: Record<string, {
   },
 };
 
+const DOMAIN_FONT_FAMILY: Record<string, string> = {
+  'health-sciences':        "'Nunito', sans-serif",
+  'culinary-arts':          "'Kalam', cursive",
+  'education':              "'Comfortaa', cursive",
+  'information-technology': "'Orbitron', sans-serif",
+  'arts-entertainment':     "'Righteous', cursive",
+  'media-communication':    "'Playfair Display', serif",
+  'law-government':         "'Cinzel Decorative', serif",
+  'financial-services':     "'Cinzel', serif",
+};
+
 function getCareerBrief(careerSlug: string | undefined, career: Career | null) {
   const staticBrief = careerBriefContent[careerSlug || ''];
   if (staticBrief) return staticBrief;
@@ -258,7 +269,7 @@ export function CareerWorld() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { muted, toggleMute, startBgm, speak, cancelSpeech } = useAudio();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, dyslexicFriendly } = useTheme();
   const { enterSimulation, leaveSimulation } = useSimulation();
 
   const [career, setCareer] = useState<Career | null>(null);
@@ -270,6 +281,9 @@ export function CareerWorld() {
   const [showBrief, setShowBrief] = useState(true);
 
   const brief = getCareerBrief(careerSlug, career);
+  const domainFont = dyslexicFriendly
+    ? "var(--font-app)"
+    : (DOMAIN_FONT_FAMILY[careerSlug || ''] || "var(--font-app)");
 
   // Trigger speech introduction when the career data finishes loading
   useEffect(() => {
@@ -478,7 +492,7 @@ export function CareerWorld() {
 
   if (selectedChallenge) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ fontFamily: domainFont }}>
         {careerSlug === 'culinary-arts' && (
           <CulinaryArtsGame
             challenge={selectedChallenge}
@@ -637,7 +651,10 @@ export function CareerWorld() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className="min-h-screen"
-      style={{ background: theme === 'dark' ? `#0f172a ${bgGradient}` : bgGradient }}
+      style={{ 
+        background: theme === 'dark' ? `#0f172a ${bgGradient}` : bgGradient,
+        fontFamily: domainFont
+      }}
     >
       <nav
         className="sticky top-0 z-40 backdrop-blur-lg border-b shadow-sm"
