@@ -30,8 +30,15 @@ export async function loadBaseMap(): Promise<BaseMap> {
   const terrain = parseLayer(xml, 'Terrain', w, h);
   const objects = parseLayer(xml, 'Objects', w, h);
   
-  // Reduce building at x=28..32, y=13..16 to clear the road and restore grass/road
+  // Reduce building height at x=28..32:
+  // Render roof top at y=10, roof bottom at y=11, building base at y=12
+  const cols = [96, 97, 97, 97, 99];
+  const mid = [120, 121, 121, 76, 123];
+  const base = [144, 145, 145, 145, 147];
   for (let x = 28; x <= 32; x++) {
+    terrain[10 * w + x] = cols[x - 28];
+    terrain[11 * w + x] = mid[x - 28];
+    terrain[12 * w + x] = base[x - 28];
     terrain[13 * w + x] = 265; // road
     terrain[14 * w + x] = 265; // road
     terrain[15 * w + x] = 20;  // grass

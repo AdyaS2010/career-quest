@@ -128,7 +128,7 @@ export function LeaderboardPage() {
                     <div 
                         className="p-8 text-white text-center rounded-t-3xl"
                         style={{
-                            background: 'linear-gradient(135deg, #172554 0%, #2563eb 100%)'
+                            background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #6366f1 100%)'
                         }}
                     >
                         <h2 className="text-3xl font-bold mb-2">Ranking Top 10</h2>

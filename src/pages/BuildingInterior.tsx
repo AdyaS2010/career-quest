@@ -14,6 +14,7 @@ import { CharacterSprite, PLAYER_PALETTE, type Palette } from './city/art';
 import { FurnitureSprite, SeatedNpc, PatientSprite, WallPanel, JobStation } from './city/interiorArt';
 import { AMENITY_SLUGS } from './city/cityLayout';
 import { AmenityInterior } from './AmenityInterior';
+import { CareerWorld } from './CareerWorld';
 import { awardCoins, loadWallet } from '../lib/wallet';
 
 const SPEED = 260, ACCEL_K = 16, HALF = 14, NEAR = 66;
@@ -33,14 +34,14 @@ function floorStyle(pat: 'wood' | 'tile' | 'carpet' | 'marble', _floor: string, 
 }
 
 // Route dispatcher: amenity slugs (market/shop/gym) open the shop interior;
-// everything else is a career simulation interior.
+// everything else is a career dashboard (CareerWorld).
 export function BuildingInterior() {
   const { careerSlug } = useParams();
   if (careerSlug && AMENITY_SLUGS.includes(careerSlug)) return <AmenityInterior slug={careerSlug} />;
-  return <CareerInterior />;
+  return <CareerWorld />;
 }
 
-function CareerInterior() {
+export function CareerInterior() {
   const { careerSlug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
