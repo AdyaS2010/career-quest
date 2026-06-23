@@ -1,12 +1,10 @@
-import { Settings, Sun, Moon, Eye, Accessibility, Wind, Sunset, X, Volume2, Home, ShoppingCart, Shirt, Dumbbell } from 'lucide-react';
+import { Settings, Sun, Moon, Eye, Accessibility, Wind, Sunset, X, Volume2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAudio } from '../contexts/AudioContext';
 
 // Accessibility + appearance settings, opened from the in-game HUD.
 export function SettingsModal({ onClose }: { onClose: () => void }) {
-  const navigate = useNavigate();
   const {
     theme, toggleTheme,
     dimmed, toggleDim,
@@ -65,64 +63,6 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </div>
-
-        {/* Quick Travel / Amenities Section */}
-        <div className="mt-6 pt-6 border-t border-slate-200/50 dark:border-slate-800/50">
-          <h3 className="text-sm font-black uppercase tracking-wider mb-3.5 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
-            <span>🏢</span> Visit Amenities
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => { onClose(); navigate('/career/home'); }}
-              className="flex items-center gap-3 p-3 rounded-2xl border border-sky-100/50 hover:border-sky-300 dark:border-sky-950 dark:hover:border-sky-800 bg-sky-500/5 hover:bg-sky-500/10 dark:bg-sky-500/5 dark:hover:bg-sky-500/15 text-left transition-all hover:scale-[1.02]"
-            >
-              <div className="p-2 rounded-xl bg-sky-500/20 text-sky-600 dark:text-sky-400">
-                <Home className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>Cozy Cottage</p>
-                <p className="text-[10px] text-slate-400 font-medium">Home & Restyle</p>
-              </div>
-            </button>
-            <button
-              onClick={() => { onClose(); navigate('/career/market'); }}
-              className="flex items-center gap-3 p-3 rounded-2xl border border-teal-100/50 hover:border-teal-300 dark:border-teal-950 dark:hover:border-teal-800 bg-teal-500/5 hover:bg-teal-500/10 dark:bg-teal-500/5 dark:hover:bg-teal-500/15 text-left transition-all hover:scale-[1.02]"
-            >
-              <div className="p-2 rounded-xl bg-teal-500/20 text-teal-600 dark:text-teal-400">
-                <ShoppingCart className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>Questmart</p>
-                <p className="text-[10px] text-slate-400 font-medium">Energy & Snacks</p>
-              </div>
-            </button>
-            <button
-              onClick={() => { onClose(); navigate('/career/shop'); }}
-              className="flex items-center gap-3 p-3 rounded-2xl border border-purple-100/50 hover:border-purple-300 dark:border-purple-950 dark:hover:border-purple-800 bg-purple-500/5 hover:bg-purple-500/10 dark:bg-purple-500/5 dark:hover:bg-purple-500/15 text-left transition-all hover:scale-[1.02]"
-            >
-              <div className="p-2 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400">
-                <Shirt className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>Style Studio</p>
-                <p className="text-[10px] text-slate-400 font-medium">Upgrades & Looks</p>
-              </div>
-            </button>
-            <button
-              onClick={() => { onClose(); navigate('/career/gym'); }}
-              className="flex items-center gap-3 p-3 rounded-2xl border border-rose-100/50 hover:border-rose-300 dark:border-rose-950 dark:hover:border-rose-800 bg-rose-500/5 hover:bg-rose-500/10 dark:bg-rose-500/5 dark:hover:bg-rose-500/15 text-left transition-all hover:scale-[1.02]"
-            >
-              <div className="p-2 rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400">
-                <Dumbbell className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>Iron Gym</p>
-                <p className="text-[10px] text-slate-400 font-medium">Train Stamina</p>
-              </div>
-            </button>
-          </div>
-        </div>
-
         <button
           onClick={onClose}
           className="w-full mt-7 py-3.5 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-black text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all"

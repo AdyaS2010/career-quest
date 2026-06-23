@@ -18,8 +18,7 @@ import { loadQuiz, saveQuiz, type QuizResult } from './city/quiz';
 import { loadWallet } from '../lib/wallet';
 import { loadPrefs, nowInTz } from '../lib/prefs';
 import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, type BaseMap } from './city/pico8';
-
-
+import { AMENITIES } from './city/cityLayout';
 
 const SCALE = 6, TS = TILE * SCALE, SPEED = 2.7, REACH = TS * 1.3;
 let savedPos: { x: number; y: number } | null = null; // remembers where the player left off across navigations
@@ -50,6 +49,10 @@ const DOOR_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 24, y: 19 },     // media + communication
   'law-government': { x: 14, y: 0.5 },           // law
   'financial-services': { x: 14, y: 29 },      // financial services
+  'market': { x: 37, y: 10 },
+  'home': { x: 28, y: 4 },
+  'shop': { x: 30, y: 18 },
+  'gym': { x: 9, y: 1 }
 };
 
 // Sign placement is INDEPENDENT of the doormats — each board sits wherever it
@@ -64,6 +67,10 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 25, y: 16.9 },
   'law-government': { x: 14.5, y: 0.1 },         // top-edge building — keep the board low so it stays on screen
   'financial-services': { x: 13, y: 26.8 },
+  'market': { x: 37.5, y: 7.8 },
+  'home': { x: 28.55, y: 1.7 },
+  'shop': { x: 30.55, y: 15.8 },
+  'gym': { x: 9.5, y: -0.2 }
 };
 
 // Each domain is a little establishment on Questford's high street. Every name is
@@ -72,13 +79,17 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
   'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 600, fontSize: 12.5, letterSpacing: '0.02em', color: '#2ea47d' } }, // clinical forest green
-  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 700, fontSize: 13.5, color: '#c2410c' } }, // rich warm terracotta rust
+  'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#c2410c' } }, // rich warm terracotta rust
   'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Bricolage Grotesque', sans-serif", fontWeight: 800, fontSize: 12.5, color: '#1e3a8a' } },
   'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
   'arts-entertainment':     { name: 'Spotlight Studios',  textStyle: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 12, letterSpacing: '0.02em', color: '#7e22ce' } }, // vibrant purple
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
-  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
-  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#475569' } },
+  'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
+  'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
+  'market':                 { name: 'Questmart',          textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0d9488' } },
+  'home':                   { name: 'Cozy Cottage',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
+  'shop':                   { name: 'Style Studio',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#9333ea' } },
+  'gym':                    { name: 'Iron Quest Gym',     textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#e11d48' } }
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -233,7 +244,8 @@ export function CityHub() {
         const cells = spreadCells(map, pool, careers.length + 1);
         const npc = cells.shift()!;
         const builtCareers: Door[] = careers.map((c, i) => { const fixed = DOOR_COORDS[c.slug]; return { slug: c.slug, name: c.name, color: c.color_scheme as unknown as ColorScheme, icon: c.icon as string, cx: fixed?.x ?? (cells[i]?.x ?? npc.x), cy: fixed?.y ?? (cells[i]?.y ?? npc.y), mastered: mastered.has(c.slug) }; });
-        const built = builtCareers;
+        const builtAmenities: Door[] = AMENITIES.map((a) => { const fixed = DOOR_COORDS[a.slug]; return { slug: a.slug, name: a.label, color: { primary: a.color, secondary: a.awning } as unknown as ColorScheme, icon: a.emoji, cx: fixed?.x ?? npc.x, cy: fixed?.y ?? npc.y, mastered: false }; });
+        const built = [...builtCareers, ...builtAmenities];
         if (!alive) return;
         doorsRef.current = built; setDoors(built);
         
@@ -659,7 +671,7 @@ export function CityHub() {
           onStartHere={(slug) => { setQuizOpen(false); navigate(`/career/${slug}`); }}
         />
       )}
-      {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
+      {showMap && <MapPreview doors={doors.filter(d => !['home', 'market', 'shop', 'gym'].includes(d.slug))} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showOnboardingChoice && (
         <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -693,7 +705,7 @@ export function CityHub() {
           </div>
         </div>
       )}
-      {showMap && <MapPreview doors={doors} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
+      {showMap && <MapPreview doors={doors.filter(d => !['home', 'market', 'shop', 'gym'].includes(d.slug))} skills={skills} recommended={quizResult?.top} onPick={(slug) => { setShowMap(false); navigate(`/career/${slug}`); }} onFullMap={() => { setShowMap(false); navigate('/map'); }} onCity={() => setShowMap(false)} onClose={() => setShowMap(false)} />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );

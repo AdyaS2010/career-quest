@@ -234,7 +234,7 @@ const DOMAIN_FONT_FAMILY: Record<string, string> = {
   'information-technology': "'Orbitron', sans-serif",
   'arts-entertainment':     "'Righteous', cursive",
   'media-communication':    "'Playfair Display', serif",
-  'law-government':         "'Cinzel', serif",
+  'law-government':         "'Outfit', sans-serif",
   'financial-services':     "'Outfit', sans-serif",
 };
 
@@ -750,7 +750,7 @@ export function CareerWorld() {
         </section>
 
         {/* Station cards */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch">
+        <section className={challenges.length === 4 ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 items-stretch" : "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 items-stretch"}>
           {challenges.map((challenge, index) => {
             const challengeProgress = progress[challenge.id];
             const prevOrderIndex = challenge.order_index - 1;
