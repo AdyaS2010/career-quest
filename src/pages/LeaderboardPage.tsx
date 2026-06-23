@@ -125,7 +125,18 @@ export function LeaderboardPage() {
                         borderColor: 'var(--border-default)'
                     }}
                 >
-                    <div className="p-8 bg-blue-700 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-blue-900/30">
+                    <div 
+                        className="p-8 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-blue-950/40"
+                        style={{
+                            background: 'linear-gradient(135deg, #172554 0%, #1e3b8a 50%, #1d4ed8 100%)'
+                        }}
+                    >
+                        {/* Diagonal glossy shine streak */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent opacity-70 pointer-events-none"></div>
+                        
+                        {/* Upper highlight for that polished glass/paint reflection */}
+                        <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+
                         <h2 className="text-4xl font-black uppercase tracking-tight mb-2" style={{ fontFamily: "'Cinzel', serif" }}>Ranking Top 10</h2>
                         <p className="text-amber-100 font-medium text-sm tracking-wide">Compare your competencies and scores with players globally!</p>
 
