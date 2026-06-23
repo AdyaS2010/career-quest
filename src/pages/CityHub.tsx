@@ -70,12 +70,12 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; style: React.CSSProperties }> = {
   'health-sciences':        { name: 'St. Vitals Hospital', style: { fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: '0.02em' } },
-  'culinary-arts':          { name: 'Fork & Fire',       style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 15.5, lineHeight: 1 } },
+  'culinary-arts':          { name: 'Hearthside Bistro', style: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14, lineHeight: 1 } },
   'education':              { name: 'Wise Owl Academy',   style: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11 } },
   'information-technology': { name: 'Pixel Works',        style: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em' } },
-  'arts-entertainment':     { name: 'Center Stage',       style: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 13, letterSpacing: '0.02em' } },
+  'arts-entertainment':     { name: 'Spotlight Studios',  style: { fontFamily: "'Righteous', cursive", fontWeight: 400, fontSize: 11.5, letterSpacing: '0.02em' } },
   'media-communication':    { name: 'The Gazette',        style: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5 } },
-  'law-government':         { name: 'Gavel Hall',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
+  'law-government':         { name: 'Courthouse',         style: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5 } },
   'financial-services':     { name: 'Sterling Bank',      style: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em' } },
 };
 
