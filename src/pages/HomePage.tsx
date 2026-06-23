@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Map, Trophy, User, LogOut, ZoomIn, ZoomOut, Maximize2, Volume2, VolumeX, Moon, Sun, Sparkles, Flame, Settings, Eye, Accessibility } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -487,7 +488,7 @@ export function HomePage() {
       </nav>
 
       {/* Settings Modal */}
-      {showSettings && (
+      {showSettings && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div
             className="w-full max-w-md rounded-[2.5rem] border-4 p-8 shadow-2xl transform transition-all"
@@ -598,7 +599,8 @@ export function HomePage() {
               Save Kingdom Settings
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Main Content / Map Area */}

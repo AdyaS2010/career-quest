@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { UserCog, X, Globe2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { loadPrefs, savePrefs, TZ_OPTIONS } from '../lib/prefs';
@@ -47,7 +48,7 @@ export function ProfileEditModal({ profile, userId, onClose, onSaved }: {
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
         className="w-full max-w-md rounded-[2rem] border-4 p-7 shadow-2xl max-h-[90vh] overflow-y-auto"
@@ -149,6 +150,7 @@ export function ProfileEditModal({ profile, userId, onClose, onSaved }: {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
