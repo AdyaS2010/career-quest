@@ -19,6 +19,240 @@ import { FinanceGame } from '../games/Finance';
 import { EducationGame } from '../games/Education';
 import { ArtsGame } from '../games/Arts';
 
+const careerBriefContent: Record<string, {
+  title: string;
+  subtitle: string;
+  lead: string;
+  icon: string;
+  speechIntro: string;
+  bullets: string[];
+  chips: { emoji: string; title: string; subtitle: string }[];
+  quickFacts: { label: string; value: string }[];
+  source: string;
+}> = {
+  'culinary-arts': {
+    title: 'Culinary & Food Services',
+    subtitle: 'Culinary Arts',
+    lead: 'Run service like a real kitchen team: take accurate orders, execute under heat, and plate dishes guests remember.',
+    icon: '👨‍🍳',
+    speechIntro: "Welcome to the kitchen, chef! Fire up the stoves, prep your stations, and let's run the perfect dinner rush today!",
+    bullets: [
+      'Plan menus, source ingredients, and lead a kitchen team.',
+      'Run service under time pressure while maintaining quality and safety.',
+      'Manage food cost, waste, and supplier relationships.',
+    ],
+    chips: [
+      { emoji: '🍴', title: 'Service Flow', subtitle: 'Front-of-house to pass line coordination' },
+      { emoji: '⏱️', title: 'Speed Under Pressure', subtitle: 'Time windows, ticket pacing, quality control' },
+      { emoji: '👨‍🍳', title: 'Culinary Craft', subtitle: 'Technique, precision, and presentation' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range', value: '$42,000-$98,000 (culinary pathways, line cook to head cook/chef)' },
+      { label: 'Median pay (May 2024)', value: '$60,990/year ($29.32/hour)' },
+      { label: 'Job outlook (2024-34)', value: '7% (much faster than average)' },
+      { label: 'Annual openings', value: '24,400 (projected)' },
+      { label: 'Typical education', value: 'High school diploma or equivalent' },
+      { label: 'Work experience', value: '5 years or more in related occupation' },
+      { label: 'Total U.S. jobs (2024)', value: '197,300' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics, Occupational Outlook Handbook, Chefs and Head Cooks (last modified Aug 28, 2025), bls.gov/ooh/food-preparation-and-serving/chefs-and-head-cooks.htm',
+  },
+  'information-technology': {
+    title: 'Information Technology & Software',
+    subtitle: 'Software Engineering',
+    lead: 'Build, debug, and ship reliable systems that solve real business and user problems.',
+    icon: '💻',
+    speechIntro: "System check complete! Dive into the code, track down those pesky bugs, and build something legendary today!",
+    bullets: [
+      'Diagnose bugs, implement fixes, and validate with tests.',
+      'Design algorithms and system architecture with performance in mind.',
+      'Collaborate with product and engineering teams to deliver software safely.',
+    ],
+    chips: [
+      { emoji: '🛠️', title: 'Build & Ship', subtitle: 'Turn requirements into working features' },
+      { emoji: '🐞', title: 'Debug Under Pressure', subtitle: 'Reproduce, diagnose, and fix fast' },
+      { emoji: '🏗️', title: 'System Thinking', subtitle: 'Scalability, reliability, and tradeoffs' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$90,000-$185,000 (software engineering, entry to experienced)' },
+      { label: 'Representative role', value: 'Software developers and related roles' },
+      { label: 'Typical education', value: 'Postsecondary pathway; skills-first hiring also growing' },
+      { label: 'Work pattern', value: 'Team-based delivery, iterative releases, on-call in some roles' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Software Developers.',
+  },
+  'law-government': {
+    title: 'Law, Courts & Public Service',
+    subtitle: 'Legal Practice',
+    lead: 'Analyze evidence, apply legal standards, and advocate clearly in high-stakes scenarios.',
+    icon: '⚖️',
+    speechIntro: "All rise for the court of public service! Review your evidence, sharpen your arguments, and let justice be served!",
+    bullets: [
+      'Evaluate admissibility and relevance of evidence.',
+      'Construct arguments with facts, rules, and precedents.',
+      'Question witnesses to uncover contradictions and strengthen claims.',
+    ],
+    chips: [
+      { emoji: '🧭', title: 'Case Strategy', subtitle: 'Build a theory of the case' },
+      { emoji: '🔎', title: 'Evidence & Rules', subtitle: 'Relevance and admissibility analysis' },
+      { emoji: '🎤', title: 'Persuasion', subtitle: 'Argue clearly under scrutiny' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$80,000-$235,000 (legal practice, early career to senior attorney)' },
+      { label: 'Representative role', value: 'Lawyers and legal support occupations' },
+      { label: 'Typical education', value: 'Professional degree for attorney track; other legal tracks vary' },
+      { label: 'Work pattern', value: 'Research-intensive, deadline-driven, courtroom and advisory settings' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Lawyers.',
+  },
+  'media-communication': {
+    title: 'Media, Journalism & Communication',
+    subtitle: 'Journalism',
+    lead: 'Verify facts, interview sources, and craft clear stories for public audiences.',
+    icon: '🎙️',
+    speechIntro: "We are live in three, two, one! Fact-check the news, interview the sources, and tell a story that makes headlines!",
+    bullets: [
+      'Fact-check claims against credible sources.',
+      'Conduct interviews and capture clear, usable quotes.',
+      'Structure stories with strong leads and evidence-backed narratives.',
+    ],
+    chips: [
+      { emoji: '✅', title: 'Source & Verify', subtitle: 'Credibility and claim validation' },
+      { emoji: '🎙️', title: 'Interview Craft', subtitle: 'Ask sharp questions, capture quotes' },
+      { emoji: '📰', title: 'Storytelling', subtitle: 'Clarity, structure, and audience focus' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$40,000-$105,000 (journalism and reporting, market-dependent)' },
+      { label: 'Representative role', value: 'News analysts, reporters, and journalists' },
+      { label: 'Typical education', value: 'Bachelor-level preparation is common' },
+      { label: 'Work pattern', value: 'Tight deadlines, cross-platform publishing, field and desk reporting' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, News Analysts, Reporters, and Journalists.',
+  },
+  'health-sciences': {
+    title: 'Health Sciences & Clinical Care',
+    subtitle: 'Patient Care',
+    lead: 'Assess symptoms, prioritize treatment, and make evidence-based decisions for patient safety.',
+    icon: '🩺',
+    speechIntro: "Triage team, stand by! Assess the vitals, prioritize treatment, and save lives in the clinic today!",
+    bullets: [
+      'Gather relevant clinical clues before diagnosis.',
+      'Select safe, effective treatments and monitor outcomes.',
+      'Triage and stabilize patients under time pressure.',
+    ],
+    chips: [
+      { emoji: '🩺', title: 'Assess & Diagnose', subtitle: 'Clinical clues to differential diagnosis' },
+      { emoji: '🚑', title: 'Triage Under Pressure', subtitle: 'Prioritize severity and act fast' },
+      { emoji: '🛟', title: 'Patient Safety', subtitle: 'Protocol-driven, evidence-based care' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$68,000-$130,000 (patient-care pathways, RN-led benchmark)' },
+      { label: 'Representative role', value: 'Registered nurses and allied clinical occupations' },
+      { label: 'Typical education', value: 'Credentialed clinical training and licensure pathways' },
+      { label: 'Work pattern', value: 'Shift-based care, teamwork, and protocol-driven decisions' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Registered Nurses.',
+  },
+  'financial-services': {
+    title: 'Finance, Banking & Risk',
+    subtitle: 'Banking Analyst',
+    lead: 'Balance customer service, risk controls, and analytical judgment in financial operations.',
+    icon: '💼',
+    speechIntro: "Markets are open! Balance the books, assess the investment risks, and keep those assets perfectly secure!",
+    bullets: [
+      'Build balanced budgets and evaluate tradeoffs.',
+      'Assess investments with risk-return discipline.',
+      'Detect fraud patterns and protect financial integrity.',
+    ],
+    chips: [
+      { emoji: '📊', title: 'Analyze & Budget', subtitle: 'Allocation strategy and cash discipline' },
+      { emoji: '🛡️', title: 'Risk Control', subtitle: 'Spot anomalies and escalate fast' },
+      { emoji: '🏦', title: 'Client Trust', subtitle: 'Accuracy, verification, and service' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$55,000-$175,000 (banking/finance analyst to senior risk tracks)' },
+      { label: 'Representative role', value: 'Financial analysts, tellers, and compliance/risk roles' },
+      { label: 'Typical education', value: 'Role-dependent; analytical and regulatory literacy is essential' },
+      { label: 'Work pattern', value: 'Data-heavy analysis, customer trust, policy and controls' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Financial Analysts.',
+  },
+  education: {
+    title: 'Education, Teaching & Leadership',
+    subtitle: 'Teaching Lab',
+    lead: 'Design instruction, manage classrooms, and support safe learning environments.',
+    icon: '🍎',
+    speechIntro: "Welcome to the classroom, educator! Design the perfect lesson plan, guide your students, and lead the way to bright futures!",
+    bullets: [
+      'Guide classroom behavior and maintain focus.',
+      'Plan lessons aligned to clear learning goals.',
+      'Coordinate responses during school safety scenarios.',
+    ],
+    chips: [
+      { emoji: '📚', title: 'Lesson Design', subtitle: 'Objectives, activities, and assessment' },
+      { emoji: '🏫', title: 'Classroom Flow', subtitle: 'Behavior guidance and attention' },
+      { emoji: '🌱', title: 'Student Growth', subtitle: 'Measure mastery and support learners' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$50,000-$100,000 (teaching and instructional leadership pathways)' },
+      { label: 'Representative role', value: 'Teachers and instructional leaders' },
+      { label: 'Typical education', value: 'Degree + educator preparation; certification requirements vary' },
+      { label: 'Work pattern', value: 'Student-facing instruction, planning, and family communication' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, High School Teachers.',
+  },
+  'arts-entertainment': {
+    title: 'Arts, Performance & Production',
+    subtitle: 'Creative Studio',
+    lead: 'Translate creative vision into polished performances and audience-ready experiences.',
+    icon: '🎭',
+    speechIntro: "Showtime! Set the lighting, hit your cues, and paint a masterpiece on stage today!",
+    bullets: [
+      'Apply color and visual design principles intentionally.',
+      'Maintain rhythm, timing, and performance accuracy.',
+      'Coordinate cues and execution in live production contexts.',
+    ],
+    chips: [
+      { emoji: '🎨', title: 'Creative Vision', subtitle: 'Color, mood, and visual storytelling' },
+      { emoji: '🎼', title: 'Performance Timing', subtitle: 'Rhythm, tempo, and precision' },
+      { emoji: '🎬', title: 'Production Craft', subtitle: 'Cue timing and live execution' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: '$40,000-$120,000 (arts/design production, portfolio-driven)' },
+      { label: 'Representative role', value: 'Designers, performers, and production specialists' },
+      { label: 'Typical education', value: 'Portfolio, training, and apprenticeship pathways vary by role' },
+      { label: 'Work pattern', value: 'Project-based schedules, rehearsals, and performance deadlines' },
+    ],
+    source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Graphic Designers and related creative occupations.',
+  },
+};
+
+function getCareerBrief(careerSlug: string | undefined, career: Career | null) {
+  const staticBrief = careerBriefContent[careerSlug || ''];
+  if (staticBrief) return staticBrief;
+
+  return {
+    title: career?.name || '',
+    subtitle: career?.name || '',
+    lead: career?.description || '',
+    icon: '🎯',
+    speechIntro: career ? `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!` : '',
+    bullets: career ? [career.description, 'Complete each simulation to build skill.', 'Compare paths and track progress over time.'] : [],
+    chips: [
+      { emoji: '🎯', title: 'Hands-on', subtitle: 'Step into real on-the-job tasks' },
+      { emoji: '⚡', title: 'Decision Speed', subtitle: 'Act under realistic pressure' },
+      { emoji: '📈', title: 'Track Progress', subtitle: 'Score by subgame and mastery' },
+    ],
+    quickFacts: [
+      { label: 'Expected salary range (U.S.)', value: 'Role-dependent; check current local labor market data for precise ranges' },
+      { label: 'Career path', value: 'Hands-on simulation training' },
+      { label: 'Skill focus', value: 'Decision quality, speed, and consistency' },
+      { label: 'Progress model', value: 'Score by subgame and mastery over time' },
+    ],
+    source: 'Source: Career Quest curated career learning content.',
+  };
+}
+
 export function CareerWorld() {
   const { careerSlug } = useParams();
   const navigate = useNavigate();
@@ -34,6 +268,19 @@ export function CareerWorld() {
   const [loading, setLoading] = useState(true);
   const [showRes, setShowRes] = useState(false);
   const [showBrief, setShowBrief] = useState(true);
+
+  const brief = getCareerBrief(careerSlug, career);
+
+  // Trigger speech introduction when the career data finishes loading
+  useEffect(() => {
+    if (!loading && career) {
+      const introText = brief.speechIntro || `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!`;
+      speak(introText);
+    }
+    return () => {
+      cancelSpeech();
+    };
+  }, [loading, career, brief.speechIntro, speak, cancelSpeech]);
 
   useEffect(() => {
     loadCareerData();
@@ -327,245 +574,6 @@ export function CareerWorld() {
     ? 'linear-gradient(180deg, #162033 0%, #131a2e 30%, #1a1040 60%, #0f172a 100%)'
     : `linear-gradient(135deg, ${colorScheme.background} 0%, ${colorScheme.accent}20 100%)`;
 
-  const careerBriefContent: Record<string, {
-    title: string;
-    subtitle: string;
-    lead: string;
-    icon: string;
-    speechIntro: string;
-    bullets: string[];
-    chips: { emoji: string; title: string; subtitle: string }[];
-    quickFacts: { label: string; value: string }[];
-    source: string;
-  }> = {
-    'culinary-arts': {
-      title: 'Culinary & Food Services',
-      subtitle: 'Culinary Arts',
-      lead: 'Run service like a real kitchen team: take accurate orders, execute under heat, and plate dishes guests remember.',
-      icon: '👨‍🍳',
-      speechIntro: "Welcome to the kitchen, chef! Fire up the stoves, prep your stations, and let's run the perfect dinner rush today!",
-      bullets: [
-        'Plan menus, source ingredients, and lead a kitchen team.',
-        'Run service under time pressure while maintaining quality and safety.',
-        'Manage food cost, waste, and supplier relationships.',
-      ],
-      chips: [
-        { emoji: '🍴', title: 'Service Flow', subtitle: 'Front-of-house to pass line coordination' },
-        { emoji: '⏱️', title: 'Speed Under Pressure', subtitle: 'Time windows, ticket pacing, quality control' },
-        { emoji: '👨‍🍳', title: 'Culinary Craft', subtitle: 'Technique, precision, and presentation' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range', value: '$42,000-$98,000 (culinary pathways, line cook to head cook/chef)' },
-        { label: 'Median pay (May 2024)', value: '$60,990/year ($29.32/hour)' },
-        { label: 'Job outlook (2024-34)', value: '7% (much faster than average)' },
-        { label: 'Annual openings', value: '24,400 (projected)' },
-        { label: 'Typical education', value: 'High school diploma or equivalent' },
-        { label: 'Work experience', value: '5 years or more in related occupation' },
-        { label: 'Total U.S. jobs (2024)', value: '197,300' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics, Occupational Outlook Handbook, Chefs and Head Cooks (last modified Aug 28, 2025), bls.gov/ooh/food-preparation-and-serving/chefs-and-head-cooks.htm',
-    },
-    'information-technology': {
-      title: 'Information Technology & Software',
-      subtitle: 'Software Engineering',
-      lead: 'Build, debug, and ship reliable systems that solve real business and user problems.',
-      icon: '💻',
-      speechIntro: "System check complete! Dive into the code, track down those pesky bugs, and build something legendary today!",
-      bullets: [
-        'Diagnose bugs, implement fixes, and validate with tests.',
-        'Design algorithms and system architecture with performance in mind.',
-        'Collaborate with product and engineering teams to deliver software safely.',
-      ],
-      chips: [
-        { emoji: '🛠️', title: 'Build & Ship', subtitle: 'Turn requirements into working features' },
-        { emoji: '🐞', title: 'Debug Under Pressure', subtitle: 'Reproduce, diagnose, and fix fast' },
-        { emoji: '🏗️', title: 'System Thinking', subtitle: 'Scalability, reliability, and tradeoffs' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$90,000-$185,000 (software engineering, entry to experienced)' },
-        { label: 'Representative role', value: 'Software developers and related roles' },
-        { label: 'Typical education', value: 'Postsecondary pathway; skills-first hiring also growing' },
-        { label: 'Work pattern', value: 'Team-based delivery, iterative releases, on-call in some roles' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Software Developers.',
-    },
-    'law-government': {
-      title: 'Law, Courts & Public Service',
-      subtitle: 'Legal Practice',
-      lead: 'Analyze evidence, apply legal standards, and advocate clearly in high-stakes scenarios.',
-      icon: '⚖️',
-      speechIntro: "All rise for the court of public service! Review your evidence, sharpen your arguments, and let justice be served!",
-      bullets: [
-        'Evaluate admissibility and relevance of evidence.',
-        'Construct arguments with facts, rules, and precedents.',
-        'Question witnesses to uncover contradictions and strengthen claims.',
-      ],
-      chips: [
-        { emoji: '🧭', title: 'Case Strategy', subtitle: 'Build a theory of the case' },
-        { emoji: '🔎', title: 'Evidence & Rules', subtitle: 'Relevance and admissibility analysis' },
-        { emoji: '🎤', title: 'Persuasion', subtitle: 'Argue clearly under scrutiny' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$80,000-$235,000 (legal practice, early career to senior attorney)' },
-        { label: 'Representative role', value: 'Lawyers and legal support occupations' },
-        { label: 'Typical education', value: 'Professional degree for attorney track; other legal tracks vary' },
-        { label: 'Work pattern', value: 'Research-intensive, deadline-driven, courtroom and advisory settings' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Lawyers.',
-    },
-    'media-communication': {
-      title: 'Media, Journalism & Communication',
-      subtitle: 'Journalism',
-      lead: 'Verify facts, interview sources, and craft clear stories for public audiences.',
-      icon: '🎙️',
-      speechIntro: "We are live in three, two, one! Fact-check the news, interview the sources, and tell a story that makes headlines!",
-      bullets: [
-        'Fact-check claims against credible sources.',
-        'Conduct interviews and capture clear, usable quotes.',
-        'Structure stories with strong leads and evidence-backed narratives.',
-      ],
-      chips: [
-        { emoji: '✅', title: 'Source & Verify', subtitle: 'Credibility and claim validation' },
-        { emoji: '🎙️', title: 'Interview Craft', subtitle: 'Ask sharp questions, capture quotes' },
-        { emoji: '📰', title: 'Storytelling', subtitle: 'Clarity, structure, and audience focus' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$40,000-$105,000 (journalism and reporting, market-dependent)' },
-        { label: 'Representative role', value: 'News analysts, reporters, and journalists' },
-        { label: 'Typical education', value: 'Bachelor-level preparation is common' },
-        { label: 'Work pattern', value: 'Tight deadlines, cross-platform publishing, field and desk reporting' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, News Analysts, Reporters, and Journalists.',
-    },
-    'health-sciences': {
-      title: 'Health Sciences & Clinical Care',
-      subtitle: 'Patient Care',
-      lead: 'Assess symptoms, prioritize treatment, and make evidence-based decisions for patient safety.',
-      icon: '🩺',
-      speechIntro: "Triage team, stand by! Assess the vitals, prioritize treatment, and save lives in the clinic today!",
-      bullets: [
-        'Gather relevant clinical clues before diagnosis.',
-        'Select safe, effective treatments and monitor outcomes.',
-        'Triage and stabilize patients under time pressure.',
-      ],
-      chips: [
-        { emoji: '🩺', title: 'Assess & Diagnose', subtitle: 'Clinical clues to differential diagnosis' },
-        { emoji: '🚑', title: 'Triage Under Pressure', subtitle: 'Prioritize severity and act fast' },
-        { emoji: '🛟', title: 'Patient Safety', subtitle: 'Protocol-driven, evidence-based care' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$68,000-$130,000 (patient-care pathways, RN-led benchmark)' },
-        { label: 'Representative role', value: 'Registered nurses and allied clinical occupations' },
-        { label: 'Typical education', value: 'Credentialed clinical training and licensure pathways' },
-        { label: 'Work pattern', value: 'Shift-based care, teamwork, and protocol-driven decisions' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Registered Nurses.',
-    },
-    'financial-services': {
-      title: 'Finance, Banking & Risk',
-      subtitle: 'Banking Analyst',
-      lead: 'Balance customer service, risk controls, and analytical judgment in financial operations.',
-      icon: '💼',
-      speechIntro: "Markets are open! Balance the books, assess the investment risks, and keep those assets perfectly secure!",
-      bullets: [
-        'Build balanced budgets and evaluate tradeoffs.',
-        'Assess investments with risk-return discipline.',
-        'Detect fraud patterns and protect financial integrity.',
-      ],
-      chips: [
-        { emoji: '📊', title: 'Analyze & Budget', subtitle: 'Allocation strategy and cash discipline' },
-        { emoji: '🛡️', title: 'Risk Control', subtitle: 'Spot anomalies and escalate fast' },
-        { emoji: '🏦', title: 'Client Trust', subtitle: 'Accuracy, verification, and service' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$55,000-$175,000 (banking/finance analyst to senior risk tracks)' },
-        { label: 'Representative role', value: 'Financial analysts, tellers, and compliance/risk roles' },
-        { label: 'Typical education', value: 'Role-dependent; analytical and regulatory literacy is essential' },
-        { label: 'Work pattern', value: 'Data-heavy analysis, customer trust, policy and controls' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Financial Analysts.',
-    },
-    education: {
-      title: 'Education, Teaching & Leadership',
-      subtitle: 'Teaching Lab',
-      lead: 'Design instruction, manage classrooms, and support safe learning environments.',
-      icon: '🍎',
-      speechIntro: "Welcome to the classroom, educator! Design the perfect lesson plan, guide your students, and lead the way to bright futures!",
-      bullets: [
-        'Guide classroom behavior and maintain focus.',
-        'Plan lessons aligned to clear learning goals.',
-        'Coordinate responses during school safety scenarios.',
-      ],
-      chips: [
-        { emoji: '📚', title: 'Lesson Design', subtitle: 'Objectives, activities, and assessment' },
-        { emoji: '🏫', title: 'Classroom Flow', subtitle: 'Behavior guidance and attention' },
-        { emoji: '🌱', title: 'Student Growth', subtitle: 'Measure mastery and support learners' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$50,000-$100,000 (teaching and instructional leadership pathways)' },
-        { label: 'Representative role', value: 'Teachers and instructional leaders' },
-        { label: 'Typical education', value: 'Degree + educator preparation; certification requirements vary' },
-        { label: 'Work pattern', value: 'Student-facing instruction, planning, and family communication' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, High School Teachers.',
-    },
-    'arts-entertainment': {
-      title: 'Arts, Performance & Production',
-      subtitle: 'Creative Studio',
-      lead: 'Translate creative vision into polished performances and audience-ready experiences.',
-      icon: '🎭',
-      speechIntro: "Showtime! Set the lighting, hit your cues, and paint a masterpiece on stage today!",
-      bullets: [
-        'Apply color and visual design principles intentionally.',
-        'Maintain rhythm, timing, and performance accuracy.',
-        'Coordinate cues and execution in live production contexts.',
-      ],
-      chips: [
-        { emoji: '🎨', title: 'Creative Vision', subtitle: 'Color, mood, and visual storytelling' },
-        { emoji: '🎼', title: 'Performance Timing', subtitle: 'Rhythm, tempo, and precision' },
-        { emoji: '🎬', title: 'Production Craft', subtitle: 'Cue timing and live execution' },
-      ],
-      quickFacts: [
-        { label: 'Expected salary range (U.S.)', value: '$40,000-$120,000 (arts/design production, portfolio-driven)' },
-        { label: 'Representative role', value: 'Designers, performers, and production specialists' },
-        { label: 'Typical education', value: 'Portfolio, training, and apprenticeship pathways vary by role' },
-        { label: 'Work pattern', value: 'Project-based schedules, rehearsals, and performance deadlines' },
-      ],
-      source: 'Source: U.S. Bureau of Labor Statistics Occupational Outlook Handbook, Graphic Designers and related creative occupations.',
-    },
-  };
-
-  const brief = careerBriefContent[careerSlug || ''] || {
-    title: career.name,
-    subtitle: career.name,
-    lead: career.description,
-    icon: '🎯',
-    speechIntro: `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!`,
-    bullets: [career.description, 'Complete each simulation to build skill.', 'Compare paths and track progress over time.'],
-    chips: [
-      { emoji: '🎯', title: 'Hands-on', subtitle: 'Step into real on-the-job tasks' },
-      { emoji: '⚡', title: 'Decision Speed', subtitle: 'Act under realistic pressure' },
-      { emoji: '📈', title: 'Track Progress', subtitle: 'Score by subgame and mastery' },
-    ],
-    quickFacts: [
-      { label: 'Expected salary range (U.S.)', value: 'Role-dependent; check current local labor market data for precise ranges' },
-      { label: 'Career path', value: 'Hands-on simulation training' },
-      { label: 'Skill focus', value: 'Decision quality, speed, and consistency' },
-      { label: 'Progress model', value: 'Score by subgame and mastery over time' },
-    ],
-    source: 'Source: Career Quest curated career learning content.',
-  };
-
-  // Trigger speech introduction when the career data finishes loading
-  useEffect(() => {
-    if (!loading && career) {
-      const introText = brief.speechIntro || `Welcome to ${career.name}! Step into the workspace, complete the challenges, and build your career skills today!`;
-      speak(introText);
-    }
-    return () => {
-      cancelSpeech();
-    };
-  }, [loading, career, brief.speechIntro, speak, cancelSpeech]);
 
   const getChallengeMeta = (slug: string, challenge: Challenge) => {
     const raw = String((challenge.config as any)?.subType || '').toLowerCase();
