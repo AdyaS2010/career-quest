@@ -119,37 +119,37 @@ export function LeaderboardPage() {
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div
-                    className="rounded-[2rem] shadow-2xl overflow-hidden border-4"
+                    className="rounded-3xl shadow-xl overflow-hidden border"
                     style={{
                         backgroundColor: 'var(--surface-card)',
                         borderColor: 'var(--border-default)'
                     }}
                 >
-                    <div className="p-8 bg-indigo-600 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-indigo-700/20">
-                        <h2 className="text-4xl font-black uppercase tracking-tight mb-2" style={{ fontFamily: "'Cinzel', serif" }}>Ranking Top 10</h2>
-                        <p className="text-indigo-100 font-medium text-sm tracking-wide">Compare your competencies and scores with players globally!</p>
+                    <div className="p-8 bg-indigo-600 text-white text-center rounded-t-3xl">
+                        <h2 className="text-3xl font-bold mb-2">Ranking Top 10</h2>
+                        <p className="text-indigo-100">See how you compare with other players globally!</p>
 
                         {userRank && (
-                            <div className="mt-6 bg-black/25 backdrop-blur-md rounded-2xl p-4 inline-block border border-white/20 shadow-lg transform transition hover:scale-102">
-                                <p className="font-bold text-amber-300 mb-2 uppercase tracking-widest text-[10px]">Your Global Placement</p>
+                            <div className="mt-6 bg-white/20 backdrop-blur-md rounded-xl p-4 inline-block border border-white/30 shadow-lg transform transition hover:scale-105">
+                                <p className="font-semibold text-white mb-2 uppercase tracking-wide text-xs">Your Global Ranking</p>
                                 <div className="flex items-center gap-6 px-4">
                                     <div className="text-left">
-                                        <div className="text-[10px] text-amber-200/70 uppercase font-black tracking-wider">Rank</div>
-                                        <div className="text-3xl font-black font-fantasy">#{userRank.rank}</div>
+                                        <div className="text-sm text-indigo-200 uppercase font-bold tracking-wider">Rank</div>
+                                        <div className="text-3xl font-bold">#{userRank.rank}</div>
                                     </div>
-                                    <div className="w-px h-10 bg-white/20"></div>
+                                    <div className="w-px h-10 bg-white/30"></div>
                                     <div className="text-right">
-                                        <div className="text-[10px] text-amber-200/70 uppercase font-black tracking-wider">Score</div>
-                                        <div className="text-3xl font-black font-fantasy">{userRank.score.toLocaleString()}</div>
+                                        <div className="text-sm text-indigo-200 uppercase font-bold tracking-wider">Score</div>
+                                        <div className="text-3xl font-bold">{userRank.score.toLocaleString()}</div>
                                     </div>
 
                                     <button
                                         onClick={handleShare}
-                                        className="ml-4 flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 px-4 py-2 rounded-xl transition-all shadow-md font-black text-xs h-full"
+                                        className="ml-4 flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-lg transition-all shadow-md font-semibold text-sm h-full"
                                         title="Share Rank"
                                     >
                                         <Share2 className="w-4 h-4" />
-                                        Share Rank
+                                        Share
                                     </button>
                                 </div>
                             </div>
