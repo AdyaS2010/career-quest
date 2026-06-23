@@ -211,8 +211,62 @@ export function ProfilePage() {
             borderColor: theme === 'dark' ? 'rgba(251, 191, 36, 0.5)' : '#fbbf24'
           }}
         >
-          <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-8 text-white">
-            <div className="flex items-center gap-6">
+          <div 
+            className="p-8 text-white relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #131d2b 0%, #10211a 33%, #22140d 66%, #1d1017 100%)',
+              borderBottom: '4px solid rgba(251, 191, 36, 0.2)'
+            }}
+          >
+            {/* Ambient glows to add depth and quality */}
+            <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-screen"
+                 style={{
+                   background: 'radial-gradient(circle at 20% 20%, #3b82f6 0%, transparent 60%), radial-gradient(circle at 80% 80%, #10b981 0%, transparent 65%), radial-gradient(circle at 50% 50%, #ec4899 0%, transparent 60%)'
+                 }}
+            />
+
+            {/* Back Silhouette Layer: Cozy City Buildings */}
+            <div className="absolute inset-x-0 bottom-0 h-16 opacity-[0.06] pointer-events-none">
+              <svg viewBox="0 0 1000 64" preserveAspectRatio="none" className="w-full h-full fill-white">
+                <rect x="20" y="24" width="40" height="40" />
+                <rect x="70" y="10" width="50" height="54" />
+                <rect x="130" y="32" width="30" height="32" />
+                <rect x="180" y="18" width="60" height="46" />
+                <rect x="280" y="25" width="45" height="39" />
+                <rect x="340" y="8" width="55" height="56" />
+                <rect x="410" y="30" width="35" height="34" />
+                <rect x="480" y="15" width="70" height="49" />
+                <rect x="580" y="22" width="40" height="42" />
+                <rect x="640" y="12" width="50" height="52" />
+                <rect x="720" y="28" width="45" height="36" />
+                <rect x="800" y="14" width="65" height="50" />
+                <rect x="890" y="20" width="50" height="44" />
+                <rect x="950" y="26" width="30" height="38" />
+              </svg>
+            </div>
+
+            {/* Front Silhouette Layer: Stylized Autumn Foliage */}
+            <div className="absolute inset-x-0 bottom-0 h-10 opacity-[0.12] pointer-events-none">
+              <svg viewBox="0 0 1000 40" preserveAspectRatio="none" className="w-full h-full fill-white">
+                <circle cx="50" cy="35" r="16" />
+                <circle cx="100" cy="38" r="12" />
+                <circle cx="150" cy="30" r="18" />
+                <circle cx="220" cy="36" r="14" />
+                <circle cx="270" cy="32" r="17" />
+                <circle cx="320" cy="38" r="13" />
+                <circle cx="400" cy="34" r="19" />
+                <circle cx="450" cy="36" r="14" />
+                <circle cx="520" cy="31" r="18" />
+                <circle cx="600" cy="37" r="15" />
+                <circle cx="670" cy="33" r="20" />
+                <circle cx="750" cy="36" r="14" />
+                <circle cx="820" cy="32" r="18" />
+                <circle cx="880" cy="38" r="13" />
+                <circle cx="940" cy="34" r="16" />
+              </svg>
+            </div>
+
+            <div className="flex items-center gap-6 relative z-10">
               <div className="w-32 h-32 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-4 border-white shadow-xl">
                 <span className="text-6xl">🧭</span>
               </div>
@@ -262,7 +316,7 @@ export function ProfilePage() {
 
                 <button
                   onClick={handlePrintReport}
-                  className="flex items-center gap-2 bg-white hover:bg-amber-50 text-amber-600 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center"
+                  className="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center"
                 >
                   <BookOpen className="w-4 h-4" />
                   Career Report

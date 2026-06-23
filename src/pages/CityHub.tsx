@@ -86,7 +86,7 @@ export function CityHub() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { muted, toggleMute, playSfx, setAmbience, startBgm } = useAudio();
-  const { dyslexicFriendly } = useTheme();
+  const { dyslexicFriendly, reducedMotion } = useTheme();
 
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
@@ -412,12 +412,17 @@ export function CityHub() {
       }
 
       // entrances: beacon + position the HTML sign; track nearest
+      const now = nowInTz(tzRef.current);
+      const hour = now.getHours();
+      const isNight = hour >= 19 || hour < 6;
+      const lightsOn = isNight && !reducedMotion;
+
       let near: Door | 'npc' | null = null, nd = REACH;
       for (const d of doorsRef.current) {
         const wx = (d.cx + 0.5) * TS, wy = (d.cy + 0.5) * TS, sx = wx - cam.x, sy = wy - cam.y;
         const dist = Math.hypot(wx - pos.x, wy - pos.y); if (dist < nd) { nd = dist; near = d; }
-        drawBanner(ctx, sx - TS * 0.8, sy + 3, d.color.primary, t, sky.glow);            // district banners flank the entrance
-        drawBanner(ctx, sx + TS * 0.8, sy + 3, d.color.secondary || d.color.primary, t + 240, sky.glow);
+        drawBanner(ctx, sx - TS * 0.8, sy + 3, d.color.primary, t, lightsOn);            // district banners flank the entrance
+        drawBanner(ctx, sx + TS * 0.8, sy + 3, d.color.secondary || d.color.primary, t + 240, lightsOn);
         drawDoormat(ctx, sx, sy, d.color.primary, d.mastered);
         const el = signEls.current.get(d.slug);
         if (el) {
@@ -454,7 +459,7 @@ export function CityHub() {
       ctx.fillRect(0, 0, vw, vh);
 
       // ===== night light glows — drawn ON TOP of the night wash to cut through and glow brightly =====
-      if (sky.glow > 0.05) {
+      if (lightsOn && sky.glow > 0.05) {
         for (const d of doorsRef.current) {
           const wx = (d.cx + 0.5) * TS, wy = (d.cy + 0.5) * TS, sx = wx - cam.x, sy = wy - cam.y;
           // check if near or inside viewport boundary (with padded range for cones/glows)
@@ -843,7 +848,7 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number,
 }
 
 // A small district banner on a pole — flanks each building entrance in its colour.
-function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number, skyGlow = 0) {
+function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number, lightsOn = false) {
   const wave = Math.sin(t / 260) * 1.6;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y));
   
@@ -857,7 +862,7 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
   // Base
   ctx.fillStyle = '#1f2937'; ctx.fillRect(-2, -37, 4, 1);
   // Glass enclosure
-  ctx.fillStyle = skyGlow > 0.05 ? 'rgba(254, 240, 138, 0.4)' : 'rgba(243, 244, 246, 0.25)';
+  ctx.fillStyle = lightsOn ? 'rgba(254, 240, 138, 0.4)' : 'rgba(243, 244, 246, 0.25)';
   ctx.fillRect(-2.5, -42, 5, 5);
   // Frame border
   ctx.strokeStyle = '#111827'; ctx.lineWidth = 0.5; ctx.strokeRect(-2.5, -42, 5, 5);
@@ -867,7 +872,7 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
   ctx.fillRect(-1.5, -44.5, 3, 1.5);
   
   // Bulb (inside the glass enclosure)
-  ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(0, -39.5, 1.2, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = lightsOn ? '#fef08a' : '#4b5563'; ctx.beginPath(); ctx.arc(0, -39.5, 1.2, 0, Math.PI * 2); ctx.fill();
 
   // 4. Pennant / flag
   ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -25); ctx.closePath(); ctx.fill(); // pennant

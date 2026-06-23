@@ -125,10 +125,7 @@ export function LeaderboardPage() {
                         borderColor: 'var(--border-default)'
                     }}
                 >
-                    <div className="p-8 bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-amber-500/20">
-                        {/* Decorative Sun Glow behind header */}
-                        <div className="absolute top-0 right-1/4 w-32 h-32 bg-yellow-300/20 rounded-full blur-3xl pointer-events-none"></div>
-                        
+                    <div className="p-8 bg-blue-700 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-blue-900/30">
                         <h2 className="text-4xl font-black uppercase tracking-tight mb-2" style={{ fontFamily: "'Cinzel', serif" }}>Ranking Top 10</h2>
                         <p className="text-amber-100 font-medium text-sm tracking-wide">Compare your competencies and scores with players globally!</p>
 
