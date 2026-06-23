@@ -69,7 +69,7 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // The signage fonts are adjusted thematically to look playful and on-point for
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: '0.02em', color: '#15803d' } }, // clinical forest green
+  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 600, fontSize: 12.5, letterSpacing: '0.02em', color: '#2563eb' } }, // clinical forest green
   'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#c2410c' } }, // rich warm terracotta rust
   'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#1e3a8a' } },
   'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
