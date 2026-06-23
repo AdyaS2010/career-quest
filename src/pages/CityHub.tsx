@@ -69,7 +69,7 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
 // The signage fonts are adjusted thematically to look playful and on-point for
 // each domain (e.g. Orbitron for IT, Kalam for Cooking, Righteous for Arts).
 const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties }> = {
-  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 600, fontSize: 12.5, letterSpacing: '0.02em', color: '#06b6d4' } }, // clinical forest green
+  'health-sciences':        { name: 'St. Vitals Hospital', textStyle: { fontFamily: "'Fredoka', sans-serif", fontWeight: 600, fontSize: 12.5, letterSpacing: '0.02em', color: '#2ea47d' } }, // clinical forest green
   'culinary-arts':          { name: 'Delish Bistro',       textStyle: { fontFamily: "'Kalam', cursive", fontWeight: 700, fontSize: 14.5, lineHeight: 1, color: '#c2410c' } }, // rich warm terracotta rust
   'education':              { name: 'Wise Owl Academy',   textStyle: { fontFamily: "'Comfortaa', cursive", fontWeight: 700, fontSize: 11.5, color: '#1e3a8a' } },
   'information-technology': { name: 'Pixel Tech',         textStyle: { fontFamily: "'Orbitron', sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: '0.05em', color: '#0f766e' } },
@@ -478,7 +478,7 @@ export function CityHub() {
           : sign.textStyle;
         const boardStyle = { 
           background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', 
-          borderColor: d.slug === 'health-sciences' ? '#06b6d4' : d.color.primary 
+          borderColor: d.slug === 'health-sciences' ? '#2ea47d' : d.color.primary 
         };
 
         return (
@@ -504,7 +504,7 @@ export function CityHub() {
                 textShadow: '0 1px 0 rgba(255,255,255,0.55)', 
                 ...textStyle 
               }}>{sign.name}</span>
-              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.slug === 'health-sciences' ? '#06b6d4' : d.color.primary}, transparent)` }} />
+              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.slug === 'health-sciences' ? '#2ea47d' : d.color.primary}, transparent)` }} />
             </div>
           </div>
         );
