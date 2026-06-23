@@ -831,42 +831,95 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number,
 }
 
 // A small district banner on a pole — flanks each building entrance in its colour.
-// At night, the finial glows and casts a warm street light cone downward.
+// At night, the flag and the lamp at the top glow, casting a warm street light cone and ground pool.
 function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number, skyGlow = 0) {
   const wave = Math.sin(t / 260) * 1.6;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y));
+  
+  // 1. Ground shadow
   ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.ellipse(0, 1, 4, 2, 0, 0, 7); ctx.fill();
-  ctx.fillStyle = '#6b5535'; ctx.fillRect(-1, -36, 2, 37);                 // pole
-  ctx.fillStyle = '#e7d6a8'; ctx.beginPath(); ctx.arc(0, -36, 2, 0, 7); ctx.fill(); // finial
+  
+  // 2. Sleek dark iron pole
+  ctx.fillStyle = '#374151'; ctx.fillRect(-1, -36, 2, 37);                 // pole
+  
+  // 3. Post-top lantern fixture
+  // Base
+  ctx.fillStyle = '#1f2937'; ctx.fillRect(-2, -37, 4, 1);
+  // Glass enclosure
+  ctx.fillStyle = skyGlow > 0.05 ? 'rgba(254, 240, 138, 0.4)' : 'rgba(243, 244, 246, 0.25)';
+  ctx.fillRect(-2.5, -42, 5, 5);
+  // Frame border
+  ctx.strokeStyle = '#111827'; ctx.lineWidth = 0.5; ctx.strokeRect(-2.5, -42, 5, 5);
+  // Metal Cap
+  ctx.fillStyle = '#1f2937'; 
+  ctx.fillRect(-3.5, -43, 7, 1); 
+  ctx.fillRect(-1.5, -44.5, 3, 1.5);
+  
+  // Bulb (inside the glass enclosure)
+  ctx.fillStyle = '#fef08a'; ctx.beginPath(); ctx.arc(0, -39.5, 1.2, 0, Math.PI * 2); ctx.fill();
+
+  // 4. Pennant / flag
   ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -25); ctx.closePath(); ctx.fill(); // pennant
   ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.beginPath(); ctx.moveTo(1, -35); ctx.lineTo(14 + wave, -30); ctx.lineTo(1, -30); ctx.closePath(); ctx.fill();
 
-  // night glow street light effect
+  // 5. Night glow street light and flag glow effect
   if (skyGlow > 0.05) {
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     
-    // Light bulb glow at the finial top
-    const bulbGrad = ctx.createRadialGradient(0, -36, 0, 0, -36, 6);
-    bulbGrad.addColorStop(0, `rgba(255, 253, 207, ${0.9 * skyGlow})`);
-    bulbGrad.addColorStop(1, 'rgba(255, 253, 207, 0)');
-    ctx.fillStyle = bulbGrad;
-    ctx.beginPath();
-    ctx.arc(0, -36, 6, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Cast light cone downwards
-    const coneGrad = ctx.createLinearGradient(0, -36, 0, 0);
-    coneGrad.addColorStop(0, `rgba(253, 224, 71, ${0.35 * skyGlow})`);
-    coneGrad.addColorStop(0.5, `rgba(253, 224, 71, ${0.12 * skyGlow})`);
-    coneGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+    // A. Cast light cone downwards from the lantern base (y = -37) to the ground (y = 5)
+    const coneGrad = ctx.createLinearGradient(0, -37, 0, 5);
+    coneGrad.addColorStop(0, `rgba(254, 240, 138, ${0.45 * skyGlow})`);
+    coneGrad.addColorStop(0.5, `rgba(254, 240, 138, ${0.15 * skyGlow})`);
+    coneGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
     ctx.fillStyle = coneGrad;
 
     // Draw cone triangle pointing down to ground
     ctx.beginPath();
-    ctx.moveTo(0, -36);
-    ctx.lineTo(-24, 0);
-    ctx.lineTo(24, 0);
+    ctx.moveTo(0, -37);
+    ctx.lineTo(-24, 5);
+    ctx.lineTo(24, 5);
+    ctx.closePath();
+    ctx.fill();
+
+    // B. Light pool on the ground/mat
+    const groundGrad = ctx.createRadialGradient(0, 1, 0, 0, 1, 28);
+    groundGrad.addColorStop(0, `rgba(254, 240, 138, ${0.3 * skyGlow})`);
+    groundGrad.addColorStop(0.5, `rgba(254, 240, 138, ${0.1 * skyGlow})`);
+    groundGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    ctx.fillStyle = groundGrad;
+    ctx.beginPath();
+    ctx.ellipse(0, 1, 28, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // C. Light bulb glow / bloom at the lantern center (0, -39.5)
+    const bulbGrad = ctx.createRadialGradient(0, -39.5, 0, 0, -39.5, 8);
+    bulbGrad.addColorStop(0, `rgba(255, 255, 255, ${1.0 * skyGlow})`);
+    bulbGrad.addColorStop(0.2, `rgba(254, 240, 138, ${0.85 * skyGlow})`);
+    bulbGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    ctx.fillStyle = bulbGrad;
+    ctx.beginPath();
+    ctx.arc(0, -39.5, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // D. Thematic neon glowing flag effect
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12 * skyGlow;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(1, -35);
+    ctx.lineTo(14 + wave, -30);
+    ctx.lineTo(1, -25);
+    ctx.closePath();
+    ctx.fill();
+
+    // Inner glowing highlight on the flag
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(2, -33);
+    ctx.lineTo(10 + wave, -30);
+    ctx.lineTo(2, -28);
     ctx.closePath();
     ctx.fill();
 
