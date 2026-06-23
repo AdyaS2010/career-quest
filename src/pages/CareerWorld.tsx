@@ -228,7 +228,7 @@ const careerBriefContent: Record<string, {
 };
 
 const DOMAIN_FONT_FAMILY: Record<string, string> = {
-  'health-sciences':        "'Nunito', sans-serif",
+  'health-sciences':        "'Quicksand', sans-serif",
   'culinary-arts':          "'Kalam', cursive",
   'education':              "'Comfortaa', cursive",
   'information-technology': "'Orbitron', sans-serif",
