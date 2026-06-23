@@ -478,7 +478,7 @@ export function CityHub() {
           : sign.textStyle;
         const boardStyle = { 
           background: 'linear-gradient(180deg,#fffaf0 0%,#f4ecd9 100%)', 
-          borderColor: d.slug === 'health-sciences' ? '#2ea47d' : d.color.primary 
+          borderColor: d.slug === 'health-sciences' ? '#f87171' : d.color.primary 
         };
 
         return (
@@ -504,7 +504,7 @@ export function CityHub() {
                 textShadow: '0 1px 0 rgba(255,255,255,0.55)', 
                 ...textStyle 
               }}>{sign.name}</span>
-              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.slug === 'health-sciences' ? '#2ea47d' : d.color.primary}, transparent)` }} />
+              <div style={{ height: 2, marginTop: 3, borderRadius: 2, background: `linear-gradient(90deg, transparent, ${d.slug === 'health-sciences' ? '#f87171' : d.color.primary}, transparent)` }} />
             </div>
           </div>
         );
