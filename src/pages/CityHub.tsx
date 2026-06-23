@@ -868,10 +868,11 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
     ctx.globalCompositeOperation = 'screen';
     
     // A. Cast light cone downwards from the lantern base (y = -37) to the ground (y = 5)
+    // Saturated warm golden light for a richer aesthetic
     const coneGrad = ctx.createLinearGradient(0, -37, 0, 5);
-    coneGrad.addColorStop(0, `rgba(254, 240, 138, ${0.45 * skyGlow})`);
-    coneGrad.addColorStop(0.5, `rgba(254, 240, 138, ${0.15 * skyGlow})`);
-    coneGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    coneGrad.addColorStop(0, `rgba(254, 243, 199, ${0.65 * skyGlow})`); // warm amber cream
+    coneGrad.addColorStop(0.4, `rgba(253, 224, 71, ${0.3 * skyGlow})`);  // rich gold
+    coneGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
     ctx.fillStyle = coneGrad;
 
     // Draw cone triangle pointing down to ground
@@ -882,29 +883,31 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
     ctx.closePath();
     ctx.fill();
 
-    // B. Light pool on the ground/mat
-    const groundGrad = ctx.createRadialGradient(0, 1, 0, 0, 1, 28);
-    groundGrad.addColorStop(0, `rgba(254, 240, 138, ${0.3 * skyGlow})`);
-    groundGrad.addColorStop(0.5, `rgba(254, 240, 138, ${0.1 * skyGlow})`);
-    groundGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    // B. Light pool on the ground/mat (widened and made brighter)
+    const groundGrad = ctx.createRadialGradient(0, 1, 0, 0, 1, 32);
+    groundGrad.addColorStop(0, `rgba(253, 224, 71, ${0.48 * skyGlow})`);
+    groundGrad.addColorStop(0.5, `rgba(253, 224, 71, ${0.18 * skyGlow})`);
+    groundGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
     ctx.fillStyle = groundGrad;
     ctx.beginPath();
-    ctx.ellipse(0, 1, 28, 9, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 1, 32, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // C. Light bulb glow / bloom at the lantern center (0, -39.5)
-    const bulbGrad = ctx.createRadialGradient(0, -39.5, 0, 0, -39.5, 8);
+    // C. Light bulb glow / bloom at the lantern center (0, -39.5) - radius increased to 12
+    const bulbGrad = ctx.createRadialGradient(0, -39.5, 0, 0, -39.5, 12);
     bulbGrad.addColorStop(0, `rgba(255, 255, 255, ${1.0 * skyGlow})`);
-    bulbGrad.addColorStop(0.2, `rgba(254, 240, 138, ${0.85 * skyGlow})`);
-    bulbGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+    bulbGrad.addColorStop(0.2, `rgba(254, 240, 138, ${0.95 * skyGlow})`);
+    bulbGrad.addColorStop(0.6, `rgba(253, 224, 71, ${0.5 * skyGlow})`);
+    bulbGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
     ctx.fillStyle = bulbGrad;
     ctx.beginPath();
-    ctx.arc(0, -39.5, 8, 0, Math.PI * 2);
+    ctx.arc(0, -39.5, 12, 0, Math.PI * 2);
     ctx.fill();
 
     // D. Thematic neon glowing flag effect
+    // 1st layer: broad, soft background glow (shadowBlur = 20)
     ctx.shadowColor = color;
-    ctx.shadowBlur = 12 * skyGlow;
+    ctx.shadowBlur = 20 * skyGlow;
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.moveTo(1, -35);
@@ -913,9 +916,19 @@ function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
     ctx.closePath();
     ctx.fill();
 
-    // Inner glowing highlight on the flag
+    // 2nd layer: smaller, intense neon core glow (shadowBlur = 8)
+    ctx.shadowBlur = 8 * skyGlow;
+    ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.15 * skyGlow) + ')';
+    ctx.beginPath();
+    ctx.moveTo(1, -35);
+    ctx.lineTo(14 + wave, -30);
+    ctx.lineTo(1, -25);
+    ctx.closePath();
+    ctx.fill();
+
+    // 3rd layer: Inner glowing highlight on the flag (no shadow, white core)
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.35 * skyGlow) + ')';
     ctx.beginPath();
     ctx.moveTo(2, -33);
     ctx.lineTo(10 + wave, -30);
