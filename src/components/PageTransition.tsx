@@ -21,6 +21,7 @@ export function PageTransition({ children }: PageTransitionProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15, ease: 'linear' }}
+                className="w-full min-h-screen"
             >
                 {children}
             </motion.div>
@@ -34,6 +35,7 @@ export function PageTransition({ children }: PageTransitionProps) {
             exit={{ opacity: 0, scale: 1.06, filter: 'blur(4px)' }}
             transition={{ duration: 0.46, ease: [0.22, 1, 0.36, 1] }}
             style={{ transformOrigin: 'center center', willChange: 'transform, opacity, filter' }}
+            className="w-full min-h-screen"
         >
             {children}
         </motion.div>

@@ -27,7 +27,18 @@ export async function loadBaseMap(): Promise<BaseMap> {
   const map = xml.querySelector('map')!;
   const w = parseInt(map.getAttribute('width') || '55', 10);
   const h = parseInt(map.getAttribute('height') || '30', 10);
-  _cache = { w, h, terrain: parseLayer(xml, 'Terrain', w, h), objects: parseLayer(xml, 'Objects', w, h) };
+  const terrain = parseLayer(xml, 'Terrain', w, h);
+  const objects = parseLayer(xml, 'Objects', w, h);
+  
+  // Reduce building at x=28..32, y=13..16 to clear the road and restore grass/road
+  for (let x = 28; x <= 32; x++) {
+    terrain[13 * w + x] = 265; // road
+    terrain[14 * w + x] = 265; // road
+    terrain[15 * w + x] = 20;  // grass
+    terrain[16 * w + x] = 20;  // grass
+  }
+  
+  _cache = { w, h, terrain, objects };
   return _cache;
 }
 
