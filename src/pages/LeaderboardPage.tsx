@@ -119,37 +119,40 @@ export function LeaderboardPage() {
 
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div
-                    className="rounded-3xl shadow-xl overflow-hidden border"
+                    className="rounded-[2rem] shadow-2xl overflow-hidden border-4"
                     style={{
                         backgroundColor: 'var(--surface-card)',
                         borderColor: 'var(--border-default)'
                     }}
                 >
-                    <div className="p-8 bg-indigo-600 text-white text-center rounded-t-3xl">
-                        <h2 className="text-3xl font-bold mb-2">Ranking Top 10</h2>
-                        <p className="text-indigo-100">See how you compare with other players globally!</p>
+                    <div className="p-8 bg-gradient-to-r from-amber-500 via-orange-500 to-indigo-600 text-white text-center rounded-t-[1.7rem] relative overflow-hidden border-b-4 border-amber-500/20">
+                        {/* Decorative Sun Glow behind header */}
+                        <div className="absolute top-0 right-1/4 w-32 h-32 bg-yellow-300/20 rounded-full blur-3xl pointer-events-none"></div>
+                        
+                        <h2 className="text-4xl font-black uppercase tracking-tight mb-2" style={{ fontFamily: "'Cinzel', serif" }}>Ranking Top 10</h2>
+                        <p className="text-amber-100 font-medium text-sm tracking-wide">Compare your competencies and scores with players globally!</p>
 
                         {userRank && (
-                            <div className="mt-6 bg-white/20 backdrop-blur-md rounded-xl p-4 inline-block border border-white/30 shadow-lg transform transition hover:scale-105">
-                                <p className="font-semibold text-white mb-2 uppercase tracking-wide text-xs">Your Global Ranking</p>
+                            <div className="mt-6 bg-black/25 backdrop-blur-md rounded-2xl p-4 inline-block border border-white/20 shadow-lg transform transition hover:scale-102">
+                                <p className="font-bold text-amber-300 mb-2 uppercase tracking-widest text-[10px]">Your Global Placement</p>
                                 <div className="flex items-center gap-6 px-4">
                                     <div className="text-left">
-                                        <div className="text-sm text-indigo-200 uppercase font-bold tracking-wider">Rank</div>
-                                        <div className="text-3xl font-bold">#{userRank.rank}</div>
+                                        <div className="text-[10px] text-amber-200/70 uppercase font-black tracking-wider">Rank</div>
+                                        <div className="text-3xl font-black font-fantasy">#{userRank.rank}</div>
                                     </div>
-                                    <div className="w-px h-10 bg-white/30"></div>
+                                    <div className="w-px h-10 bg-white/20"></div>
                                     <div className="text-right">
-                                        <div className="text-sm text-indigo-200 uppercase font-bold tracking-wider">Score</div>
-                                        <div className="text-3xl font-bold">{userRank.score.toLocaleString()}</div>
+                                        <div className="text-[10px] text-amber-200/70 uppercase font-black tracking-wider">Score</div>
+                                        <div className="text-3xl font-black font-fantasy">{userRank.score.toLocaleString()}</div>
                                     </div>
 
                                     <button
                                         onClick={handleShare}
-                                        className="ml-4 flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white px-4 py-2 rounded-lg transition-all shadow-md font-semibold text-sm h-full"
+                                        className="ml-4 flex items-center gap-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 px-4 py-2 rounded-xl transition-all shadow-md font-black text-xs h-full"
                                         title="Share Rank"
                                     >
                                         <Share2 className="w-4 h-4" />
-                                        Share
+                                        Share Rank
                                     </button>
                                 </div>
                             </div>
@@ -172,36 +175,37 @@ export function LeaderboardPage() {
                                         className="flex items-center p-4 rounded-2xl transition-all"
                                         style={{
                                             backgroundColor: user?.id === leader.id
-                                                ? (theme === 'dark' ? 'rgba(99, 102, 241, 0.2)' : '#eef2ff')
-                                                : (theme === 'dark' ? 'var(--surface-elevated)' : '#f9fafb'),
+                                                ? (theme === 'dark' ? 'rgba(251, 191, 36, 0.12)' : '#fffbeb')
+                                                : (theme === 'dark' ? 'var(--surface-elevated)' : '#ffffff'),
                                             border: user?.id === leader.id
-                                                ? `2px solid ${theme === 'dark' ? '#6366f1' : '#818cf8'}`
-                                                : '1px solid transparent',
-                                            transform: user?.id === leader.id ? 'scale(1.02)' : 'scale(1)',
+                                                ? `2px solid var(--accent-primary)`
+                                                : `1px solid var(--border-default)`,
+                                            transform: user?.id === leader.id ? 'scale(1.015)' : 'scale(1)',
                                             boxShadow: user?.id === leader.id ? '0 4px 12px var(--shadow-color)' : 'none'
                                         }}
                                     >
                                         <div className="flex-shrink-0 w-16 flex justify-center">
                                             {getRankIcon(index)}
                                         </div>
-
+ 
                                         <div className="flex-shrink-0 mr-4">
                                             <div
-                                                className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold"
+                                                className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black border"
                                                 style={{
-                                                    backgroundColor: theme === 'dark' ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff',
+                                                    backgroundColor: theme === 'dark' ? 'rgba(251, 191, 36, 0.15)' : '#fef3c7',
+                                                    borderColor: 'var(--border-default)',
                                                     color: 'var(--accent-primary)'
                                                 }}
                                             >
                                                 {leader.username.charAt(0).toUpperCase()}
                                             </div>
                                         </div>
-
+ 
                                         <div className="flex-1">
                                             <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
                                                 {leader.username}
                                                 {user?.id === leader.id && (
-                                                    <span className="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded-full">You</span>
+                                                    <span className="text-[10px] bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">You</span>
                                                 )}
                                             </h3>
                                             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>

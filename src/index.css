@@ -4,72 +4,49 @@
 
 /* ===== Theme CSS Variables ===== */
 :root {
-  /* Light Mode (Default) */
-  --bg-primary: #f0f9ff;
-  /* sky-50 */
-  --bg-secondary: #e0f2fe;
-  /* sky-100 */
-  --bg-tertiary: #ffffff;
-  /* white */
+  /* Light Mode (Cozy Cream-Gold City Vibe) */
+  --bg-primary: #fffdf5;     /* warm vanilla cream */
+  --bg-secondary: #fef3c7;   /* soft honey gold / amber-100 */
+  --bg-tertiary: #ffffff;    /* pure white */
   --surface-card: #ffffff;
-  --surface-card-hover: #f8fafc;
+  --surface-card-hover: #fffbeb; /* very warm cream hover */
   --surface-elevated: #ffffff;
-  --text-primary: #0f172a;
-  /* slate-900 */
-  --text-secondary: #475569;
-  /* slate-600 */
-  --text-tertiary: #64748b;
-  /* slate-500 */
-  --text-muted: #94a3b8;
-  /* slate-400 */
-  --border-default: #e2e8f0;
-  /* slate-200 */
-  --border-subtle: #f1f5f9;
-  /* slate-100 */
-  --shadow-color: rgba(0, 0, 0, 0.1);
-  --nav-bg: rgba(255, 255, 255, 0.8);
-  --nav-border: #e2e8f0;
+  --text-primary: #0f172a;   /* slate-900 */
+  --text-secondary: #475569; /* slate-600 */
+  --text-tertiary: #64748b;  /* slate-500 */
+  --text-muted: #94a3b8;     /* slate-400 */
+  --border-default: #fde6c7; /* soft warm gold border */
+  --border-subtle: #fef3c7;  /* honey gold sub-border */
+  --shadow-color: rgba(69, 45, 10, 0.08); /* warm soft shadow */
+  --nav-bg: rgba(255, 253, 245, 0.85); /* glassmorphic warm white */
+  --nav-border: #fde6c7;
   --input-bg: #ffffff;
-  --input-border: #d1d5db;
-  --accent-primary: #3b82f6;
-  /* blue-500 */
-  --accent-secondary: #8b5cf6;
-  /* purple-500 */
+  --input-border: #cbd5e1;
+  --accent-primary: #d97706;  /* warm amber-600 for cozy accessibility */
+  --accent-secondary: #7c3aed; /* purple-600 */
 }
 
 [data-theme="dark"] {
-  /* Dark Mode */
-  --bg-primary: #0f172a;
-  /* slate-900 */
-  --bg-secondary: #1e1b4b;
-  /* indigo-950 */
-  --bg-tertiary: #1e293b;
-  /* slate-800 */
-  --surface-card: #1e293b;
-  /* slate-800 */
-  --surface-card-hover: #334155;
-  /* slate-700 */
-  --surface-elevated: #334155;
-  /* slate-700 */
-  --text-primary: #f1f5f9;
-  /* slate-100 */
-  --text-secondary: #cbd5e1;
-  /* slate-300 */
-  --text-tertiary: #94a3b8;
-  /* slate-400 */
-  --text-muted: #64748b;
-  /* slate-500 */
-  --border-default: rgba(255, 255, 255, 0.1);
+  /* Dark Mode (Cozy Starry Night City Vibe) */
+  --bg-primary: #0a1228;      /* midnight blue sky base */
+  --bg-secondary: #121a46;    /* deep cosmic indigo */
+  --bg-tertiary: #111b35;     /* dark slate-blue card */
+  --surface-card: #111b35;
+  --surface-card-hover: #1b2850; /* indigo-gray hover */
+  --surface-elevated: #1b2850;
+  --text-primary: #f8fafc;    /* slate-50 */
+  --text-secondary: #cbd5e1;  /* slate-300 */
+  --text-tertiary: #94a3b8;   /* slate-400 */
+  --text-muted: #64748b;      /* slate-500 */
+  --border-default: rgba(251, 191, 36, 0.22); /* cozy gold border highlight */
   --border-subtle: rgba(255, 255, 255, 0.05);
-  --shadow-color: rgba(0, 0, 0, 0.4);
-  --nav-bg: rgba(15, 23, 42, 0.8);
-  --nav-border: rgba(255, 255, 255, 0.1);
-  --input-bg: #1e293b;
-  --input-border: #475569;
-  --accent-primary: #60a5fa;
-  /* blue-400 */
-  --accent-secondary: #a78bfa;
-  /* purple-400 */
+  --shadow-color: rgba(0, 0, 0, 0.45);
+  --nav-bg: rgba(10, 18, 40, 0.85); /* glassmorphic midnight blue */
+  --nav-border: rgba(251, 191, 36, 0.15);
+  --input-bg: #111b35;
+  --input-border: #334155;
+  --accent-primary: #fbbf24;  /* glowing gold for high contrast */
+  --accent-secondary: #c084fc; /* purple-400 */
 }
 
 /* Theme transition for smooth switching */

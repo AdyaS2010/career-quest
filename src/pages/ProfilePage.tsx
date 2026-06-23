@@ -499,26 +499,26 @@ export function ProfilePage() {
         </div>
 
         {/* PAGE 1 CONTENT */}
-        <div className="p-16 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px] print:mb-0">
+        <div className="p-10 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px] print:mb-0">
           {/* Header Section */}
-          <div className="flex justify-between items-start border-b-[8px] border-slate-900 pb-8 mb-12 relative">
-            <div className="flex gap-8 items-center pr-32">
+          <div className="flex justify-between items-start border-b-[6px] border-slate-900 pb-4 mb-6 relative">
+            <div className="flex gap-6 items-center pr-32">
               <div className="relative">
-                <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white text-3xl shadow-2xl z-20 relative">🧭</div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-amber-500 rounded-lg -z-10"></div>
+                <div className="w-14 h-14 bg-slate-900 rounded-xl flex items-center justify-center text-white text-2xl shadow-2xl z-20 relative">🧭</div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-lg -z-10"></div>
               </div>
               <div>
-                <h1 className="text-4xl font-black uppercase tracking-tighter mb-1" style={{ fontFamily: "'Cinzel', serif" }}>Career Quest</h1>
-                <p className="text-base font-bold tracking-[0.4em] text-slate-500 uppercase ml-1">Academic Competency Transcript</p>
-                <div className="flex gap-3 mt-2">
-                  <span className="text-[7px] font-black bg-slate-900 text-white px-2 py-0.5 rounded tracking-[0.10em] uppercase">Ref: FBLA-2026-QS</span>
-                  <span className="text-[7px] font-black border border-amber-500 text-amber-600 px-2 py-0.5 rounded tracking-[0.10em] uppercase">Gold Merit Standard</span>
+                <h1 className="text-3xl font-black uppercase tracking-tighter mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>Career Quest</h1>
+                <p className="text-xs font-bold tracking-[0.3em] text-slate-500 uppercase ml-0.5">Academic Competency Transcript</p>
+                <div className="flex gap-2 mt-1">
+                  <span className="text-[6px] font-black bg-slate-900 text-white px-2 py-0.5 rounded tracking-[0.10em] uppercase">Ref: FBLA-2026-QS</span>
+                  <span className="text-[6px] font-black border border-amber-500 text-amber-600 px-2 py-0.5 rounded tracking-[0.10em] uppercase">Gold Merit Standard</span>
                 </div>
               </div>
             </div>
 
             {/* Official Gold Seal Graphic - Repositioned to avoid overlap */}
-            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 opacity-90 scale-75 origin-top-right">
+            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 opacity-90 scale-[0.65] origin-top-right">
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 p-1 shadow-xl flex items-center justify-center relative">
                 <div className="absolute inset-0 border-4 border-dashed border-white/40 rounded-full"></div>
                 <div className="w-full h-full rounded-full border-2 border-amber-200/50 flex flex-col items-center justify-center text-center p-2">
@@ -533,46 +533,46 @@ export function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-12 gap-12 mb-10 items-center break-inside-avoid">
+          <div className="grid grid-cols-12 gap-8 mb-6 items-center break-inside-avoid">
             <div className="col-span-8">
-              <div className="mb-6">
-                <h2 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] mb-2 flex items-center gap-4">
+              <div className="mb-2">
+                <h2 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] mb-1.5 flex items-center gap-4">
                   Candidate Credentials
                   <div className="flex-1 h-[1px] bg-slate-100"></div>
                 </h2>
-                <div className="space-y-1">
-                  <h3 className="text-6xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Righteous', cursive" }}>{profile?.username}</h3>
-                  <div className="flex items-center gap-4 pt-1">
-                    <p className="text-xl text-slate-400 font-light italic">Assessment Lead: <span className="text-slate-900 font-bold not-italic font-serif">{profile?.character_name}</span></p>
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
-                    <p className="text-xl text-slate-400 font-light italic tracking-widest">{currentLevel} Levels Attained</p>
+                <div className="space-y-0.5">
+                  <h3 className="text-5xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Righteous', cursive" }}>{profile?.username}</h3>
+                  <div className="flex items-center gap-3 pt-0.5">
+                    <p className="text-lg text-slate-400 font-light italic">Assessment Lead: <span className="text-slate-900 font-bold not-italic font-serif">{profile?.character_name}</span></p>
+                    <div className="w-1 h-1 bg-amber-500 rounded-full"></div>
+                    <p className="text-lg text-slate-400 font-light italic tracking-widest">{currentLevel} Levels Attained</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="col-span-4 bg-slate-50 p-8 rounded-[2.5rem] border-2 border-slate-100 shadow-inner text-center relative overflow-hidden break-inside-avoid">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-600"></div>
-              <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2">Cumulative Mastery XP</div>
-              <div className="text-6xl font-black text-slate-900 mb-1 tabular-nums">{profile?.total_score || 0}</div>
-              <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">
+            <div className="col-span-4 bg-slate-50 p-5 rounded-[1.8rem] border border-slate-100 shadow-inner text-center relative overflow-hidden break-inside-avoid">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-600"></div>
+              <div className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Cumulative Mastery XP</div>
+              <div className="text-5xl font-black text-slate-900 mb-0.5 tabular-nums">{profile?.total_score || 0}</div>
+              <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest leading-none">
                 Standardized performance evaluation
               </p>
             </div>
           </div>
 
           {/* Metric Bar Scoreboard */}
-          <div className="grid grid-cols-4 gap-4 mb-12 break-inside-avoid">
+          <div className="grid grid-cols-4 gap-4 mb-6 break-inside-avoid">
             {[
               { label: 'Islands Mastered', value: completedCareers, icon: '🏰', trend: 'Global Mastery' },
               { label: 'Successful Trials', value: totalChallengesCompleted, icon: '🎯', trend: 'Skill Validation' },
               { label: 'Evaluation Precision', value: `${averageScore}%`, icon: '📈', trend: 'Consistency Rating' },
               { label: 'Login Consistency', value: profile?.longest_streak || 0, icon: '🔥', trend: 'Persistence Factor' }
             ].map((stat, i) => (
-              <div key={i} className="p-6 border-2 border-slate-100 rounded-2xl group flex flex-col justify-center">
-                <div className="text-[10px] font-black text-slate-300 uppercase mb-2 tracking-widest">{stat.label}</div>
-                <div className="text-3xl font-black text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-[8px] font-bold text-amber-600 uppercase tracking-widest">
+              <div key={i} className="p-4 border border-slate-100 rounded-xl group flex flex-col justify-center">
+                <div className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-widest">{stat.label}</div>
+                <div className="text-2xl font-black text-slate-900 mb-0.5">{stat.value}</div>
+                <div className="text-[7px] font-bold text-amber-600 uppercase tracking-widest">
                   {stat.trend}
                 </div>
               </div>
@@ -580,29 +580,29 @@ export function ProfilePage() {
           </div>
 
           {/* Matrix Header */}
-          <div className="flex items-center gap-6 mb-8 break-inside-avoid">
-            <h3 className="text-3xl font-black uppercase tracking-tight text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Matrix of Core Competencies</h3>
-            <div className="flex-1 h-[3px] bg-slate-900"></div>
-            <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">NACE Standards v2026.4</div>
+          <div className="flex items-center gap-6 mb-4 break-inside-avoid">
+            <h3 className="text-2xl font-black uppercase tracking-tight text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Matrix of Core Competencies</h3>
+            <div className="flex-1 h-[2px] bg-slate-900"></div>
+            <div className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">NACE Standards v2026.4</div>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-16 gap-y-8 mb-4 break-inside-avoid">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-2 break-inside-avoid">
             {getNACECompetencies().map((comp, i) => (
               <div key={comp.name} className="relative break-inside-avoid">
-                <div className="flex justify-between items-end mb-2">
+                <div className="flex justify-between items-end mb-1">
                   <div>
-                    <div className="flex items-center gap-3 mb-0.5">
-                      <span className="text-slate-200 font-black text-xl">{(i + 1).toString().padStart(2, '0')}</span>
-                      <h4 className="font-bold text-lg text-slate-900 tracking-tight">{comp.name}</h4>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-slate-200 font-black text-base">{(i + 1).toString().padStart(2, '0')}</span>
+                      <h4 className="font-bold text-sm text-slate-900 tracking-tight">{comp.name}</h4>
                     </div>
-                    <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wider leading-none">{comp.description}</p>
+                    <p className="text-[8px] text-slate-400 font-medium uppercase tracking-wider leading-none">{comp.description}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-black text-slate-900 leading-none">{comp.score}%</div>
-                    <div className="text-[7px] font-bold text-slate-300 uppercase">Proficiency</div>
+                    <div className="text-lg font-black text-slate-900 leading-none">{comp.score}%</div>
+                    <div className="text-[6px] font-bold text-slate-300 uppercase">Proficiency</div>
                   </div>
                 </div>
-                <div className="h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                <div className="h-1.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
                   <div
                     className="h-full rounded-full bg-slate-900 transition-all duration-1000"
                     style={{ width: `${comp.score}%` }}
@@ -617,19 +617,19 @@ export function ProfilePage() {
         <div className="page-break" style={{ pageBreakBefore: 'always' }}></div>
 
         {/* PAGE 2 CONTENT */}
-        <div className="p-16 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px]">
+        <div className="p-10 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px]">
           <div className="flex-1 flex flex-col">
             <div className="break-inside-avoid">
-              <div className="flex items-center gap-6 mb-8">
-                <h3 className="text-3xl font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Learning Success Artifacts</h3>
+              <div className="flex items-center gap-6 mb-4">
+                <h3 className="text-2xl font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Learning Success Artifacts</h3>
                 <div className="flex-1 h-[2px] bg-slate-100"></div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-10 gap-y-6 mb-10">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
                 {careers.filter(c => getCareerAccuracy(c.id) > 0).map(career => (
-                  <div key={career.id} className="relative bg-slate-50 p-6 rounded-2xl border border-slate-100 break-inside-avoid">
-                    <h4 className="font-black text-slate-900 uppercase tracking-widest text-base mb-2 border-b pb-1 leading-none">{career.name}</h4>
-                    <ul className="text-[10px] text-slate-500 space-y-2 font-medium leading-tight list-disc list-inside">
+                  <div key={career.id} className="relative bg-slate-50 p-4 rounded-xl border border-slate-100 break-inside-avoid">
+                    <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1.5 border-b pb-0.5 leading-none">{career.name}</h4>
+                    <ul className="text-[8px] text-slate-500 space-y-0.5 font-medium leading-tight list-disc list-inside">
                       {career.slug === 'culinary-arts' && (
                         <>
                           <li>Mastered advanced mise-en-place and kitchen hierarchy.</li>
@@ -684,24 +684,24 @@ export function ProfilePage() {
               </div>
             </div>
 
-            <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 shadow-2xl relative overflow-hidden break-inside-avoid">
+            <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden break-inside-avoid">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/4 -translate-y-1/4"></div>
-              <h3 className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-6 border-b border-white/10 pb-3 leading-none">Specialized Domain Evaluation Summary</h3>
-              <div className="grid grid-cols-2 gap-x-12 gap-y-4">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 border-b border-white/10 pb-2 leading-none">Specialized Domain Evaluation Summary</h3>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                 {careers.map(career => {
                   const accuracy = getCareerAccuracy(career.id);
                   const points = careerScores[career.id] || 0;
                   return (
                     <div key={career.id} className="flex justify-between items-center group">
                       <div>
-                        <span className="font-bold text-white text-sm tracking-wide uppercase">{career.name}</span>
-                        <div className="flex gap-1.5 items-center mt-0.5">
-                          <p className="text-[8px] text-slate-500 font-bold uppercase tracking-[0.1em]">{career.title}</p>
+                        <span className="font-bold text-white text-xs tracking-wide uppercase">{career.name}</span>
+                        <div className="flex gap-1 items-center mt-0.5">
+                          <p className="text-[7px] text-slate-500 font-bold uppercase tracking-[0.1em]">{career.title}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-base font-black text-white">{points} <span className="text-[9px] text-slate-500 font-medium">XP</span></div>
-                        <span className={`text-[9px] font-black uppercase tracking-[0.1em] block mt-0.5 ${accuracy > 80 ? 'text-amber-400' : accuracy > 0 ? 'text-blue-400' : 'text-slate-700'}`}>
+                        <div className="text-sm font-black text-white">{points} <span className="text-[8px] text-slate-500 font-medium">XP</span></div>
+                        <span className={`text-[8px] font-black uppercase tracking-[0.1em] block mt-0.5 ${accuracy > 80 ? 'text-amber-400' : accuracy > 0 ? 'text-blue-400' : 'text-slate-700'}`}>
                           {accuracy > 80 ? 'MASTER' : accuracy > 0 ? 'ELITE' : 'CANDIDATE'}
                         </span>
                       </div>
@@ -713,40 +713,40 @@ export function ProfilePage() {
           </div>
 
           {/* Verification & Footnotes */}
-          <div className="mt-auto pt-10 border-t-[6px] border-slate-900 break-inside-avoid">
-            <div className="grid grid-cols-12 gap-12 items-end">
+          <div className="pt-4 border-t-4 border-slate-900 break-inside-avoid">
+            <div className="grid grid-cols-12 gap-6 items-end">
               <div className="col-span-8">
-                <div className="mb-4 flex gap-4 pr-10">
-                  <div className="w-1 h-10 bg-amber-500"></div>
-                  <p className="text-[9px] font-medium text-slate-400 leading-relaxed italic">
+                <div className="mb-2 flex gap-3 pr-4">
+                  <div className="w-1 h-8 bg-amber-500"></div>
+                  <p className="text-[8px] font-medium text-slate-400 leading-normal italic">
                     "This document serves as an official record of career simulation competencies. Performance is indexed against 2026 industry standards and discovery protocols."
                   </p>
                 </div>
-                <div className="flex gap-8 items-center pt-6 opacity-75">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-slate-900" />
+                <div className="flex gap-6 items-center pt-2 opacity-75">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-slate-900" />
                     <span className="text-[8px] font-black uppercase tracking-[0.1em]">Verified Profile</span>
                   </div>
-                  <div className="flex items-center gap-2 border-l pl-8">
-                    <BookMarked className="w-4 h-4 text-slate-900" />
+                  <div className="flex items-center gap-1.5 border-l pl-4">
+                    <BookMarked className="w-3.5 h-3.5 text-slate-900" />
                     <span className="text-[8px] font-black uppercase tracking-[0.1em]">Accredited Tasks</span>
                   </div>
-                  <div className="flex items-center gap-2 border-l pl-8">
-                    <Zap className="w-4 h-4 text-slate-900" />
+                  <div className="flex items-center gap-1.5 border-l pl-4">
+                    <Zap className="w-3.5 h-3.5 text-slate-900" />
                     <span className="text-[8px] font-black uppercase tracking-[0.1em]">Real-time Accuracy</span>
                   </div>
                 </div>
               </div>
               <div className="col-span-4 text-right">
-                <div className="mb-6">
-                  <div className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1 leading-none">Discovery Board Authorization</div>
-                  <div className="h-[2px] w-48 bg-slate-900 ml-auto mb-2"></div>
+                <div className="mb-4">
+                  <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5 leading-none">Discovery Board Authorization</div>
+                  <div className="h-[1.5px] w-40 bg-slate-900 ml-auto mb-1.5"></div>
                   <div className="flex flex-col items-end">
-                    <p className="font-serif text-xl font-bold tracking-tighter mb-0.5 text-slate-900">Mayor Questopher</p>
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Board Registry ID: 489-CQ-2026</p>
+                    <p className="font-serif text-lg font-bold tracking-tighter mb-0.5 text-slate-900">Mayor Questopher</p>
+                    <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.15deg]">Board Registry ID: 489-CQ-2026</p>
                   </div>
                 </div>
-                <div className="text-[10px] font-black text-slate-200 select-none uppercase tracking-[0.5em]">
+                <div className="text-[9px] font-black text-slate-200 select-none uppercase tracking-[0.4em]">
                   FOR OFFICIAL PRESENTATION ONLY
                 </div>
               </div>
