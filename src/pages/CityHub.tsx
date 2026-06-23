@@ -64,6 +64,18 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'financial-services': { x: 13, y: 26.8 },
 };
 
+const STREETLIGHT_COORDS: { x: number; y: number }[] = [
+  { x: 22, y: 14 },
+  { x: 28, y: 15 },
+  { x: 34, y: 14 },
+  { x: 26, y: 9 },
+  { x: 19, y: 14 },
+  { x: 11, y: 14 },
+  { x: 44, y: 12 },
+  { x: 16, y: 22 },
+  { x: 16, y: 27 },
+];
+
 // Each domain is a little establishment on Questford's high street. Every name is
 // plain enough to guess the trade at a glance, with just a wink of wit.
 // The signage fonts are adjusted thematically to look playful and on-point for
@@ -452,6 +464,101 @@ export function CityHub() {
       const sky = daylight(nowInTz(tzRef.current));
       ctx.fillStyle = `rgba(${sky.r | 0},${sky.g | 0},${sky.b | 0},${sky.a})`;
       ctx.fillRect(0, 0, vw, vh);
+
+      // ===== nighttime illumination: shop windows & streetlights =====
+      if (sky.glow > 0.05) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        
+        // 1. Shop window glows (around storefront frames)
+        for (const slug in DOOR_COORDS) {
+          const door = DOOR_COORDS[slug];
+          const dx = door.x * TS - cam.x;
+          const dy = (door.y - 1.2) * TS - cam.y;
+          
+          // draw glowing door border
+          ctx.strokeStyle = `rgba(254, 240, 138, ${0.62 * sky.glow})`; // warm golden yellow
+          ctx.lineWidth = 3;
+          roundRect(ctx, dx + 4, dy + 4, TS - 8, TS * 1.2 - 8, 4);
+          ctx.stroke();
+
+          // draw soft light spill onto the street
+          const grad = ctx.createRadialGradient(dx + TS / 2, dy + TS, 0, dx + TS / 2, dy + TS, TS * 1.4);
+          grad.addColorStop(0, `rgba(253, 224, 71, ${0.35 * sky.glow})`);
+          grad.addColorStop(0.4, `rgba(253, 224, 71, ${0.12 * sky.glow})`);
+          grad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(dx + TS / 2, dy + TS, TS * 1.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 2. Streetlights light cones
+        for (const coord of STREETLIGHT_COORDS) {
+          const lx = coord.x * TS + TS / 2 - cam.x;
+          const ly = coord.y * TS - cam.y;
+          const postHeight = TS * 1.5;
+          const groundY = ly + postHeight;
+
+          // light cone gradient
+          const coneGrad = ctx.createRadialGradient(lx, ly, 2, lx, ly + postHeight * 0.4, postHeight);
+          coneGrad.addColorStop(0, `rgba(254, 240, 138, ${0.62 * sky.glow})`);
+          coneGrad.addColorStop(0.3, `rgba(253, 224, 71, ${0.25 * sky.glow})`);
+          coneGrad.addColorStop(1, 'rgba(253, 224, 71, 0)');
+          ctx.fillStyle = coneGrad;
+
+          // cone path
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.lineTo(lx - TS * 1.2, groundY);
+          ctx.lineTo(lx + TS * 1.2, groundY);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // 3. Draw physical lamppost poles (normal blit mode, on top of light cone/wash)
+        for (const coord of STREETLIGHT_COORDS) {
+          const lx = coord.x * TS + TS / 2 - cam.x;
+          const ly = coord.y * TS - cam.y;
+          const postHeight = TS * 1.5;
+          const groundY = ly + postHeight;
+
+          // Base shadow
+          ctx.fillStyle = 'rgba(0,0,0,0.18)';
+          ctx.beginPath();
+          ctx.ellipse(lx, groundY, 5, 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Iron pole
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(lx, ly);
+          ctx.lineTo(lx, groundY);
+          ctx.stroke();
+
+          // Crossbar bracket
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(lx - 4, ly + 2);
+          ctx.lineTo(lx + 4, ly + 2);
+          ctx.stroke();
+
+          // Lamp cap
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(lx, ly, 4, Math.PI, 0);
+          ctx.fill();
+
+          // Tiny glowing bulb core with a flicker effect
+          const bulbFlicker = 0.82 + 0.18 * Math.sin(t / 120 + coord.x * 7.7); // different offset per lamp!
+          ctx.fillStyle = `rgba(255, 254, 219, ${bulbFlicker * sky.glow})`;
+          ctx.beginPath();
+          ctx.arc(lx, ly + 2, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
 
       // live tile-coordinate readout (so the player can point me to spots)
       if (coordElRef.current) coordElRef.current.textContent = `${Math.floor(pos.x / TS)}, ${Math.floor(pos.y / TS)}`;
