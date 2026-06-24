@@ -552,7 +552,7 @@ export function CityHub() {
       </AnimatePresence>
 
       {/* HUD */}
-      <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">
+      <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3 print:hidden">
         <div id="tutorial-hud-progress" className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
           <span className="text-xl">🏙️</span>
           <div className="hidden md:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">Where Futures Begin</p></div>
