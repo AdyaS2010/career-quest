@@ -21,7 +21,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
     { icon: <Eye className="w-6 h-6 text-purple-500" />, tint: '#8b5cf6', title: 'High Contrast', sub: 'Maximum legibility', on: highContrast, toggle: toggleHighContrast },
     { icon: <Accessibility className="w-6 h-6 text-emerald-500" />, tint: '#10b981', title: 'Inclusive Font', sub: dyslexicFriendly ? 'Classic Outfit typeface' : 'Default Questford typeface', on: dyslexicFriendly, toggle: toggleDyslexicFriendly },
     { icon: <Wind className="w-6 h-6 text-blue-500" />, tint: '#3b82f6', title: 'Reduced Motion', sub: 'Minimize animations', on: reducedMotion, toggle: toggleReducedMotion },
-    { icon: <Volume2 className="w-6 h-6 text-indigo-500" />, tint: '#6366f1', title: 'Narrator Voice', sub: voiceoverEnabled ? 'Voiceover Enabled' : 'Voiceover Muted', on: voiceoverEnabled, toggle: toggleVoiceover },
+    { icon: <Volume2 className="w-6 h-6 text-indigo-500" />, tint: '#6366f1', title: 'Text-to-Speech (TTS)', sub: voiceoverEnabled ? 'TTS Voiceover Active' : 'TTS Voiceover Muted', on: voiceoverEnabled, toggle: toggleVoiceover },
   ];
 
   return createPortal(
