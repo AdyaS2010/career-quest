@@ -49,7 +49,6 @@ const DOOR_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 24, y: 19 },     // media + communication
   'law-government': { x: 14, y: 0.5 },           // law
   'financial-services': { x: 14, y: 29 },      // financial services
-  'market': { x: 37, y: 10 },
   'home': { x: 28, y: 4 },
 };
 
@@ -65,7 +64,6 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'media-communication': { x: 25, y: 16.9 },
   'law-government': { x: 14.5, y: 0.1 },         // top-edge building — keep the board low so it stays on screen
   'financial-services': { x: 13, y: 26.8 },
-  'market': { x: 37.5, y: 7.8 },
   'home': { x: 28.55, y: 1.7 },
 };
 
@@ -82,7 +80,6 @@ const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
   'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
   'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
-  'market':                 { name: 'Questmart',          textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0d9488' } },
   'home':                   { name: 'Cottage Noir',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
 };
 
@@ -463,7 +460,7 @@ export function CityHub() {
         // a gentle chime the moment you step onto a new doormat
         if (key && key.startsWith('d:')) playSfx('chime');
         nearKeyRef.current = key;
-        setNearLabel(near === 'npc' ? 'Talk to Mayor Questopher' : near ? `Enter ${near.name}` : null);
+        setNearLabel(near === 'npc' ? 'Talk to Mayor Questopher' : near ? (near.slug === 'home' ? 'Enter Home' : `Enter ${near.name}`) : null);
       }
 
       drawChar(ctx, pos.x - cam.x, pos.y - cam.y, '#22c55e', t, faceRef.current, movingRef.current);

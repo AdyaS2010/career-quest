@@ -22,6 +22,7 @@ export function ProfilePage() {
   const [userRank, setUserRank] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
+  const [printMode, setPrintMode] = useState<'report' | 'certificate'>('report');
 
   useEffect(() => {
     loadProfileData();
@@ -170,8 +171,6 @@ export function ProfilePage() {
     }
   };
 
-  const [printMode, setPrintMode] = useState<'report' | 'certificate'>('report');
-
   const handlePrintReport = () => {
     setPrintMode('report');
     setTimeout(() => {
@@ -285,7 +284,7 @@ export function ProfilePage() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-4xl font-bold">{profile?.username}</h2>
+                  <h2 className="text-4xl font-bold">{profile?.username || 'Guest'}</h2>
                   <button
                     onClick={() => setEditOpen(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/40 text-sm font-bold uppercase tracking-wider transition-all"
@@ -616,7 +615,7 @@ export function ProfilePage() {
                   <div className="flex-1 h-[1px] bg-slate-100"></div>
                 </h2>
                 <div className="space-y-0.5">
-                  <h3 className="text-5xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Righteous', cursive" }}>{profile?.username}</h3>
+                  <h3 className="text-5xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Righteous', cursive" }}>{profile?.username || 'Guest'}</h3>
                   <div className="flex items-center gap-3 pt-0.5">
                     <p className="text-lg text-slate-400 font-light italic">Assessment Lead: <span className="text-slate-900 font-bold not-italic font-serif">{profile?.character_name}</span></p>
                     <div className="w-1 h-1 bg-amber-500 rounded-full"></div>
@@ -856,7 +855,7 @@ export function ProfilePage() {
             <div className="my-2">
               <p className="text-sm font-sans uppercase tracking-[0.2em] text-slate-400 leading-none">Awarded to</p>
               <h2 className="text-5xl font-black text-slate-900 font-serif my-3 tracking-wide" style={{ fontFamily: "'Cinzel', serif" }}>
-                {profile?.username}
+                {profile?.username || 'Guest'}
               </h2>
               <div className="w-36 h-[1.5px] bg-[#d97706] mx-auto" />
               <p className="text-sm font-sans italic text-slate-500 mt-2">
@@ -893,7 +892,7 @@ export function ProfilePage() {
               <div className="text-left w-48">
                 <div className="h-[1px] bg-slate-400 w-full mb-1" />
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider font-sans">Discovery registry id</p>
-                <p className="text-[10px] font-bold text-slate-800 font-mono">#489-CQ-{profile?.username?.substring(0, 3)?.toUpperCase()}-2026</p>
+                <p className="text-[10px] font-bold text-slate-800 font-mono">#489-CQ-{(profile?.username || 'GUEST').substring(0, 3).toUpperCase()}-2026</p>
               </div>
 
               {/* Gold Seal Graphic */}
