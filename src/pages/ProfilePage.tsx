@@ -762,8 +762,9 @@ export function ProfilePage() {
                         </>
                       )}
                     </ul>
-                  );
-                })}
+                  </div>
+                );
+              })}
               </div>
             </div>
 
