@@ -159,7 +159,15 @@ export function AmenityInterior({ slug }: { slug: string }) {
           {/* furniture (Y-sorted) */}
           {def.furniture.map((f, i) => (
             <div key={`f${i}`} className="absolute" style={{ left: f.x, top: f.y, zIndex: Math.round(f.y + f.h) }}>
-              <FurnitureSprite kind={f.kind} w={f.w} h={f.h} color={f.color} accent={f.accent} />
+              {slug === 'home' && ['bed', 'sofa', 'tv', 'shelf', 'desk'].includes(f.kind) ? (
+                <img 
+                  src={`/assets/cottage/${f.kind === 'shelf' ? 'bookshelf' : f.kind}.png`} 
+                  alt="" 
+                  style={{ width: f.w, height: f.h, imageRendering: 'pixelated', objectFit: 'fill' }} 
+                />
+              ) : (
+                <FurnitureSprite kind={f.kind} w={f.w} h={f.h} color={f.color} accent={f.accent} />
+              )}
             </div>
           ))}
           {/* plants */}
@@ -168,7 +176,15 @@ export function AmenityInterior({ slug }: { slug: string }) {
 
           {/* counter */}
           <div className="absolute" style={{ left: COUNTER.x, top: COUNTER.y, zIndex: Math.round(COUNTER.y + COUNTER.h) }}>
-            <FurnitureSprite kind="counter" w={COUNTER.w} h={COUNTER.h} color={def.accent} />
+            {slug === 'home' ? (
+              <img 
+                src="/assets/cottage/counter.png" 
+                alt="" 
+                style={{ width: COUNTER.w, height: COUNTER.h, imageRendering: 'pixelated', objectFit: 'fill' }} 
+              />
+            ) : (
+              <FurnitureSprite kind="counter" w={COUNTER.w} h={COUNTER.h} color={def.accent} />
+            )}
           </div>
           {/* clerk behind counter */}
           <div className="absolute" style={{ left: CLERK.x, top: CLERK.y, width: 0, height: 0, zIndex: Math.round(CLERK.y) }}>
