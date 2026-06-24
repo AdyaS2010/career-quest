@@ -16,7 +16,7 @@ export function ProfilePage() {
   const [careers, setCareers] = useState<Career[]>([]);
   const [challengeProgress, setChallengeProgress] = useState<UserChallengeProgress[]>([]);
   const [careerScores, setCareerScores] = useState<Record<string, number>>({});
-  const [challengesList, setChallengesList] = useState<{ id: string; career_id: string; max_score: number }[]>([]);
+  const [challengesList, setChallengesList] = useState<{ id: string; career_id: string; title: string; max_score: number }[]>([]);
   const [careerChallengeCount, setCareerChallengeCount] = useState<Record<string, number>>({});
   const [careerStartedCount, setCareerStartedCount] = useState<Record<string, number>>({});
   const [userRank, setUserRank] = useState<number | null>(null);
@@ -36,7 +36,7 @@ export function ProfilePage() {
         supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
         supabase.from('careers').select('*').eq('is_active', true).order('order_index'),
         (supabase.from('user_challenge_progress') as any).select('*').eq('user_id', user.id),
-        (supabase.from('challenges') as any).select('id, career_id, max_score'),
+        (supabase.from('challenges') as any).select('id, career_id, title, max_score'),
       ]);
 
       if (profileRes.data) {
@@ -54,7 +54,7 @@ export function ProfilePage() {
       if (challengeProgressRes.data) setChallengeProgress(challengeProgressRes.data);
 
       // Compute per-career scores and status from challenge best_scores (source of truth)
-      const challenges = (challengesRes.data || []) as { id: string; career_id: string; max_score: number }[];
+      const challenges = (challengesRes.data || []) as { id: string; career_id: string; title: string; max_score: number }[];
       const chalProgress = (challengeProgressRes.data || []) as UserChallengeProgress[];
       setChallengesList(challenges);
 
@@ -189,6 +189,24 @@ export function ProfilePage() {
     setTimeout(() => {
       window.print();
     }, 500);
+  };
+
+  const getTopCompletedTrials = () => {
+    const trials = challengeProgress.map(cp => {
+      const challenge = challengesList.find(c => c.id === cp.challenge_id);
+      const career = careers.find(c => c.id === challenge?.career_id);
+      return {
+        title: challenge?.title || 'Unknown Simulation',
+        careerName: career?.name || 'General District',
+        attempts: cp.attempts || 1,
+        bestScore: cp.best_score || 0,
+        maxScore: challenge?.max_score || 100,
+        accuracy: Math.round(((cp.best_score || 0) / (challenge?.max_score || 100)) * 100),
+      };
+    });
+    return trials
+      .sort((a, b) => b.accuracy - a.accuracy || b.bestScore - a.bestScore)
+      .slice(0, 6);
   };
 
   const getNACECompetencies = () => {
@@ -567,272 +585,297 @@ export function ProfilePage() {
 
       {/* PRINT ONLY: Professional Career Report Card */}
       {printMode === 'report' && (
-        <div className="hidden print:block print-report-root print:m-0 print:p-0 bg-white text-slate-900 font-serif relative overflow-hidden">
-        {/* Intricate Border Decor */}
-        <div className="absolute inset-4 border-[12px] border-double border-slate-100 pointer-events-none"></div>
+        <div className="hidden print:block print-report-root print:m-0 print:p-0 bg-white text-slate-900 font-sans relative overflow-hidden w-[210mm] min-h-[297mm] p-[15mm]">
+          {/* Double Slate/Gold Ornamental Border */}
+          <div className="absolute inset-4 border border-[#d97706] pointer-events-none" />
+          <div className="absolute inset-5 border-2 border-slate-900 pointer-events-none" />
 
-        {/* Subtle Watermark - The Great Compass */}
-        <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none scale-[3] rotate-[15deg]">
-          <svg viewBox="0 0 100 100" className="w-64 h-64">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
-            <path d="M50 5 L55 45 L95 50 L55 55 L50 95 L45 55 L5 50 L45 45 Z" fill="currentColor" />
-          </svg>
-        </div>
-
-        {/* PAGE 1 CONTENT */}
-        <div className="p-10 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px] print:mb-0">
-          {/* Header Section */}
-          <div className="flex justify-between items-start border-b-[6px] border-slate-900 pb-4 mb-6 relative">
-            <div className="flex gap-6 items-center pr-32">
-              <div className="relative">
-                <div className="w-14 h-14 bg-slate-900 rounded-xl flex items-center justify-center text-white text-2xl shadow-2xl z-20 relative">🧭</div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-lg -z-10"></div>
+          {/* PAGE 1 CONTENT */}
+          <div className="p-8 relative z-10 max-w-5xl mx-auto flex flex-col justify-between print:h-[1020px] print:mb-0">
+            {/* Header Section */}
+            <div className="flex justify-between items-start border-b-[4px] border-slate-900 pb-3 mb-5 relative">
+              <div className="flex gap-4 items-center">
+                <div className="relative">
+                  <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xl shadow-md z-20 relative">🧭</div>
+                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-amber-500 rounded-lg -z-10"></div>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-black uppercase tracking-tight text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Questford Discovery Board</h1>
+                  <p className="text-[9px] font-bold tracking-[0.25em] text-slate-500 uppercase">Academic Competency Transcript & Graduation Dossier</p>
+                  <div className="flex gap-2 mt-1">
+                    <span className="text-[6px] font-black bg-slate-900 text-white px-2 py-0.5 rounded tracking-wider uppercase">Ref: FBLA-2026-QS</span>
+                    <span className="text-[6px] font-black border border-amber-500 text-amber-600 px-2 py-0.5 rounded tracking-wider uppercase">Gold Merit Standard</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-black uppercase tracking-tighter mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>Career Quest</h1>
-                <p className="text-xs font-bold tracking-[0.3em] text-slate-500 uppercase ml-0.5">Academic Competency Transcript</p>
-                <div className="flex gap-2 mt-1">
-                  <span className="text-[6px] font-black bg-slate-900 text-white px-2 py-0.5 rounded tracking-[0.10em] uppercase">Ref: FBLA-2026-QS</span>
-                  <span className="text-[6px] font-black border border-amber-500 text-amber-600 px-2 py-0.5 rounded tracking-[0.10em] uppercase">Gold Merit Standard</span>
+
+              {/* Official Gold Seal Graphic */}
+              <div className="scale-[0.55] origin-top-right -translate-y-3">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 p-0.5 shadow-lg flex items-center justify-center relative">
+                  <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-full"></div>
+                  <div className="w-full h-full rounded-full border border-amber-200/50 flex flex-col items-center justify-center text-center p-1">
+                    <span className="text-[6px] font-black text-amber-900 leading-none mb-0.5 uppercase tracking-widest">Official<br />Discovery</span>
+                    <div className="w-4 h-[0.5px] bg-amber-900/40 my-0.5"></div>
+                    <span className="text-[8px] font-black text-amber-950 uppercase tracking-tighter font-serif">Verified</span>
+                  </div>
+                  <div className="absolute -bottom-4 left-1/4 w-4 h-8 bg-amber-600 -z-10 clip-path-ribbon"></div>
+                  <div className="absolute -bottom-4 right-1/4 w-4 h-8 bg-amber-700 -z-10 clip-path-ribbon"></div>
                 </div>
               </div>
             </div>
 
-            {/* Official Gold Seal Graphic - Repositioned to avoid overlap */}
-            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 opacity-90 scale-[0.65] origin-top-right">
-              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 p-1 shadow-xl flex items-center justify-center relative">
-                <div className="absolute inset-0 border-4 border-dashed border-white/40 rounded-full"></div>
-                <div className="w-full h-full rounded-full border-2 border-amber-200/50 flex flex-col items-center justify-center text-center p-2">
-                  <span className="text-[7px] font-black text-amber-900 leading-none mb-1 uppercase tracking-widest">Official<br />Discovery</span>
-                  <div className="w-6 h-[1px] bg-amber-900/40 my-1"></div>
-                  <span className="text-[9px] font-black text-amber-950 uppercase tracking-tighter font-serif">Verified</span>
-                </div>
-                {/* Ribbons */}
-                <div className="absolute -bottom-6 left-1/4 w-5 h-10 bg-amber-600 -z-10 clip-path-ribbon"></div>
-                <div className="absolute -bottom-6 right-1/4 w-5 h-10 bg-amber-700 -z-10 clip-path-ribbon"></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-12 gap-8 mb-6 items-center break-inside-avoid">
-            <div className="col-span-8">
-              <div className="mb-2">
-                <h2 className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] mb-1.5 flex items-center gap-4">
-                  Candidate Credentials
-                  <div className="flex-1 h-[1px] bg-slate-100"></div>
+            {/* Candidate Info and Endorsement Letter */}
+            <div className="grid grid-cols-12 gap-6 mb-5 items-stretch break-inside-avoid">
+              <div className="col-span-7 flex flex-col justify-center">
+                <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 block">Candidate Credentials</span>
+                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tight mb-2" style={{ fontFamily: "'Cinzel', serif" }}>
+                  {profile?.username || 'Guest'}
                 </h2>
-                <div className="space-y-0.5">
-                  <h3 className="text-5xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Righteous', cursive" }}>{profile?.username || 'Guest'}</h3>
-                  <div className="flex items-center gap-3 pt-0.5">
-                    <p className="text-lg text-slate-400 font-light italic">Assessment Lead: <span className="text-slate-900 font-bold not-italic font-serif">{profile?.character_name}</span></p>
-                    <div className="w-1 h-1 bg-amber-500 rounded-full"></div>
-                    <p className="text-lg text-slate-400 font-light italic tracking-widest">{currentLevel} Levels Attained</p>
-                  </div>
+                <div className="space-y-1 text-[9px] text-slate-600">
+                  <p><strong>Counselor Lead:</strong> <span className="text-slate-900 font-bold">{profile?.character_name || 'Mayor Questopher'}</span></p>
+                  <p><strong>Academic Status:</strong> <span className="text-slate-900 font-bold">Graduated (Level {currentLevel})</span></p>
+                  <p><strong>Evaluation Date:</strong> <span className="text-slate-900 font-bold">{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+                  <p><strong>Registry Verification ID:</strong> <span className="text-slate-900 font-mono font-bold">#489-CQ-{(profile?.username || 'GUEST').substring(0, 3).toUpperCase()}-2026</span></p>
                 </div>
+              </div>
+
+              <div className="col-span-5 border-l-4 border-amber-500 bg-amber-50/40 p-4 rounded-r-2xl flex flex-col justify-center">
+                <span className="text-[6px] font-black text-amber-800 uppercase tracking-widest mb-1.5 block">Mayoral Commendation</span>
+                <p className="text-[8px] italic text-slate-700 leading-normal">
+                  "Having successfully completed the core vocational simulations of Questford, the candidate has validated hands-on skill competencies and demonstrated outstanding career readiness under our counselor-guided curriculum. Recommended for direct workforce placement."
+                </p>
+                <p className="text-[7px] font-bold text-slate-900 text-right mt-2 font-serif">— Mayor Questopher, Counselor-in-Chief</p>
               </div>
             </div>
 
-            <div className="col-span-4 bg-slate-50 p-5 rounded-[1.8rem] border border-slate-100 shadow-inner text-center relative overflow-hidden break-inside-avoid">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-600"></div>
-              <div className="text-[8px] font-black text-slate-300 uppercase tracking-[0.2em] mb-1">Cumulative Mastery XP</div>
-              <div className="text-5xl font-black text-slate-900 mb-0.5 tabular-nums">{profile?.total_score || 0}</div>
-              <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest leading-none">
-                Standardized performance evaluation
-              </p>
+            {/* Metric Scoreboard */}
+            <div className="grid grid-cols-4 gap-3 mb-5 break-inside-avoid">
+              {[
+                { label: 'Islands Mastered', value: `${completedCareers} / 8`, trend: 'District Competency', color: 'border-blue-200 bg-blue-50/20 text-blue-800' },
+                { label: 'Successful Trials', value: `${totalChallengesCompleted} Runs`, trend: 'Skill Validation', color: 'border-amber-200 bg-amber-50/20 text-amber-800' },
+                { label: 'Evaluation Precision', value: `${averageScore}%`, trend: 'Accuracy Rating', color: 'border-green-200 bg-green-50/20 text-green-800' },
+                { label: 'Cumulative XP', value: `${profile?.total_score || 0}`, trend: 'Graduation Points', color: 'border-purple-200 bg-purple-50/20 text-purple-800' }
+              ].map((stat, i) => (
+                <div key={i} className={`p-3 border rounded-xl flex flex-col justify-center text-center ${stat.color}`}>
+                  <div className="text-[7px] font-black uppercase tracking-wider mb-1 opacity-70">{stat.label}</div>
+                  <div className="text-xl font-black mb-0.5">{stat.value}</div>
+                  <div className="text-[6px] font-bold uppercase tracking-widest opacity-80">{stat.trend}</div>
+                </div>
+              ))}
             </div>
-          </div>
 
-          {/* Metric Bar Scoreboard */}
-          <div className="grid grid-cols-4 gap-4 mb-6 break-inside-avoid">
-            {[
-              { label: 'Islands Mastered', value: completedCareers, icon: '🏰', trend: 'Global Mastery' },
-              { label: 'Successful Trials', value: totalChallengesCompleted, icon: '🎯', trend: 'Skill Validation' },
-              { label: 'Evaluation Precision', value: `${averageScore}%`, icon: '📈', trend: 'Consistency Rating' },
-              { label: 'Login Consistency', value: profile?.longest_streak || 0, icon: '🔥', trend: 'Persistence Factor' }
-            ].map((stat, i) => (
-              <div key={i} className="p-4 border border-slate-100 rounded-xl group flex flex-col justify-center">
-                <div className="text-[8px] font-black text-slate-300 uppercase mb-1 tracking-widest">{stat.label}</div>
-                <div className="text-2xl font-black text-slate-900 mb-0.5">{stat.value}</div>
-                <div className="text-[7px] font-bold text-amber-600 uppercase tracking-widest">
-                  {stat.trend}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Matrix Header */}
-          <div className="flex items-center gap-6 mb-4 break-inside-avoid">
-            <h3 className="text-2xl font-black uppercase tracking-tight text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Matrix of Core Competencies</h3>
-            <div className="flex-1 h-[2px] bg-slate-900"></div>
-            <div className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">NACE Standards v2026.4</div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-x-12 gap-y-4 mb-2 break-inside-avoid">
-            {getNACECompetencies().map((comp, i) => (
-              <div key={comp.name} className="relative break-inside-avoid">
-                <div className="flex justify-between items-end mb-1">
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-slate-200 font-black text-base">{(i + 1).toString().padStart(2, '0')}</span>
-                      <h4 className="font-bold text-sm text-slate-900 tracking-tight">{comp.name}</h4>
-                    </div>
-                    <p className="text-[8px] text-slate-400 font-medium uppercase tracking-wider leading-none">{comp.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-lg font-black text-slate-900 leading-none">{comp.score}%</div>
-                    <div className="text-[6px] font-bold text-slate-300 uppercase">Proficiency</div>
-                  </div>
-                </div>
-                <div className="h-1.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-                  <div
-                    className="h-full rounded-full bg-slate-900 transition-all duration-1000"
-                    style={{ width: `${comp.score}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* FORCED PAGE BREAK */}
-        <div className="page-break" style={{ pageBreakBefore: 'always' }}></div>
-
-        {/* PAGE 2 CONTENT */}
-        <div className="p-10 relative z-10 max-w-5xl mx-auto flex flex-col print:h-[1050px]">
-          <div className="flex-1 flex flex-col">
-            <div className="break-inside-avoid">
-              <div className="flex items-center gap-6 mb-4">
-                <h3 className="text-2xl font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Learning Success Artifacts</h3>
-                <div className="flex-1 h-[2px] bg-slate-100"></div>
+            {/* Matrix of Core Competencies */}
+            <div className="mb-4 break-inside-avoid">
+              <div className="flex items-center gap-4 mb-3">
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Matrix of Certified Core Competencies</h3>
+                <div className="flex-1 h-[1.5px] bg-slate-900"></div>
+                <div className="text-[7px] font-black text-slate-400 uppercase tracking-wider">NACE Standards v2026.4</div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
-                {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).map(career => {
-                  if (!career || !career.id) return null;
+              <div className="grid grid-cols-2 gap-x-8 gap-y-3.5">
+                {getNACECompetencies().map((comp, i) => {
+                  const isCertified = comp.score >= 80;
+                  const isExcellent = comp.score >= 90;
                   return (
-                    <div key={career.id} className="relative bg-slate-50 p-4 rounded-xl border border-slate-100 break-inside-avoid">
-                    <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1.5 border-b pb-0.5 leading-none">{career.name}</h4>
-                    <ul className="text-[8px] text-slate-500 space-y-0.5 font-medium leading-tight list-disc list-inside">
-                      {career.slug === 'culinary-arts' && (
-                        <>
-                          <li>Mastered advanced mise-en-place and kitchen hierarchy.</li>
-                          <li>Applied sensory science and aesthetic design to plating.</li>
-                        </>
-                      )}
-                      {career.slug === 'law-government' && (
-                        <>
-                          <li>Demonstrated expert courtroom synthesis of legal evidence.</li>
-                          <li>Analyzed jurisprudential ethics and persuasive delivery.</li>
-                        </>
-                      )}
-                      {career.slug === 'information-technology' && (
-                        <>
-                          <li>Architected scalable data structures and logical workflows.</li>
-                          <li>Validated cryptographic protocols and system integrity.</li>
-                        </>
-                      )}
-                      {career.slug === 'financial-services' && (
-                        <>
-                          <li>Calculated complex risk distributions and asset allocations.</li>
-                          <li>Navigated fiduciary ethics and market simulators.</li>
-                        </>
-                      )}
-                      {career.slug === 'health-sciences' && (
-                        <>
-                          <li>Executed medical triage prioritization in simulations.</li>
-                          <li>Applied pharmacological precision and diagnostic logic.</li>
-                        </>
-                      )}
-                      {career.slug === 'education' && (
-                        <>
-                          <li>Developed adaptive pedagogical frameworks for learners.</li>
-                          <li>Synthesized classroom management with emotional IQ.</li>
-                        </>
-                      )}
-                      {career.slug === 'media-communication' && (
-                        <>
-                          <li>Crafted strategic communications and brand narratives.</li>
-                          <li>Evaluated journalistic integrity and multi-channel engagement.</li>
-                        </>
-                      )}
-                      {career.slug === 'arts-entertainment' && (
-                        <>
-                          <li>Optimized performance dynamics and audience triggers.</li>
-                          <li>Synthesized creative vision with production logistics.</li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                );
-              })}
-              </div>
-            </div>
-
-            <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden break-inside-avoid">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/4 -translate-y-1/4"></div>
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 border-b border-white/10 pb-2 leading-none">Specialized Domain Evaluation Summary</h3>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                {careers.map(career => {
-                  if (!career || !career.id) return null;
-                  const accuracy = getCareerAccuracy(career.id);
-                  const points = careerScores[career.id] || 0;
-                  return (
-                    <div key={career.id} className="flex justify-between items-center group">
-                      <div>
-                        <span className="font-bold text-white text-xs tracking-wide uppercase">{career.name}</span>
-                        <div className="flex gap-1 items-center mt-0.5">
-                          <p className="text-[7px] text-slate-500 font-bold uppercase tracking-[0.1em]">{career.title}</p>
+                    <div key={comp.name} className="relative">
+                      <div className="flex justify-between items-end mb-1">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-slate-300 font-bold text-xs">{(i + 1).toString().padStart(2, '0')}</span>
+                            <h4 className="font-bold text-xs text-slate-900 tracking-tight">{comp.name}</h4>
+                          </div>
+                          <p className="text-[7px] text-slate-400 font-medium tracking-wide uppercase mt-0.5">{comp.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-[5px] font-black uppercase tracking-wider mr-2 ${
+                            isExcellent 
+                              ? 'bg-green-100 text-green-800' 
+                              : isCertified 
+                                ? 'bg-blue-100 text-blue-800' 
+                                : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {isExcellent ? 'Excellent' : isCertified ? 'Validated' : 'Developing'}
+                          </span>
+                          <span className="text-[10px] font-black text-slate-950 font-mono">{comp.score}%</span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-black text-white">{points} <span className="text-[8px] text-slate-500 font-medium">XP</span></div>
-                        <span className={`text-[8px] font-black uppercase tracking-[0.1em] block mt-0.5 ${accuracy > 80 ? 'text-amber-400' : accuracy > 0 ? 'text-blue-400' : 'text-slate-700'}`}>
-                          {accuracy > 80 ? 'MASTER' : accuracy > 0 ? 'ELITE' : 'CANDIDATE'}
-                        </span>
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                        <div
+                          className={`h-full rounded-full transition-all duration-1000 ${
+                            isExcellent 
+                              ? 'bg-green-600' 
+                              : isCertified 
+                                ? 'bg-indigo-600' 
+                                : 'bg-slate-500'
+                          }`}
+                          style={{ width: `${comp.score}%` }}
+                        />
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+          </div>
+
+          {/* FORCED PAGE BREAK */}
+          <div className="page-break" style={{ pageBreakBefore: 'always' }}></div>
+
+          {/* PAGE 2 CONTENT */}
+          <div className="p-8 relative z-10 max-w-5xl mx-auto flex flex-col justify-between print:h-[1020px]">
+            <div className="flex-1 flex flex-col gap-5">
+              {/* Table section */}
+              <div className="break-inside-avoid">
+                <div className="flex items-center gap-4 mb-3">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Vocational Domain Mastery & Credentials</h3>
+                  <div className="flex-1 h-[1.5px] bg-slate-950"></div>
+                </div>
+
+                <table className="w-full text-left border-collapse text-[8px] border border-slate-200 rounded-xl overflow-hidden">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 uppercase font-black text-slate-500 tracking-wider">
+                      <th className="py-2 px-3 w-1/4">Career Sector</th>
+                      <th className="py-2 px-3 w-5/12">Validated Competency Criteria</th>
+                      <th className="py-2 px-2 w-1/12 text-center">Trials</th>
+                      <th className="py-2 px-2 w-1/12 text-center">Precision</th>
+                      <th className="py-2 px-2 w-1/12 text-center">XP</th>
+                      <th className="py-2 px-3 w-1/12 text-right">Rating</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {careers.map(career => {
+                      if (!career || !career.id) return null;
+                      const totalChallenges = careerChallengeCount[career.id] || 0;
+                      const startedInCareer = careerStartedCount[career.id] || 0;
+                      const accuracy = getCareerAccuracy(career.id);
+                      const points = careerScores[career.id] || 0;
+                      
+                      return (
+                        <tr key={career.id} className="align-top hover:bg-slate-50/50">
+                          <td className="py-2 px-3">
+                            <div className="font-bold text-slate-900">{career.name}</div>
+                            <div className="text-[6px] text-slate-400 font-bold uppercase tracking-wider">{career.title}</div>
+                          </td>
+                          <td className="py-2 px-3 text-[7.5px] text-slate-600 leading-normal">
+                            {career.slug === 'culinary-arts' && "Mise-en-place, kitchen hierarchy, sensory science, & aesthetic plating."}
+                            {career.slug === 'law-government' && "Courtroom synthesis of legal evidence, jurisprudential ethics, & persuasion."}
+                            {career.slug === 'information-technology' && "Scalable data structures, logical workflows, & cryptographic protocol validation."}
+                            {career.slug === 'financial-services' && "Risk distribution calculations, asset allocation, & fiduciary ethics."}
+                            {career.slug === 'health-sciences' && "Medical triage prioritization, pharmacological precision, & diagnostics."}
+                            {career.slug === 'education' && "Adaptive pedagogical frameworks, classroom control, & emotional IQ."}
+                            {career.slug === 'media-communication' && "Strategic communications, brand narratives, & journalistic integrity."}
+                            {career.slug === 'arts-entertainment' && "Performance dynamics, audience triggers, & production logistics."}
+                          </td>
+                          <td className="py-2 px-2 text-center text-slate-700 font-mono">{startedInCareer}/{totalChallenges}</td>
+                          <td className="py-2 px-2 text-center text-slate-900 font-bold font-mono">{accuracy}%</td>
+                          <td className="py-2 px-2 text-center text-slate-700 font-mono">{points} XP</td>
+                          <td className="py-2 px-3 text-right">
+                            <span className={`inline-block px-1.5 py-0.5 rounded-[4px] text-[6px] font-black tracking-wider uppercase ${
+                              accuracy > 80 
+                                ? 'bg-amber-100 text-amber-800 border border-amber-300' 
+                                : accuracy > 0 
+                                  ? 'bg-blue-100 text-blue-800 border border-blue-300' 
+                                  : 'bg-slate-100 text-slate-500 border border-slate-200'
+                            }`}>
+                              {accuracy > 80 ? 'Master' : accuracy > 0 ? 'Elite' : 'Candidate'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Simulation Trial Ledger */}
+              <div className="break-inside-avoid">
+                <div className="flex items-center gap-4 mb-2">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Verified Simulation Performance Ledger</h3>
+                  <div className="flex-1 h-[1.5px] bg-slate-900"></div>
+                </div>
+
+                <table className="w-full text-left border-collapse text-[7.5px] border border-slate-200 rounded-xl overflow-hidden">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 uppercase font-black text-slate-500 tracking-wider">
+                      <th className="py-1.5 px-3 w-5/12">Simulation Trial Run</th>
+                      <th className="py-1.5 px-3 w-3/12">Career District</th>
+                      <th className="py-1.5 px-2 w-1/12 text-center">Attempts</th>
+                      <th className="py-1.5 px-2 w-1/12 text-center">Record Score</th>
+                      <th className="py-1.5 px-3 w-2/12 text-right">Validation Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {getTopCompletedTrials().map((trial, idx) => (
+                      <tr key={idx} className="align-middle hover:bg-slate-50/50">
+                        <td className="py-1.5 px-3 font-bold text-slate-900">{trial.title}</td>
+                        <td className="py-1.5 px-3">{trial.careerName}</td>
+                        <td className="py-1.5 px-2 text-center font-mono">{trial.attempts}</td>
+                        <td className="py-1.5 px-2 text-center font-bold font-mono text-slate-950">{trial.bestScore} / {trial.maxScore}</td>
+                        <td className="py-1.5 px-3 text-right">
+                          <span className={`inline-block px-1.5 py-0.5 rounded-[4px] text-[5.5px] font-bold uppercase tracking-wider ${
+                            trial.accuracy >= 100
+                              ? 'bg-green-100 text-green-800 border border-green-200'
+                              : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                          }`}>
+                            {trial.accuracy >= 100 ? '100% Perfect' : 'Validated'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                    {getTopCompletedTrials().length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-4 text-center text-slate-400 italic">
+                          No simulation trials completed yet. Access the city plaza map to undergo career simulation runs.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                {getTopCompletedTrials().length > 0 && (
+                  <p className="text-[6px] text-slate-400 italic mt-1">
+                    * Showing top 6 verified simulation trial runs. Full audit trail is logged and verified on the Questford Board Registry database.
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Verification & Footnotes */}
-            <div className="pt-4 border-t-4 border-slate-900 break-inside-avoid">
+            {/* Verification Footnotes and Signature */}
+            <div className="pt-3 border-t-2 border-slate-900 break-inside-avoid">
               <div className="grid grid-cols-12 gap-6 items-end">
                 <div className="col-span-8">
                   <div className="mb-2 flex gap-3 pr-4">
                     <div className="w-1 h-8 bg-amber-500"></div>
-                    <p className="text-[8px] font-medium text-slate-400 leading-normal italic">
-                      "This document serves as an official record of career simulation competencies. Performance is indexed against 2026 industry standards and discovery protocols."
+                    <p className="text-[7.5px] font-medium text-slate-400 leading-normal italic">
+                      "This document serves as an official authenticated transcript of student competency Discovery on the Questford platform. Performance metrics have been compiled in real-time and indexed against NACE core education benchmarks."
                     </p>
                   </div>
-                  <div className="flex gap-6 items-center pt-2 opacity-75">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex gap-4 items-center pt-1 opacity-80">
+                    <div className="flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.1em]">Verified Profile</span>
+                      <span className="text-[7px] font-black uppercase tracking-wider">Verified Profile</span>
                     </div>
-                    <div className="flex items-center gap-1.5 border-l pl-4">
+                    <div className="flex items-center gap-1 border-l pl-3">
                       <BookMarked className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.1em]">Accredited Tasks</span>
+                      <span className="text-[7px] font-black uppercase tracking-wider">Accredited Ledger</span>
                     </div>
-                    <div className="flex items-center gap-1.5 border-l pl-4">
+                    <div className="flex items-center gap-1 border-l pl-3">
                       <Zap className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-[0.1em]">Real-time Accuracy</span>
+                      <span className="text-[7px] font-black uppercase tracking-wider">Real-time Precision</span>
                     </div>
                   </div>
                 </div>
-                <div className="col-span-4 text-right">
-                  <div className="mb-4">
-                    <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5 leading-none">Discovery Board Authorization</div>
-                    <div className="h-[1.5px] w-40 bg-slate-900 ml-auto mb-1.5"></div>
+
+                <div className="col-span-4 text-right flex flex-col items-end">
+                  <div className="mb-3">
+                    <div className="text-[7px] font-black text-slate-400 uppercase tracking-wider mb-0.5 leading-none">Discovery Board Seal of Certification</div>
+                    <div className="h-[1.5px] w-36 bg-slate-900 ml-auto mb-1"></div>
                     <div className="flex flex-col items-end">
-                      <p className="font-serif text-lg font-bold tracking-tighter mb-0.5 text-slate-900">Mayor Questopher</p>
-                      <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.15deg]">Board Registry ID: 489-CQ-2026</p>
+                      <p className="font-serif text-sm font-bold tracking-tighter text-slate-950 font-style-italic" style={{ fontFamily: "'Kalam', cursive" }}>Mayor Questopher</p>
+                      <p className="text-[6px] font-black text-slate-400 uppercase tracking-[0.1em]">Board Registry ID: 489-CQ-2026</p>
                     </div>
                   </div>
-                  <div className="text-[9px] font-black text-slate-200 select-none uppercase tracking-[0.4em]">
-                    FOR OFFICIAL PRESENTATION ONLY
+                  <div className="text-[7px] font-black text-slate-300 select-none uppercase tracking-[0.25em]">
+                    FOR OFFICIAL GRADUATION STANDARDS ONLY
                   </div>
                 </div>
               </div>
