@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Trophy, DoorOpen, Sparkles, ExternalLink, X } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -45,6 +46,7 @@ export function CareerInterior() {
   const { careerSlug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { reducedMotion } = useTheme();
   const def = interiorFor(careerSlug || '');
 
   const [career, setCareer] = useState<Career | null>(null);
@@ -143,7 +145,8 @@ export function CareerInterior() {
     const wallet = loadWallet(user?.id || 'anon');
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const currentSpeed = SPEED * speedMultiplier;
+    const baseSpeed = reducedMotion ? SPEED : 360;
+    const currentSpeed = baseSpeed * speedMultiplier;
 
     const step = (ts: number) => {
       const dt = last.current ? Math.min((ts - last.current) / 1000, 0.05) : 0;
@@ -186,7 +189,7 @@ export function CareerInterior() {
     };
     raf.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf.current);
-  }, [loading, def, challenges, solids, dialogue]);
+  }, [loading, def, challenges, solids, dialogue, user, reducedMotion]);
 
   const onGameComplete = async (score: number) => {
     if (selected && user && career) {

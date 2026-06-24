@@ -364,7 +364,8 @@ export function CityHub() {
     const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const currentSpeed = SPEED * speedMultiplier;
+    const baseSpeed = reducedMotion ? SPEED : 3.8;
+    const currentSpeed = baseSpeed * speedMultiplier;
 
     let prevT = performance.now();
     let firstFrame = true;
@@ -487,7 +488,7 @@ export function CityHub() {
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(rafRef.current); };
-  }, [ready]);
+  }, [ready, user, reducedMotion]);
 
   return (
     <div ref={wrapRef} className="fixed inset-0 overflow-hidden select-none" style={{ background: '#0a1228', touchAction: 'none' }}>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Volume2, VolumeX, ExternalLink, X, Coins } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -35,6 +36,7 @@ export function DomainWorld() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { muted, toggleMute } = useAudio();
+  const { reducedMotion } = useTheme();
 
   const [career, setCareer] = useState<Career | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -173,6 +175,12 @@ export function DomainWorld() {
   // ---- render / game loop ----
   useEffect(() => {
     if (!ready) return;
+    const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
+    const speedLvl = wallet.speedLvl || 0;
+    const speedMultiplier = 1 + speedLvl * 0.18;
+    const baseSpeed = reducedMotion ? SPEED : 3.8;
+    const currentSpeed = baseSpeed * speedMultiplier;
+
     const loop = (t: number) => {
       rafRef.current = requestAnimationFrame(loop);
       const cv = canvasRef.current, wrap = wrapRef.current, map = mapRef.current, sheet = sheetRef.current, walk = walkRef.current;
@@ -194,7 +202,7 @@ export function DomainWorld() {
         if (K.has('w') || K.has('arrowup')) dy -= 1; if (K.has('s') || K.has('arrowdown')) dy += 1;
         if (dx || dy) {
           movingRef.current = true;
-          const len = Math.hypot(dx, dy) || 1; dx = dx / len * SPEED; dy = dy / len * SPEED;
+          const len = Math.hypot(dx, dy) || 1; dx = (dx / len) * currentSpeed; dy = (dy / len) * currentSpeed;
           if (dx) faceRef.current = dx < 0 ? -1 : 1;
           const okX = walkableAt(map, walk, pos.x + dx, pos.y); if (okX) pos.x = Math.max(2, Math.min(worldW - 2, pos.x + dx));
           const okY = walkableAt(map, walk, pos.x, pos.y + dy); if (okY) pos.y = Math.max(2, Math.min(worldH - 2, pos.y + dy));
@@ -240,7 +248,7 @@ export function DomainWorld() {
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(rafRef.current); };
-  }, [ready, career, challenges, careerSlug]);
+  }, [ready, career, challenges, careerSlug, user, reducedMotion]);
 
   const onComplete = async (score: number) => {
     if (user && career && selected) {

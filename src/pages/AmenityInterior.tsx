@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Coins, Check, Lock } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ROOM_W, ROOM_H, ROOM_SPAWN, ROOM_EXIT } from './city/interiors';
 import { AMENITY_DEFS, type ShopItem } from './city/amenities';
@@ -17,6 +18,7 @@ const CLERK = { x: ROOM_W / 2, y: 210 };
 export function AmenityInterior({ slug }: { slug: string }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { reducedMotion } = useTheme();
   const def = AMENITY_DEFS[slug];
   const solids = def ? [COUNTER, ...def.furniture] : [COUNTER];
 
@@ -82,7 +84,8 @@ export function AmenityInterior({ slug }: { slug: string }) {
       }
       const l = Math.hypot(ix, iy);
       const speedMultiplier = 1 + (wallet.speedLvl || 0) * 0.18;
-      const currentSpeed = SPEED * speedMultiplier;
+      const baseSpeed = reducedMotion ? SPEED : 350;
+      const currentSpeed = baseSpeed * speedMultiplier;
       let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * currentSpeed; ty = iy / l * currentSpeed; }
       const s = 1 - Math.exp(-ACCEL_K * dt);
       p.vx += (tx - p.vx) * s; p.vy += (ty - p.vy) * s;
@@ -99,7 +102,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
     };
     raf.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf.current);
-  }, [wallet.speedLvl]);
+  }, [wallet.speedLvl, reducedMotion]);
 
   const buy = (item: ShopItem) => {
     setWallet(w => {

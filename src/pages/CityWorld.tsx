@@ -129,7 +129,7 @@ export function CityWorld() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { muted, toggleMute, startBgm, bgmPlaying } = useAudio();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, reducedMotion } = useTheme();
   const { showGuide } = useGuide();
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -413,7 +413,8 @@ export function CityWorld() {
       const il = Math.hypot(ix, iy);
       const sprint = keys.current.has('shift') ? SPRINT_MULT : 1;
       const gymBoost = 1 + walletRef.current.speedLvl * 0.16;   // gym sprint upgrades
-      const maxSpd = MAX_SPEED * gymBoost;
+      const baseMaxSpeed = reducedMotion ? MAX_SPEED : 400;
+      const maxSpd = baseMaxSpeed * gymBoost;
       let tx = 0, ty = 0;
       if (il > 0.01) { tx = (ix / il) * maxSpd * sprint; ty = (iy / il) * maxSpd * sprint; }
       const smooth = 1 - Math.exp(-ACCEL_K * dt);
@@ -494,7 +495,7 @@ export function CityWorld() {
     };
     raf.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf.current);
-  }, [loading, viewport.w, viewport.h]);
+  }, [loading, viewport.w, viewport.h, reducedMotion]);
 
   // clock — uses the player's REAL local time (so Questford's day matches your
   // day). The displayed minute only changes once per real minute.

@@ -874,27 +874,50 @@ export function ProfilePage() {
               </p>
             </div>
 
-            {/* Mastered Districts Badges List */}
-            <div className="my-1 flex flex-wrap justify-center gap-3 max-w-[200mm]">
-              {careers.map(career => {
-                if (!career || !career.id) return null;
-                const totalChallenges = careerChallengeCount[career.id] || 0;
-                const startedInCareer = careerStartedCount[career.id] || 0;
-                const accuracy = getCareerAccuracy(career.id);
-                const isCompleted = totalChallenges > 0 && startedInCareer >= totalChallenges && accuracy > 80;
-                
-                if (!isCompleted) return null;
+            {/* Certified Career Domains & NACE Core Competencies */}
+            <div className="my-1 flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center">
+                <span className="text-[7px] font-sans font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5">Mastered Districts</span>
+                <div className="flex flex-wrap justify-center gap-2 max-w-[200mm]">
+                  {careers.map(career => {
+                    if (!career || !career.id) return null;
+                    const totalChallenges = careerChallengeCount[career.id] || 0;
+                    const startedInCareer = careerStartedCount[career.id] || 0;
+                    const accuracy = getCareerAccuracy(career.id);
+                    const isCompleted = totalChallenges > 0 && startedInCareer >= totalChallenges && accuracy > 80;
+                    
+                    if (!isCompleted) return null;
 
-                return (
-                  <div key={career.id} className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-amber-300 bg-amber-50 text-[10px] font-black uppercase tracking-wider text-amber-800 font-sans shadow-sm">
-                    <span>🏆</span>
-                    <span>{career.name}</span>
-                  </div>
-                );
-              })}
-              {completedCareers === 0 && (
-                <div className="text-xs text-slate-400 font-sans uppercase tracking-widest italic">No domains mastered yet · Complete challenges with &gt;80% accuracy</div>
-              )}
+                    return (
+                      <div key={career.id} className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-amber-300 bg-amber-50 text-[9px] font-black uppercase tracking-wider text-amber-800 font-sans shadow-sm">
+                        <span>🏆</span>
+                        <span>{career.name}</span>
+                      </div>
+                    );
+                  })}
+                  {completedCareers === 0 && (
+                    <div className="text-[9px] text-slate-400 font-sans uppercase tracking-widest italic">No domains mastered yet · Complete challenges with &gt;80% accuracy</div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center mt-1">
+                <span className="text-[7px] font-sans font-black uppercase tracking-[0.2em] text-slate-400 mb-1.5">NACE Core Competencies Certified</span>
+                <div className="flex flex-wrap justify-center gap-2 max-w-[200mm]">
+                  {getNACECompetencies().map(comp => {
+                    if (comp.score < 80) return null;
+                    return (
+                      <div key={comp.name} className="flex items-center gap-1 px-2.5 py-0.5 rounded-full border border-indigo-200 bg-indigo-50/50 text-[8px] font-black uppercase tracking-wider text-indigo-800 font-sans shadow-sm">
+                        <span>🛡️</span>
+                        <span>{comp.name}</span>
+                      </div>
+                    );
+                  })}
+                  {getNACECompetencies().filter(comp => comp.score >= 80).length === 0 && (
+                    <div className="text-[9px] text-slate-400 font-sans uppercase tracking-widest italic">No NACE competencies certified yet · Complete challenges with &gt;80% accuracy</div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Signatures & Seal Section */}
@@ -940,6 +963,7 @@ export function ProfilePage() {
         <style dangerouslySetInnerHTML={{
           __html: `
           @media print {
+            header, nav, .print\\:hidden { display: none !important; }
             .page-break { display: block; page-break-before: always; break-before: page; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .clip-path-ribbon { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%); }
@@ -952,6 +976,7 @@ export function ProfilePage() {
         <style dangerouslySetInnerHTML={{
           __html: `
           @media print {
+            header, nav, .print\\:hidden { display: none !important; }
             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; padding: 0; background: #fff; }
             .clip-path-ribbon { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%); }
             @page { size: A4 landscape; margin: 0; }

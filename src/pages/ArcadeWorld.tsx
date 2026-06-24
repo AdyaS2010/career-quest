@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trophy, User, LogOut, Compass, Coins, Volume2, VolumeX } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -47,6 +48,7 @@ export function ArcadeWorld() {
   const { user, signOut } = useAuth();
   const { muted, toggleMute, startBgm, bgmPlaying } = useAudio();
   const { showGuide } = useGuide();
+  const { reducedMotion } = useTheme();
 
   const enteredKey = `questford_entered_${user?.id || 'anon'}`;
   const hasEntered = useCallback(() => { try { return !!localStorage.getItem(enteredKey); } catch { return false; } }, [enteredKey]);
@@ -205,7 +207,10 @@ export function ArcadeWorld() {
       const p = player.current;
       let ix = 0, iy = 0;
       if (!blockedRef.current) { const k = keys.current; ix = (k.has('d') || k.has('arrowright') ? 1 : 0) - (k.has('a') || k.has('arrowleft') ? 1 : 0) + touch.current.x; iy = (k.has('s') || k.has('arrowdown') ? 1 : 0) - (k.has('w') || k.has('arrowup') ? 1 : 0) + touch.current.y; }
-      const l = Math.hypot(ix, iy); let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * SPEED; ty = iy / l * SPEED; }
+      const l = Math.hypot(ix, iy);
+      const baseSpeed = reducedMotion ? SPEED : 350;
+      const currentSpeed = baseSpeed;
+      let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * currentSpeed; ty = iy / l * currentSpeed; }
       const sm = 1 - Math.exp(-ACCEL_K * dt); p.vx += (tx - p.vx) * sm; p.vy += (ty - p.vy) * sm;
 
       const blockedAt = (x: number, y: number) => {
@@ -218,7 +223,7 @@ export function ArcadeWorld() {
       if (!blockedAt(nx, p.y)) p.x = Math.max(40, Math.min(W - 40, nx)); else p.vx = 0;
       if (!blockedAt(p.x, ny)) p.y = Math.max(sceneRef.current === 'exterior' ? 250 : 96, Math.min(H - 36, ny)); else p.vy = 0;
       const sp = Math.hypot(p.vx, p.vy); p.moving = sp > 10;
-      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += sp / SPEED * dt * 12; }
+      if (p.moving) { p.dir = Math.abs(p.vx) > Math.abs(p.vy) ? (p.vx > 0 ? 'right' : 'left') : (p.vy > 0 ? 'down' : 'up'); p.phase += sp / currentSpeed * dt * 12; }
 
       // nearest interactable
       let best: typeof near = null, bd = NEAR;
@@ -232,7 +237,7 @@ export function ArcadeWorld() {
     raf.current = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cabinets.length]);
+  }, [cabinets.length, reducedMotion]);
 
   const beginGame = useCallback(async (name: string) => {
     setShowIntro(false);
