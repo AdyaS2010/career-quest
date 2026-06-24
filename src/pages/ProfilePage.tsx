@@ -723,68 +723,83 @@ export function ProfilePage() {
 
           {/* PAGE 2 CONTENT */}
           <div className="p-8 relative z-10 max-w-5xl mx-auto flex flex-col justify-between print:h-[1020px]">
-            <div className="flex-1 flex flex-col gap-5">
-              {/* Table section */}
+            <div className="flex-1 flex flex-col gap-4">
+              
+              {/* Learning Success Artifacts Grid */}
               <div className="break-inside-avoid">
-                <div className="flex items-center gap-4 mb-3">
-                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Vocational Domain Mastery & Credentials</h3>
+                <div className="flex items-center gap-4 mb-2.5">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Learning Success Artifacts</h3>
                   <div className="flex-1 h-[1.5px] bg-slate-950"></div>
                 </div>
 
-                <table className="w-full text-left border-collapse text-[8px] border border-slate-200 rounded-xl overflow-hidden">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 uppercase font-black text-slate-500 tracking-wider">
-                      <th className="py-2 px-3 w-1/4">Career Sector</th>
-                      <th className="py-2 px-3 w-5/12">Validated Competency Criteria</th>
-                      <th className="py-2 px-2 w-1/12 text-center">Trials</th>
-                      <th className="py-2 px-2 w-1/12 text-center">Precision</th>
-                      <th className="py-2 px-2 w-1/12 text-center">XP</th>
-                      <th className="py-2 px-3 w-1/12 text-right">Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                    {careers.map(career => {
-                      if (!career || !career.id) return null;
-                      const totalChallenges = careerChallengeCount[career.id] || 0;
-                      const startedInCareer = careerStartedCount[career.id] || 0;
-                      const accuracy = getCareerAccuracy(career.id);
-                      const points = careerScores[career.id] || 0;
-                      
-                      return (
-                        <tr key={career.id} className="align-top hover:bg-slate-50/50">
-                          <td className="py-2 px-3">
-                            <div className="font-bold text-slate-900">{career.name}</div>
-                            <div className="text-[6px] text-slate-400 font-bold uppercase tracking-wider">{career.title}</div>
-                          </td>
-                          <td className="py-2 px-3 text-[7.5px] text-slate-600 leading-normal">
-                            {career.slug === 'culinary-arts' && "Mise-en-place, kitchen hierarchy, sensory science, & aesthetic plating."}
-                            {career.slug === 'law-government' && "Courtroom synthesis of legal evidence, jurisprudential ethics, & persuasion."}
-                            {career.slug === 'information-technology' && "Scalable data structures, logical workflows, & cryptographic protocol validation."}
-                            {career.slug === 'financial-services' && "Risk distribution calculations, asset allocation, & fiduciary ethics."}
-                            {career.slug === 'health-sciences' && "Medical triage prioritization, pharmacological precision, & diagnostics."}
-                            {career.slug === 'education' && "Adaptive pedagogical frameworks, classroom control, & emotional IQ."}
-                            {career.slug === 'media-communication' && "Strategic communications, brand narratives, & journalistic integrity."}
-                            {career.slug === 'arts-entertainment' && "Performance dynamics, audience triggers, & production logistics."}
-                          </td>
-                          <td className="py-2 px-2 text-center text-slate-700 font-mono">{startedInCareer}/{totalChallenges}</td>
-                          <td className="py-2 px-2 text-center text-slate-900 font-bold font-mono">{accuracy}%</td>
-                          <td className="py-2 px-2 text-center text-slate-700 font-mono">{points} XP</td>
-                          <td className="py-2 px-3 text-right">
-                            <span className={`inline-block px-1.5 py-0.5 rounded-[4px] text-[6px] font-black tracking-wider uppercase ${
-                              accuracy > 80 
-                                ? 'bg-amber-100 text-amber-800 border border-amber-300' 
-                                : accuracy > 0 
-                                  ? 'bg-blue-100 text-blue-800 border border-blue-300' 
-                                  : 'bg-slate-100 text-slate-500 border border-slate-200'
-                            }`}>
-                              {accuracy > 80 ? 'Master' : accuracy > 0 ? 'Elite' : 'Candidate'}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                  {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).map(career => {
+                    if (!career || !career.id) return null;
+                    return (
+                      <div key={career.id} className="relative bg-white p-3 rounded-xl border border-slate-200 shadow-sm break-inside-avoid">
+                        <div className="absolute top-2 right-2 text-[9px]">✨</div>
+                        <h4 className="font-black text-slate-950 uppercase tracking-wider text-[9px] mb-1 pb-0.5 border-b border-slate-100 leading-tight">
+                          {career.name}
+                        </h4>
+                        <ul className="text-[7.5px] text-slate-700 space-y-0.5 font-medium leading-normal list-disc list-inside">
+                          {career.slug === 'culinary-arts' && (
+                            <>
+                              <li>Mastered advanced culinary prep and kitchen command structures.</li>
+                              <li>Applied plating dynamics and flavor pairing aesthetics.</li>
+                            </>
+                          )}
+                          {career.slug === 'law-government' && (
+                            <>
+                              <li>Synthesized case evidence under strict jurisprudential guidelines.</li>
+                              <li>Demonstrated ethics, structure, and persuasive arguments.</li>
+                            </>
+                          )}
+                          {career.slug === 'information-technology' && (
+                            <>
+                              <li>Designed logical schema structures and algorithmic solutions.</li>
+                              <li>Verified system reliability and secure connection protocols.</li>
+                            </>
+                          )}
+                          {career.slug === 'financial-services' && (
+                            <>
+                              <li>Analyzed compounding risk indices and asset diversification.</li>
+                              <li>Practiced fiduciary accountability and resource models.</li>
+                            </>
+                          )}
+                          {career.slug === 'health-sciences' && (
+                            <>
+                              <li>Performed clinical diagnostic logic and triage protocols.</li>
+                              <li>Executed treatment priorities under acute time constraints.</li>
+                            </>
+                          )}
+                          {career.slug === 'education' && (
+                            <>
+                              <li>Curated adaptive lesson delivery plans for cognitive needs.</li>
+                              <li>Balanced classroom dynamics with targeted educational metrics.</li>
+                            </>
+                          )}
+                          {career.slug === 'media-communication' && (
+                            <>
+                              <li>Engineered multi-channel campaigns and message alignment.</li>
+                              <li>Applied editorial standards to check source credibility.</li>
+                            </>
+                          )}
+                          {career.slug === 'arts-entertainment' && (
+                            <>
+                              <li>Controlled stage blocking, pacing, and audience projection.</li>
+                              <li>Synthesized creative designs with logistic feasibility.</li>
+                            </>
+                          )}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                  {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).length === 0 && (
+                    <div className="col-span-2 text-center py-4 border border-dashed border-slate-200 rounded-xl text-slate-400 text-[8px] italic">
+                      No learning success artifacts recorded yet. Complete district simulations to populate your transcript credentials.
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Simulation Trial Ledger */}
@@ -794,24 +809,24 @@ export function ProfilePage() {
                   <div className="flex-1 h-[1.5px] bg-slate-900"></div>
                 </div>
 
-                <table className="w-full text-left border-collapse text-[7.5px] border border-slate-200 rounded-xl overflow-hidden">
+                <table className="w-full text-left border-collapse text-[7.5px] border border-slate-200 rounded-xl overflow-hidden shadow-sm">
                   <thead>
                     <tr className="bg-slate-50 border-b border-slate-200 uppercase font-black text-slate-500 tracking-wider">
-                      <th className="py-1.5 px-3 w-5/12">Simulation Trial Run</th>
-                      <th className="py-1.5 px-3 w-3/12">Career District</th>
-                      <th className="py-1.5 px-2 w-1/12 text-center">Attempts</th>
-                      <th className="py-1.5 px-2 w-1/12 text-center">Record Score</th>
-                      <th className="py-1.5 px-3 w-2/12 text-right">Validation Status</th>
+                      <th className="py-1 px-3 w-5/12">Simulation Trial Run</th>
+                      <th className="py-1 px-3 w-3/12">Career District</th>
+                      <th className="py-1 px-2 w-1/12 text-center">Attempts</th>
+                      <th className="py-1 px-2 w-1/12 text-center">Record Score</th>
+                      <th className="py-1 px-3 w-2/12 text-right">Validation Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
-                    {getTopCompletedTrials().map((trial, idx) => (
+                    {getTopCompletedTrials().slice(0, 4).map((trial, idx) => (
                       <tr key={idx} className="align-middle hover:bg-slate-50/50">
-                        <td className="py-1.5 px-3 font-bold text-slate-900">{trial.title}</td>
-                        <td className="py-1.5 px-3">{trial.careerName}</td>
-                        <td className="py-1.5 px-2 text-center font-mono">{trial.attempts}</td>
-                        <td className="py-1.5 px-2 text-center font-bold font-mono text-slate-950">{trial.bestScore} / {trial.maxScore}</td>
-                        <td className="py-1.5 px-3 text-right">
+                        <td className="py-1 px-3 font-bold text-slate-900">{trial.title}</td>
+                        <td className="py-1 px-3">{trial.careerName}</td>
+                        <td className="py-1 px-2 text-center font-mono">{trial.attempts}</td>
+                        <td className="py-1 px-2 text-center font-bold font-mono text-slate-950">{trial.bestScore} / {trial.maxScore}</td>
+                        <td className="py-1 px-3 text-right">
                           <span className={`inline-block px-1.5 py-0.5 rounded-[4px] text-[5.5px] font-bold uppercase tracking-wider ${
                             trial.accuracy >= 100
                               ? 'bg-green-100 text-green-800 border border-green-200'
@@ -831,12 +846,57 @@ export function ProfilePage() {
                     )}
                   </tbody>
                 </table>
-                {getTopCompletedTrials().length > 0 && (
-                  <p className="text-[6px] text-slate-400 italic mt-1">
-                    * Showing top 6 verified simulation trial runs. Full audit trail is logged and verified on the Questford Board Registry database.
-                  </p>
-                )}
               </div>
+
+              {/* Specialized Domain Evaluation Summary Card */}
+              <div className="break-inside-avoid">
+                <div className="print-summary-dark rounded-2xl p-4 shadow-md relative overflow-hidden border border-amber-500/20"
+                     style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)' }}>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
+                  
+                  <div className="flex justify-between items-center mb-2 pb-1.5 border-b border-white/10">
+                    <h3 className="text-[8.5px] font-black uppercase tracking-[0.2em] text-amber-400 leading-none">
+                      Specialized Domain Evaluation Summary
+                    </h3>
+                    <span className="text-[6.5px] font-bold text-slate-400 uppercase tracking-widest font-sans">Questford Board Audit</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                    {careers.map(career => {
+                      if (!career || !career.id) return null;
+                      const accuracy = getCareerAccuracy(career.id);
+                      const points = careerScores[career.id] || 0;
+                      return (
+                        <div key={career.id} className="flex justify-between items-center border-b border-white/5 pb-1">
+                          <div>
+                            <span className="font-bold text-white text-[8px] tracking-wide uppercase leading-tight block">
+                              {career.name}
+                            </span>
+                            <span className="text-[6px] text-slate-400 font-medium uppercase tracking-wider">
+                              {career.title}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[8.5px] font-black text-white leading-none">
+                              {points} <span className="text-[6px] text-slate-400 font-medium">XP</span>
+                            </div>
+                            <span className={`text-[6.5px] font-black uppercase tracking-wider block mt-0.5 ${
+                              accuracy > 80 
+                                ? 'text-amber-400' 
+                                : accuracy > 0 
+                                  ? 'text-blue-400' 
+                                  : 'text-slate-500'
+                            }`}>
+                              {accuracy > 80 ? '★ MASTER' : accuracy > 0 ? 'ELITE' : 'CANDIDATE'}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Verification Footnotes and Signature */}

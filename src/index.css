@@ -422,4 +422,14 @@ body {
   .bg-purple-50\/20 {
     background-color: rgba(250, 245, 255, 0.25) !important;
   }
+
+  /* Printing styling for the restored dark summary container */
+  .print-summary-dark {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+    border-color: rgba(245, 158, 11, 0.2) !important;
+    color: white !important;
+  }
+  .print-summary-dark * {
+    color: white !important;
+  }
 }
