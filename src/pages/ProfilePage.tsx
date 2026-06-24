@@ -181,14 +181,14 @@ export function ProfilePage() {
     setPrintMode('report');
     setTimeout(() => {
       window.print();
-    }, 100);
+    }, 500);
   };
 
   const handlePrintCertificate = () => {
     setPrintMode('certificate');
     setTimeout(() => {
       window.print();
-    }, 100);
+    }, 500);
   };
 
   const getNACECompetencies = () => {
@@ -567,7 +567,7 @@ export function ProfilePage() {
 
       {/* PRINT ONLY: Professional Career Report Card */}
       {printMode === 'report' && (
-        <div className="hidden print:block print:m-0 print:p-0 bg-white text-slate-900 font-serif relative overflow-hidden">
+        <div className="hidden print:block print-report-root print:m-0 print:p-0 bg-white text-slate-900 font-serif relative overflow-hidden">
         {/* Intricate Border Decor */}
         <div className="absolute inset-4 border-[12px] border-double border-slate-100 pointer-events-none"></div>
 
@@ -958,29 +958,23 @@ export function ProfilePage() {
         </div>
       )}
 
-      {/* CSS styles to ensure high quality printing */}
+      {/* CSS styles to ensure page orientation is correct */}
       {printMode === 'report' ? (
         <style dangerouslySetInnerHTML={{
           __html: `
           @media print {
-            header, nav, .print\\:hidden { display: none !important; }
-            .page-break { display: block; page-break-before: always; break-before: page; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .clip-path-ribbon { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%); }
-            h1, h2, h3, h4 { break-after: avoid; }
-            .break-inside-avoid { break-inside: avoid; }
             @page { size: A4; margin: 0; }
+            .print-report-root { display: block !important; }
+            .print-landscape-cert { display: none !important; }
           }
         ` }} />
       ) : (
         <style dangerouslySetInnerHTML={{
           __html: `
           @media print {
-            header, nav, .print\\:hidden { display: none !important; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; padding: 0; background: #fff; }
-            .clip-path-ribbon { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%); }
             @page { size: A4 landscape; margin: 0; }
-            .print-landscape-cert { width: 297mm; height: 210mm; position: relative; box-sizing: border-box; }
+            .print-landscape-cert { display: block !important; }
+            .print-report-root { display: none !important; }
           }
         ` }} />
       )}

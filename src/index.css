@@ -292,3 +292,45 @@ body {
     transform: translateY(-8px);
   }
 }
+
+/* ===== Global Print Layout Rules ===== */
+@media print {
+  /* Hide the navbar, headers, feet, and any interactive UI items */
+  header,
+  nav,
+  footer,
+  #tutorial-hud-progress,
+  #tutorial-hud-actions,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Force background colors to print correctly */
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background-color: white !important;
+    color: #0f172a !important;
+  }
+
+  /* Hide the main profile content wrapper during printing */
+  main {
+    display: none !important;
+  }
+
+  /* Allow page breaks and general utility classes */
+  .page-break {
+    display: block;
+    page-break-before: always;
+    break-before: page;
+  }
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+  .clip-path-ribbon {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%);
+  }
+}
