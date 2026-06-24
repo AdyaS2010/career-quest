@@ -101,22 +101,25 @@ export function ProfilePage() {
 
   // Build max_score lookup for challenges
   const challengeMaxScores: Record<string, number> = {};
-  challengesList.forEach(c => { challengeMaxScores[c.id] = c.max_score; });
+  (challengesList || []).forEach(c => { if (c && c.id) challengeMaxScores[c.id] = c.max_score || 0; });
 
   // Helper: get career accuracy (total best_score / total max_score for career)
   const getCareerAccuracy = (careerId: string) => {
-    const careerChals = challengesList.filter(c => c.career_id === careerId);
-    const totalMax = careerChals.reduce((sum, c) => sum + c.max_score, 0);
+    if (!careerId) return 0;
+    const careerChals = (challengesList || []).filter(c => c && c.career_id === careerId);
+    const totalMax = careerChals.reduce((sum, c) => sum + (c?.max_score || 0), 0);
     if (totalMax === 0) return 0;
     const totalBest = careerChals.reduce((sum, c) => {
-      const progress = challengeProgress.find(p => p.challenge_id === c.id);
+      const progress = (challengeProgress || []).find(p => p && p.challenge_id === c?.id);
       return sum + (progress?.best_score || 0);
     }, 0);
-    return (totalBest / totalMax) * 100;
+    const acc = (totalBest / totalMax) * 100;
+    return isNaN(acc) ? 0 : acc;
   };
 
   // Islands Mastered = careers where >80% accuracy AND every challenge attempted
-  const completedCareers = careers.filter(career => {
+  const completedCareers = (careers || []).filter(career => {
+    if (!career || !career.id) return false;
     const totalInCareer = careerChallengeCount[career.id] || 0;
     const startedInCareer = careerStartedCount[career.id] || 0;
     if (totalInCareer === 0) return false;
@@ -124,22 +127,25 @@ export function ProfilePage() {
   }).length;
 
   // Challenges Complete = challenges that have been attempted (status = completed)
-  const totalChallengesCompleted = challengeProgress.filter(p => p.status === 'completed').length;
+  const totalChallengesCompleted = (challengeProgress || []).filter(p => p && p.status === 'completed').length;
 
   // Average Accuracy = average of (best_score / max_score) across all attempted challenges, as %
-  const averageScore = challengeProgress.length > 0
+  const averageScoreRaw = (challengeProgress || []).length > 0
     ? Math.round(
       challengeProgress.reduce((sum, p) => {
+        if (!p) return sum;
         const maxScore = challengeMaxScores[p.challenge_id] || 100;
-        return sum + (p.best_score / maxScore) * 100;
+        return sum + ((p.best_score || 0) / maxScore) * 100;
       }, 0) / challengeProgress.length
     )
     : 0;
+  const averageScore = isNaN(averageScoreRaw) ? 0 : averageScoreRaw;
 
   // Perfect Scores = challenges where best_score >= max_score
-  const perfectScores = challengeProgress.filter(p => {
+  const perfectScores = (challengeProgress || []).filter(p => {
+    if (!p) return false;
     const maxScore = challengeMaxScores[p.challenge_id];
-    return maxScore && p.best_score >= maxScore;
+    return maxScore && (p.best_score || 0) >= maxScore;
   }).length;
 
   // Level derived from total_score (100 points per level, max ~16 with 1500 total)
@@ -426,6 +432,7 @@ export function ProfilePage() {
 
             <div className="space-y-4">
               {careers.map(career => {
+                if (!career || !career.id) return null;
                 const totalChallenges = careerChallengeCount[career.id] || 0;
                 const startedInCareer = careerStartedCount[career.id] || 0;
                 const accuracy = getCareerAccuracy(career.id);
@@ -700,8 +707,10 @@ export function ProfilePage() {
               </div>
 
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-4">
-                {careers.filter(c => getCareerAccuracy(c.id) > 0).map(career => (
-                  <div key={career.id} className="relative bg-slate-50 p-4 rounded-xl border border-slate-100 break-inside-avoid">
+                {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).map(career => {
+                  if (!career || !career.id) return null;
+                  return (
+                    <div key={career.id} className="relative bg-slate-50 p-4 rounded-xl border border-slate-100 break-inside-avoid">
                     <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-1.5 border-b pb-0.5 leading-none">{career.name}</h4>
                     <ul className="text-[8px] text-slate-500 space-y-0.5 font-medium leading-tight list-disc list-inside">
                       {career.slug === 'culinary-arts' && (
@@ -753,8 +762,8 @@ export function ProfilePage() {
                         </>
                       )}
                     </ul>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -763,6 +772,7 @@ export function ProfilePage() {
               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 border-b border-white/10 pb-2 leading-none">Specialized Domain Evaluation Summary</h3>
               <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                 {careers.map(career => {
+                  if (!career || !career.id) return null;
                   const accuracy = getCareerAccuracy(career.id);
                   const points = careerScores[career.id] || 0;
                   return (
@@ -866,6 +876,7 @@ export function ProfilePage() {
             {/* Mastered Districts Badges List */}
             <div className="my-1 flex flex-wrap justify-center gap-3 max-w-[200mm]">
               {careers.map(career => {
+                if (!career || !career.id) return null;
                 const totalChallenges = careerChallengeCount[career.id] || 0;
                 const startedInCareer = careerStartedCount[career.id] || 0;
                 const accuracy = getCareerAccuracy(career.id);
