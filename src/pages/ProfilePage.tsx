@@ -583,142 +583,155 @@ export function ProfilePage() {
         />
       )}
 
-      {/* PRINT ONLY: Professional Career Report Card */}
       {printMode === 'report' && (
-        <div className="hidden print:block print-report-root print:m-0 print:p-0 bg-white text-slate-900 font-sans relative overflow-hidden w-[210mm] min-h-[297mm] p-[15mm]">
-          {/* Double Slate/Gold Ornamental Border */}
-          <div className="absolute inset-4 border border-[#d97706] pointer-events-none" />
-          <div className="absolute inset-5 border-2 border-slate-900 pointer-events-none" />
+        <div className="hidden print:block print-report-root print:m-0 print:p-0 bg-white text-slate-900 font-serif relative overflow-hidden w-[210mm] min-h-[297mm] p-[15mm]">
+          {/* Intricate Border Decor */}
+          <div className="absolute inset-4 border-[12px] border-double border-slate-100 pointer-events-none"></div>
+
+          {/* Subtle Watermark - The Great Compass */}
+          <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none scale-[3] rotate-[15deg]">
+            <svg viewBox="0 0 100 100" className="w-64 h-64">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
+              <path d="M50 5 L55 45 L95 50 L55 55 L50 95 L45 55 L5 50 L45 45 Z" fill="currentColor" />
+            </svg>
+          </div>
 
           {/* PAGE 1 CONTENT */}
           <div className="p-8 relative z-10 max-w-5xl mx-auto flex flex-col justify-between print:h-[1020px] print:mb-0">
             {/* Header Section */}
-            <div className="flex justify-between items-start border-b-[4px] border-slate-900 pb-3 mb-4 relative">
+            <div className="flex justify-between items-start border-b-[6px] border-slate-900 pb-3 mb-4 relative">
               <div className="flex gap-4 items-center">
                 <div className="relative">
                   <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xl shadow-md z-20 relative">🧭</div>
                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-amber-500 rounded-lg -z-10"></div>
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black uppercase tracking-tight text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Questford Discovery Board</h1>
-                  <p className="text-[10px] font-bold tracking-[0.25em] text-slate-500 uppercase">Academic Competency Transcript & Graduation Dossier</p>
-                  <div className="flex gap-2 mt-1">
+                  <h1 className="text-3xl font-black uppercase tracking-tighter mb-0.5" style={{ fontFamily: "'Cinzel', serif" }}>Career Quest</h1>
+                  <p className="text-[10px] font-bold tracking-[0.25em] text-slate-500 uppercase">Academic Competency Transcript</p>
+                  <div className="flex gap-2 mt-1 font-sans">
                     <span className="text-[8px] font-black bg-slate-900 text-white px-2.5 py-1 rounded tracking-wider uppercase">Ref: FBLA-2026-QS</span>
-                    <span className="text-[8px] font-black border border-amber-500 text-amber-600 px-2.5 py-1 rounded tracking-wider uppercase">Gold Merit Standard</span>
+                    <span className="text-[8px] font-black border border-slate-900 text-slate-900 px-2.5 py-1 rounded tracking-wider uppercase">Gold Merit Standard</span>
                   </div>
                 </div>
               </div>
 
               {/* Official Gold Seal Graphic */}
-              <div className="scale-[0.7] origin-top-right -translate-y-2">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 p-0.5 shadow-lg flex items-center justify-center relative">
-                  <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-full"></div>
-                  <div className="w-full h-full rounded-full border border-amber-200/50 flex flex-col items-center justify-center text-center p-1">
-                    <span className="text-[6px] font-black text-amber-900 leading-none mb-0.5 uppercase tracking-widest">Official<br />Discovery</span>
-                    <div className="w-4 h-[0.5px] bg-amber-900/40 my-0.5"></div>
-                    <span className="text-[8px] font-black text-amber-950 uppercase tracking-tighter font-serif">Verified</span>
+              <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 opacity-90 scale-[0.65] origin-top-right">
+                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-amber-600 p-1 shadow-xl flex items-center justify-center relative">
+                  <div className="absolute inset-0 border-4 border-dashed border-white/40 rounded-full"></div>
+                  <div className="w-full h-full rounded-full border-2 border-amber-200/50 flex flex-col items-center justify-center text-center p-2">
+                    <span className="text-[7px] font-black text-amber-900 leading-none mb-1 uppercase tracking-widest">Official<br />Discovery</span>
+                    <div className="w-6 h-[1px] bg-amber-900/40 my-1"></div>
+                    <span className="text-[9px] font-black text-amber-955 uppercase tracking-tighter font-serif">Verified</span>
                   </div>
-                  <div className="absolute -bottom-4 left-1/4 w-4 h-8 bg-amber-600 -z-10 clip-path-ribbon"></div>
-                  <div className="absolute -bottom-4 right-1/4 w-4 h-8 bg-amber-700 -z-10 clip-path-ribbon"></div>
+                  {/* Ribbons */}
+                  <div className="absolute -bottom-6 left-1/4 w-5 h-10 bg-amber-600 -z-10 clip-path-ribbon"></div>
+                  <div className="absolute -bottom-6 right-1/4 w-5 h-10 bg-amber-700 -z-10 clip-path-ribbon"></div>
                 </div>
               </div>
             </div>
 
-            {/* Candidate Credentials Dossier Block */}
-            <div className="border border-slate-200 bg-slate-50/50 rounded-xl p-4 grid grid-cols-4 gap-4 mb-4 break-inside-avoid">
-              <div>
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Candidate Name</span>
-                <span className="text-sm font-black text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>{profile?.username || 'Guest'}</span>
+            {/* Credentials Section - Reverting to original layout but with professional upgrades */}
+            <div className="grid grid-cols-12 gap-8 mb-4 items-center break-inside-avoid">
+              <div className="col-span-8">
+                <div className="mb-2">
+                  <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1.5 flex items-center gap-4">
+                    Candidate Credentials
+                    <div className="flex-1 h-[1px] bg-slate-200"></div>
+                  </h2>
+                  <div className="space-y-0.5">
+                    <h3 className="text-4xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Cinzel', serif" }}>{profile?.username || 'Guest'}</h3>
+                    <div className="flex flex-wrap items-center gap-2.5 pt-1 text-sm font-sans text-slate-500">
+                      <span>Lead Assessor: <strong className="text-slate-800 font-serif">{profile?.character_name || 'Mayor Questopher'}</strong></span>
+                      <span className="w-1.5 h-1.5 bg-slate-300 rounded-full"></span>
+                      <span>Level: <strong className="text-slate-800">{currentLevel}</strong></span>
+                      <span className="w-1.5 h-1.5 bg-slate-300 rounded-full"></span>
+                      <span>Registry ID: <strong className="text-slate-800 font-mono">#489-CQ-{(profile?.username || 'GUEST').substring(0, 3).toUpperCase()}-2026</strong></span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Lead Assessor</span>
-                <span className="text-xs font-bold text-slate-800">{profile?.character_name || 'Mayor Questopher'}</span>
-              </div>
-              <div>
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Registry ID</span>
-                <span className="text-xs font-mono font-bold text-slate-800">#489-CQ-{(profile?.username || 'GUEST').substring(0, 3).toUpperCase()}-2026</span>
-              </div>
-              <div>
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Evaluation Date</span>
-                <span className="text-xs font-bold text-slate-800">{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+
+              <div className="col-span-4 bg-slate-50 p-4.5 rounded-[1.8rem] border border-slate-100 shadow-inner text-center relative overflow-hidden break-inside-avoid">
+                <div className="absolute top-0 left-0 w-full h-[3px] bg-slate-900"></div>
+                <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 font-sans">Cumulative Mastery XP</div>
+                <div className="text-4xl font-black text-slate-900 mb-0.5 tabular-nums">{profile?.total_score || 0}</div>
+                <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest leading-none font-sans">
+                  Standardized performance evaluation
+                </p>
               </div>
             </div>
 
-            {/* Mayoral Executive Commendation Letter */}
-            <div className="border-l-4 border-amber-500 bg-amber-50/30 p-4.5 rounded-r-2xl mb-4 break-inside-avoid">
-              <span className="text-[8px] font-black text-amber-800 uppercase tracking-widest mb-1.5 block">Mayoral Recommendation</span>
-              <p className="text-[10px] italic text-slate-800 leading-relaxed">
+            {/* Mayoral Executive Commendation Letter - Clean, non-colorful style */}
+            <div className="border border-slate-200 bg-slate-50/30 p-4 rounded-xl mb-4 break-inside-avoid relative overflow-hidden">
+              <div className="absolute top-0 left-0 h-full w-1.5 bg-slate-900"></div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block font-sans pl-2">Mayoral Executive Recommendation</span>
+              <p className="text-[10.5px] italic text-slate-800 leading-relaxed pl-2 font-serif">
                 "Having successfully completed the core vocational simulations of Questford, the candidate has validated hands-on skill competencies and demonstrated outstanding career readiness under our counselor-guided curriculum. Recommended for direct workforce placement."
               </p>
-              <div className="flex justify-between items-center mt-3 pt-2 border-t border-amber-200/40">
-                <span className="text-[8px] text-slate-400 uppercase tracking-wider">Questford Office of the Mayor</span>
+              <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-slate-200/50 pl-2">
+                <span className="text-[8px] text-slate-400 uppercase tracking-wider font-sans">Questford Office of the Mayor</span>
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-bold text-slate-900 font-serif">— Mayor Questopher, Counselor-in-Chief</span>
-                  <span className="font-serif text-sm font-bold text-slate-950 font-style-italic" style={{ fontFamily: "'Kalam', cursive" }}>Questopher</span>
+                  <span className="font-serif text-sm font-bold text-slate-800 italic" style={{ fontFamily: "'Kalam', cursive" }}>Questopher</span>
                 </div>
               </div>
             </div>
 
-            {/* Metric Scoreboard */}
+            {/* Metric Scoreboard - Clean Gray Borders, White Backgrounds, High-Contrast */}
             <div className="grid grid-cols-4 gap-3 mb-4 break-inside-avoid">
               {[
-                { label: 'Islands Mastered', value: `${completedCareers} / 8`, trend: 'District Competency', color: 'border-blue-200 bg-blue-50/20 text-blue-800' },
-                { label: 'Successful Trials', value: `${totalChallengesCompleted} Runs`, trend: 'Skill Validation', color: 'border-amber-200 bg-amber-50/20 text-amber-800' },
-                { label: 'Evaluation Precision', value: `${averageScore}%`, trend: 'Accuracy Rating', color: 'border-green-200 bg-green-50/20 text-green-800' },
-                { label: 'Cumulative XP', value: `${profile?.total_score || 0}`, trend: 'Graduation Points', color: 'border-purple-200 bg-purple-50/20 text-purple-800' }
+                { label: 'Islands Mastered', value: `${completedCareers} / 8`, trend: 'District Competency' },
+                { label: 'Successful Trials', value: `${totalChallengesCompleted} Runs`, trend: 'Skill Validation' },
+                { label: 'Evaluation Precision', value: `${averageScore}%`, trend: 'Accuracy Rating' },
+                { label: 'Login Consistency', value: `${profile?.longest_streak || 0} Days`, trend: 'Persistence Factor' }
               ].map((stat, i) => (
-                <div key={i} className={`p-3.5 border rounded-xl flex flex-col justify-center text-center ${stat.color}`}>
-                  <div className="text-[8px] font-black uppercase tracking-wider mb-1 opacity-70">{stat.label}</div>
-                  <div className="text-2xl font-black mb-0.5">{stat.value}</div>
-                  <div className="text-[6.5px] font-bold uppercase tracking-widest opacity-80">{stat.trend}</div>
+                <div key={i} className="p-3 border border-slate-200 bg-white rounded-xl flex flex-col justify-center text-center shadow-sm">
+                  <div className="text-[9px] font-black uppercase tracking-wider mb-1 text-slate-400 font-sans">{stat.label}</div>
+                  <div className="text-2xl font-black mb-0.5 text-slate-900">{stat.value}</div>
+                  <div className="text-[7.5px] font-bold uppercase tracking-wider text-slate-500 font-sans">{stat.trend}</div>
                 </div>
               ))}
             </div>
 
-            {/* Matrix of Core Competencies */}
-            <div className="mb-4 break-inside-avoid">
-              <div className="flex items-center gap-4 mb-3.5">
+            {/* Matrix of Certified Core Competencies - Clean Slate Progress Bars */}
+            <div className="mb-2 break-inside-avoid">
+              <div className="flex items-center gap-4 mb-3">
                 <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Matrix of Certified Core Competencies</h3>
                 <div className="flex-1 h-[1.5px] bg-slate-900"></div>
-                <div className="text-[8px] font-black text-slate-400 uppercase tracking-wider">NACE Standards v2026.4</div>
+                <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider font-sans">NACE Standards v2026.4</div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-3.5">
                 {getNACECompetencies().map((comp, i) => {
                   const isCertified = comp.score >= 80;
                   const isExcellent = comp.score >= 90;
                   return (
-                    <div key={comp.name} className="relative">
+                    <div key={comp.name} className="relative break-inside-avoid">
                       <div className="flex justify-between items-end mb-1">
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-slate-300 font-bold text-xs">{(i + 1).toString().padStart(2, '0')}</span>
-                            <h4 className="font-bold text-[11px] text-slate-950 tracking-tight">{comp.name}</h4>
+                            <h4 className="font-bold text-[11px] text-slate-900 tracking-tight">{comp.name}</h4>
                           </div>
-                          <p className="text-[8px] text-slate-500 font-medium tracking-wide uppercase mt-0.5">{comp.description}</p>
+                          <p className="text-[9px] text-slate-400 font-medium tracking-wide uppercase mt-0.5 font-sans leading-none">{comp.description}</p>
                         </div>
-                        <div className="text-right">
-                          <span className={`inline-block px-1.5 py-0.5 rounded text-[5.5px] font-black uppercase tracking-wider mr-2 ${
+                        <div className="text-right font-sans">
+                          <span className={`inline-block px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-wider mr-2 ${
                             isExcellent 
-                              ? 'bg-green-100 text-green-800' 
+                              ? 'bg-slate-100 text-slate-800 border border-slate-300' 
                               : isCertified 
-                                ? 'bg-blue-100 text-blue-800' 
-                                : 'bg-slate-100 text-slate-600'
+                                ? 'bg-slate-50 text-slate-700 border border-slate-200' 
+                                : 'bg-slate-50 text-slate-400'
                           }`}>
                             {isExcellent ? 'Excellent' : isCertified ? 'Validated' : 'Developing'}
                           </span>
-                          <span className="text-xs font-black text-slate-950 font-mono">{comp.score}%</span>
+                          <span className="text-xs font-black text-slate-900 font-mono">{comp.score}%</span>
                         </div>
                       </div>
-                      <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                         <div
-                          className={`h-full rounded-full transition-all duration-1000 ${
-                            isExcellent 
-                              ? 'bg-green-600' 
-                              : isCertified 
-                                ? 'bg-indigo-600' 
-                                : 'bg-slate-500'
-                          }`}
+                          className="h-full rounded-full bg-slate-900 transition-all duration-1000"
                           style={{ width: `${comp.score}%` }}
                         />
                       </div>
@@ -729,30 +742,27 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* FORCED PAGE BREAK */}
           <div className="page-break" style={{ pageBreakBefore: 'always' }}></div>
 
           {/* PAGE 2 CONTENT */}
           <div className="p-8 relative z-10 max-w-5xl mx-auto flex flex-col justify-between print:h-[1020px]">
             <div className="flex-1 flex flex-col gap-4">
               
-              {/* Learning Success Artifacts Grid */}
               <div className="break-inside-avoid">
                 <div className="flex items-center gap-4 mb-2.5">
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Learning Success Artifacts</h3>
-                  <div className="flex-1 h-[1.5px] bg-slate-950"></div>
+                  <div className="flex-1 h-[1.5px] bg-slate-900"></div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                   {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).map(career => {
                     if (!career || !career.id) return null;
                     return (
-                      <div key={career.id} className="relative bg-white p-4.5 rounded-xl border border-slate-200 shadow-sm break-inside-avoid">
-                        <div className="absolute top-2.5 right-2.5 text-[10px]">✨</div>
-                        <h4 className="font-black text-slate-955 uppercase tracking-wider text-xs mb-1.5 pb-0.5 border-b border-slate-100 leading-tight">
+                      <div key={career.id} className="relative bg-slate-50/50 p-4.5 rounded-xl border border-slate-200 shadow-sm break-inside-avoid">
+                        <h4 className="font-black text-slate-900 uppercase tracking-wider text-xs mb-1.5 pb-0.5 border-b border-slate-200 leading-tight">
                           {career.name}
                         </h4>
-                        <ul className="text-[9px] text-slate-700 space-y-1 font-medium leading-relaxed list-disc list-inside">
+                        <ul className="text-[10px] text-slate-600 space-y-1 font-medium leading-relaxed list-disc list-inside font-sans">
                           {career.slug === 'culinary-arts' && (
                             <>
                               <li>Mastered advanced culinary prep and kitchen command structures.</li>
@@ -805,24 +815,18 @@ export function ProfilePage() {
                       </div>
                     );
                   })}
-                  {careers.filter(c => c && c.id && getCareerAccuracy(c.id) > 0).length === 0 && (
-                    <div className="col-span-2 text-center py-4 border border-dashed border-slate-200 rounded-xl text-slate-400 text-[9px] italic">
-                      No learning success artifacts recorded yet. Complete district simulations to populate your transcript credentials.
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Simulation Trial Ledger */}
               <div className="break-inside-avoid">
                 <div className="flex items-center gap-4 mb-2">
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-900" style={{ fontFamily: "'Cinzel', serif" }}>Verified Simulation Performance Ledger</h3>
                   <div className="flex-1 h-[1.5px] bg-slate-900"></div>
                 </div>
 
-                <table className="w-full text-left border-collapse text-[9px] border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <table className="w-full text-left border-collapse text-[10px] border border-slate-200 rounded-xl overflow-hidden shadow-sm font-sans">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-slate-200 uppercase font-black text-slate-500 tracking-wider">
+                    <tr className="bg-slate-50 border-b border-slate-300 uppercase font-black text-slate-600 tracking-wider font-sans">
                       <th className="py-2 px-3 w-5/12">Simulation Trial Run</th>
                       <th className="py-2 px-3 w-3/12">Career District</th>
                       <th className="py-2 px-2 w-1/12 text-center">Attempts</th>
@@ -833,63 +837,54 @@ export function ProfilePage() {
                   <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                     {getTopCompletedTrials().slice(0, 4).map((trial, idx) => (
                       <tr key={idx} className="align-middle hover:bg-slate-50/50">
-                        <td className="py-2 px-3 font-bold text-slate-900">{trial.title}</td>
+                        <td className="py-2 px-3 font-bold text-slate-900 font-serif">{trial.title}</td>
                         <td className="py-2 px-3">{trial.careerName}</td>
                         <td className="py-2 px-2 text-center font-mono">{trial.attempts}</td>
-                        <td className="py-2 px-2 text-center font-bold font-mono text-slate-950">{trial.bestScore} / {trial.maxScore}</td>
+                        <td className="py-2 px-2 text-center font-bold font-mono text-slate-900">{trial.bestScore} / {trial.maxScore}</td>
                         <td className="py-2 px-3 text-right">
-                          <span className={`inline-block px-2 py-0.5 rounded-[4px] text-[7px] font-bold uppercase tracking-wider ${
+                          <span className={`inline-block px-2 py-0.5 rounded-[4px] text-[7.5px] font-bold uppercase tracking-wider ${
                             trial.accuracy >= 100
-                              ? 'bg-green-100 text-green-800 border border-green-200'
-                              : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                              ? 'bg-slate-900 text-white border border-slate-900 font-sans'
+                              : 'bg-slate-100 text-slate-800 border border-slate-300 font-sans'
                           }`}>
                             {trial.accuracy >= 100 ? '100% Perfect' : 'Validated'}
                           </span>
                         </td>
                       </tr>
                     ))}
-                    {getTopCompletedTrials().length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="py-4 text-center text-slate-400 italic">
-                          No simulation trials completed yet. Access the city plaza map to undergo career simulation runs.
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
 
-              {/* Specialized Domain Evaluation Summary Card */}
               <div className="break-inside-avoid">
-                <div className="print-summary-dark rounded-2xl p-4.5 shadow-md relative overflow-hidden border border-amber-500/20"
-                     style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)' }}>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
+                <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-xl relative overflow-hidden print-summary-dark">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full translate-x-1/4 -translate-y-1/4 pointer-events-none"></div>
                   
-                  <div className="flex justify-between items-center mb-2.5 pb-1.5 border-b border-white/10">
-                    <h3 className="text-[9.5px] font-black uppercase tracking-[0.2em] text-amber-400 leading-none">
+                  <div className="flex justify-between items-center mb-3 pb-1.5 border-b border-white/10">
+                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 leading-none">
                       Specialized Domain Evaluation Summary
                     </h3>
-                    <span className="text-[7.5px] font-bold text-slate-400 uppercase tracking-widest font-sans">Questford Board Audit</span>
+                    <span className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest font-sans">Questford Board Audit</span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                     {careers.map(career => {
                       if (!career || !career.id) return null;
                       const accuracy = getCareerAccuracy(career.id);
                       const points = careerScores[career.id] || 0;
                       return (
-                        <div key={career.id} className="flex justify-between items-center border-b border-white/5 pb-1">
+                        <div key={career.id} className="flex justify-between items-center border-b border-white/5 pb-1 font-sans">
                           <div>
-                            <span className="font-bold text-white text-[9px] tracking-wide uppercase leading-tight block">
+                            <span className="font-bold text-white text-[9.5px] tracking-wide uppercase leading-tight block">
                               {career.name}
                             </span>
-                            <span className="text-[7.5px] text-slate-400 font-medium uppercase tracking-wider">
+                            <span className="text-[8px] text-slate-400 font-medium uppercase tracking-wider block mt-0.5">
                               {career.title}
                             </span>
                           </div>
                           <div className="text-right">
-                            <div className="text-[9.5px] font-black text-white leading-none">
-                              {points} <span className="text-[7.5px] text-slate-400 font-medium">XP</span>
+                            <div className="text-[10px] font-black text-white leading-none">
+                              {points} <span className="text-[7.5px] text-slate-500 font-medium">XP</span>
                             </div>
                             <span className={`text-[7.5px] font-black uppercase tracking-wider block mt-0.5 ${
                               accuracy > 80 
@@ -898,7 +893,7 @@ export function ProfilePage() {
                                   ? 'text-blue-400' 
                                   : 'text-slate-500'
                             }`}>
-                              {accuracy > 80 ? '★ MASTER' : accuracy > 0 ? 'ELITE' : 'CANDIDATE'}
+                              {accuracy > 80 ? 'MASTER' : accuracy > 0 ? 'ELITE' : 'CANDIDATE'}
                             </span>
                           </div>
                         </div>
@@ -910,43 +905,42 @@ export function ProfilePage() {
 
             </div>
 
-            {/* Verification Footnotes and Signature */}
             <div className="pt-3 border-t-2 border-slate-900 break-inside-avoid">
               <div className="grid grid-cols-12 gap-6 items-end">
-                <div className="col-span-8">
+                <div className="col-span-8 font-sans">
                   <div className="mb-2 flex gap-3 pr-4">
-                    <div className="w-1 h-8 bg-amber-500"></div>
-                    <p className="text-[8px] font-medium text-slate-500 leading-normal italic">
-                      "This document serves as an official authenticated transcript of student competency Discovery on the Questford platform. Performance metrics have been compiled in real-time and indexed against NACE core education benchmarks."
+                    <div className="w-1 h-8 bg-slate-900"></div>
+                    <p className="text-[8.5px] font-medium text-slate-400 leading-normal italic">
+                      "This document serves as an official record of career simulation competencies. Performance is indexed against 2026 industry standards and discovery protocols."
                     </p>
                   </div>
                   <div className="flex gap-4 items-center pt-1 opacity-80">
                     <div className="flex items-center gap-1">
                       <ShieldCheck className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-wider">Verified Profile</span>
+                      <span className="text-[8.5px] font-black uppercase tracking-wider">Verified Profile</span>
                     </div>
                     <div className="flex items-center gap-1 border-l pl-3">
                       <BookMarked className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-wider">Accredited Ledger</span>
+                      <span className="text-[8.5px] font-black uppercase tracking-wider">Accredited Tasks</span>
                     </div>
                     <div className="flex items-center gap-1 border-l pl-3">
                       <Zap className="w-3.5 h-3.5 text-slate-900" />
-                      <span className="text-[8px] font-black uppercase tracking-wider">Real-time Precision</span>
+                      <span className="text-[8.5px] font-black uppercase tracking-wider">Real-time Accuracy</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="col-span-4 text-right flex flex-col items-end">
                   <div className="mb-3">
-                    <div className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-0.5 leading-none">Discovery Board Seal of Certification</div>
+                    <div className="text-[8.5px] font-black text-slate-400 uppercase tracking-widest mb-0.5 leading-none font-sans">Discovery Board Authorization</div>
                     <div className="h-[1.5px] w-36 bg-slate-900 ml-auto mb-1"></div>
                     <div className="flex flex-col items-end">
-                      <p className="font-serif text-base font-bold tracking-tighter text-slate-950 font-style-italic" style={{ fontFamily: "'Kalam', cursive" }}>Mayor Questopher</p>
-                      <p className="text-[7px] font-black text-slate-400 uppercase tracking-[0.1em]">Board Registry ID: 489-CQ-2026</p>
+                      <p className="font-serif text-base font-bold tracking-tighter text-slate-900 leading-none">Mayor Questopher</p>
+                      <p className="text-[7.5px] font-black text-slate-400 uppercase tracking-[0.15deg] font-sans">Board Registry ID: 489-CQ-2026</p>
                     </div>
                   </div>
-                  <div className="text-[8px] font-black text-slate-300 select-none uppercase tracking-[0.25em]">
-                    FOR OFFICIAL GRADUATION STANDARDS ONLY
+                  <div className="text-[8.5px] font-black text-slate-200 select-none uppercase tracking-[0.4em] font-sans">
+                    FOR OFFICIAL PRESENTATION ONLY
                   </div>
                 </div>
               </div>
