@@ -64,7 +64,7 @@ export function CareerQuiz({ existing, skills, firstTime, onResult, onClose, onS
               <Compass className="w-7 h-7 text-amber-400 mx-auto mb-1" />
               <h2 className="font-fantasy text-white text-2xl">Your Career Compass</h2>
               {(() => { const d = QUIZ_DOMAINS[result.top]; return (
-                <p className="text-slate-300 text-sm mt-1">Top match: <span className="text-amber-300 font-bold">{d.emoji} {d.name}</span> — {d.tagline}</p>
+                <p className="text-slate-300 text-sm mt-1">Top match: <span className="text-amber-300 font-bold">{d.emoji} {d.name}</span>  -  {d.tagline}</p>
               ); })()}
             </div>
 

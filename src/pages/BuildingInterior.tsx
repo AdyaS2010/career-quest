@@ -16,7 +16,7 @@ import { FurnitureSprite, SeatedNpc, PatientSprite, WallPanel, JobStation } from
 import { AMENITY_SLUGS } from './city/cityLayout';
 import { AmenityInterior } from './AmenityInterior';
 import { CareerWorld } from './CareerWorld';
-import { awardCoins, loadWallet } from '../lib/wallet';
+import { awardCoins, loadWallet, paletteFromWallet } from '../lib/wallet';
 
 const SPEED = 260, ACCEL_K = 16, HALF = 14, NEAR = 66;
 
@@ -48,6 +48,8 @@ export function CareerInterior() {
   const { user } = useAuth();
   const { reducedMotion } = useTheme();
   const def = interiorFor(careerSlug || '');
+  const wallet = loadWallet(user?.id || 'anon');
+  const palette = paletteFromWallet(wallet);
 
   const [career, setCareer] = useState<Career | null>(null);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -320,7 +322,7 @@ export function CareerInterior() {
             {near?.kind === 'mentor' && <div className="absolute left-1/2 -translate-x-1/2 text-2xl animate-bounce" style={{ top: -78 }}>💬</div>}
           </div>
 
-          {/* job terminals — sensible, labelled stations to start each task */}
+          {/* job terminals  -  sensible, labelled stations to start each task */}
           {def.stations.map((stn, i) => {
             const c = challenges[i];
             if (!c) return null;
@@ -355,7 +357,7 @@ export function CareerInterior() {
           </div>
 
           {/* player */}
-          <RoomPlayer x={p.x} y={p.y} dir={p.dir} moving={p.moving} phase={p.phase} />
+          <RoomPlayer x={p.x} y={p.y} dir={p.dir} moving={p.moving} phase={p.phase} palette={palette} />
         </div>
       </div>
 
@@ -388,7 +390,7 @@ export function CareerInterior() {
 
       {dialogue && <DialogueBox lines={dialogue} onClose={() => setDialogue(null)} />}
 
-      {/* Next Steps — real-world project + curated resources for this field */}
+      {/* Next Steps  -  real-world project + curated resources for this field */}
       {showRes && res && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ background: 'rgba(2,6,23,0.62)', backdropFilter: 'blur(3px)' }} onClick={() => setShowRes(false)}>
           <div className="w-full max-w-md rounded-3xl border-4 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(160deg,#0f1f1a,#0b1220)', borderColor: '#34d399' }} onClick={e => e.stopPropagation()}>
@@ -437,14 +439,14 @@ function mentorPalette(accent: string): Palette {
 }
 
 /* walking avatar for interiors (shared SVG sprite) */
-function RoomPlayer({ x, y, dir, moving, phase }: { x: number; y: number; dir: string; moving: boolean; phase: number }) {
+function RoomPlayer({ x, y, dir, moving, phase, palette }: { x: number; y: number; dir: string; moving: boolean; phase: number; palette: Palette }) {
   const bob = moving ? Math.abs(Math.sin(phase)) * 3 : 0;
   const flip = dir === 'left' ? -1 : 1;
   return (
     <div className="absolute" style={{ left: x, top: y, width: 0, height: 0, zIndex: Math.round(y) }}>
       <div className="absolute left-1/2 -translate-x-1/2 rounded-full bg-black/35 blur-[2px]" style={{ width: 28, height: 8, top: 12 }} />
       <div className="absolute" style={{ left: -23, top: -50, transform: `scaleX(${flip}) translateY(${-bob}px)` }}>
-        <CharacterSprite w={46} dir={dir} phase={phase} moving={moving} palette={PLAYER_PALETTE} hat />
+        <CharacterSprite w={46} dir={dir} phase={phase} moving={moving} palette={palette} hat />
       </div>
     </div>
   );

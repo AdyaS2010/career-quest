@@ -40,7 +40,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
           <div className="text-5xl mb-4">🧭</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">We hit a snag</h1>
           <p className="text-gray-600 mb-6">
-            Something went wrong loading this part of Questford. Your progress is safe — try again or head back to the city.
+            Something went wrong loading this part of Questford. Your progress is safe  -  try again or head back to the city.
           </p>
           <div className="flex gap-3 justify-center">
             <button

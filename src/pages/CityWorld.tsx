@@ -223,8 +223,8 @@ export function CityWorld() {
             setProfile({ ...pData, ...updates } as Profile);
             showGuide(
               diffDays === -1
-                ? "Welcome to Questford! Daily streak started — +50 coins! 🔥"
-                : isNextDay ? `Day ${newStreak} streak! 🔥 +50 coins!` : `New streak started — +50 coins! 🔥`,
+                ? "Welcome to Questford! Daily streak started  -  +50 coins! 🔥"
+                : isNextDay ? `Day ${newStreak} streak! 🔥 +50 coins!` : `New streak started  -  +50 coins! 🔥`,
               'happy'
             );
           } else setProfile(pData);
@@ -424,8 +424,8 @@ export function CityWorld() {
       // integrate with axis-separated collision
       const nx = p.x + p.vx * dt;
       const ny = p.y + p.vy * dt;
-      if (!hitsSolid(nx, p.y)) p.x = Math.max(44, Math.min(WORLD_W - 44, nx)); else p.vx = 0;
-      if (!hitsSolid(p.x, ny)) p.y = Math.max(44, Math.min(WORLD_H - 44, ny)); else p.vy = 0;
+      if (!hitsSolid(nx, p.y)) p.x = Math.max(76, Math.min(WORLD_W - 76, nx)); else p.vx = 0;
+      if (!hitsSolid(p.x, ny)) p.y = Math.max(86, Math.min(WORLD_H - 76, ny)); else p.vy = 0;
 
       const speed = Math.hypot(p.vx, p.vy);
       p.moving = speed > 12;
@@ -497,7 +497,7 @@ export function CityWorld() {
     return () => cancelAnimationFrame(raf.current);
   }, [loading, viewport.w, viewport.h, reducedMotion]);
 
-  // clock — uses the player's REAL local time (so Questford's day matches your
+  // clock  -  uses the player's REAL local time (so Questford's day matches your
   // day). The displayed minute only changes once per real minute.
   useEffect(() => {
     const tick = () => { const n = new Date(); setTimeOfDay(n.getHours() + n.getMinutes() / 60); };
@@ -540,7 +540,7 @@ export function CityWorld() {
     const c = careerBySlug.current[b.slug];
     skills[b.slug] = { xp: c ? (careerXP[c.id] || 0) : 0, status: c ? (careerStatus[c.id] || 'not_started') : 'not_started' };
   }
-  // the player's "standout path" for the finale — their quiz top pick, else a mastered field
+  // the player's "standout path" for the finale  -  their quiz top pick, else a mastered field
   const topName = (quizResult && QUIZ_DOMAINS[quizResult.top]?.name)
     || (BUILDINGS.map(b => careerBySlug.current[b.slug]).find(c => c && careerStatus[c.id] === 'mastered')?.name)
     || 'your calling';
@@ -577,7 +577,7 @@ export function CityWorld() {
       <div className="absolute will-change-transform" style={{ width: WORLD_W, height: WORLD_H, transform: `translate3d(${-cam.current.x}px, ${-cam.current.y}px, 0)` }}>
         <StaticCity lightsOn={lightsOn} careerStatus={careerStatus} careerXP={careerXP} careerBySlug={careerBySlug.current} questSlug={questSlug} nearbySlug={nearbySlug} />
 
-        {/* fountain spray (CSS-animated droplets) — sits at fountain depth */}
+        {/* fountain spray (CSS-animated droplets)  -  sits at fountain depth */}
         <div className="absolute pointer-events-none" style={{ left: FOUNTAIN.x, top: FOUNTAIN.y - 10, zIndex: Math.round(FOUNTAIN.y) }}>
           {Array.from({ length: 9 }).map((_, i) => (
             <div key={i} className="absolute rounded-full" style={{
@@ -986,13 +986,30 @@ function Player({ x, y, dir, moving, phase, z, jump, palette, name }: { x: numbe
   const bob = moving ? Math.abs(Math.sin(phase)) * 3 : 0;
   const flip = dir === 'left' ? -1 : 1;
   const lift = jump + bob;                 // total vertical offset
-  const shadow = Math.max(10, 30 - jump * 0.35);
+  const shadow = Math.max(12, 40 - jump * 0.45);
   return (
     <div className="absolute" style={{ left: x, top: y, width: 0, height: 0, zIndex: z }}>
-      <div className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] font-bold whitespace-nowrap shadow" style={{ top: -64 - jump }}>{name}</div>
+      {/* Golden pulsing beacon under player's feet */}
+      <div className="absolute left-1/2 -translate-x-1/2 rounded-full border-2 border-amber-400/80 bg-amber-400/10 shadow-[0_0_8px_#f59e0b]" style={{ width: 42, height: 12, top: 13 }} />
+      <div className="absolute left-1/2 -translate-x-1/2 rounded-full border-2 border-amber-400/60 animate-ping pointer-events-none" style={{ width: 42, height: 12, top: 13, animationDuration: '2.5s' }} />
+
+      {/* Classic shadow */}
       <div className="absolute left-1/2 -translate-x-1/2 rounded-full bg-black/35 blur-[2px]" style={{ width: shadow, height: 9, top: 14 }} />
-      <div className="absolute" style={{ left: -23, top: -50, transform: `scaleX(${flip}) translateY(${-lift}px)` }}>
-        <CharacterSprite w={46} dir={dir} phase={phase} moving={moving} palette={palette} hat />
+
+      {/* Glowing pointer arrow above player name */}
+      <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none" style={{ top: -109 - jump }}>
+        <svg className="w-4 h-4 text-amber-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] animate-bounce" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 16l-6-6h12z" />
+        </svg>
+      </div>
+
+      {/* High-visibility name tag */}
+      <div className="absolute left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 border border-amber-300 text-slate-900 text-[10px] font-extrabold whitespace-nowrap shadow-[0_2px_6px_rgba(0,0,0,0.4)]" style={{ top: -93 - jump }}>
+        {name}
+      </div>
+
+      <div className="absolute" style={{ left: -32, top: -75, transform: `scaleX(${flip}) translateY(${-lift}px)` }}>
+        <CharacterSprite w={64} dir={dir} phase={phase} moving={moving} palette={palette} hat />
       </div>
     </div>
   );
@@ -1072,7 +1089,7 @@ function TopBar(props: {
       {/* right cluster: actions, grouped */}
       <div className="flex items-center gap-1 pointer-events-auto rounded-2xl border border-white/15 shadow-xl px-1.5 py-1.5"
         style={{ background: 'linear-gradient(180deg, rgba(17,24,39,0.92), rgba(17,24,39,0.78))', backdropFilter: 'blur(10px)' }}>
-        <HudBtn onClick={props.onClassicMap} title="Classic island map" accent="#a78bfa"><MapIcon className="w-5 h-5" /></HudBtn>
+        <HudBtn onClick={props.onClassicMap} title="Districts Map" accent="#a78bfa"><MapIcon className="w-5 h-5" /></HudBtn>
         <HudBtn onClick={props.onLeaderboard} title="Leaderboard" accent="#fbbf24"><Trophy className="w-5 h-5" /></HudBtn>
         <HudBtn onClick={props.onCompass} title="Career Compass" accent="#34d399"><Compass className="w-5 h-5" /></HudBtn>
         <HudBtn onClick={props.onProfile} title="Profile" accent="#60a5fa"><User className="w-5 h-5" /></HudBtn>

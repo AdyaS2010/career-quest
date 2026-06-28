@@ -84,7 +84,7 @@ function AppRoutes() {
   return (
     <>
       <AnimatedRoutes />
-      {/* Global screen-dim “brightness” layer — sits above scene content but below
+      {/* Global screen-dim “brightness” layer  -  sits above scene content but below
           the control rail, and never intercepts clicks. */}
       <div
         aria-hidden

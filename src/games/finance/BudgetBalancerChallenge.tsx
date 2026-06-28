@@ -130,7 +130,7 @@ export function BudgetBalancerChallenge({ onComplete }: BudgetBalancerChallengeP
                                 You've just been hired as a junior financial analyst at a growing tech startup.
                                 The CEO needs you to review this month's expenses and sort them into the correct
                                 budget categories before tomorrow's board meeting. Get them right to prove
-                                yourself — the company's budget depends on accurate record-keeping!
+                                yourself  -  the company's budget depends on accurate record-keeping!
                             </p>
                         </div>
 
@@ -271,7 +271,7 @@ export function BudgetBalancerChallenge({ onComplete }: BudgetBalancerChallengeP
                                 <div className="mb-4">
                                     <p className="text-gray-600 font-medium mb-4 text-center">
                                         {phase === 'feedback'
-                                            ? (isCorrect ? '✅ Correct!' : `❌ Wrong — this belongs in "${currentTransaction.correctCategory}"`)
+                                            ? (isCorrect ? '✅ Correct!' : `❌ Wrong  -  this belongs in "${currentTransaction.correctCategory}"`)
                                             : 'Which budget category does this belong to?'}
                                     </p>
                                     <div className="grid grid-cols-5 gap-3">

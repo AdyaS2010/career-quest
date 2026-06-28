@@ -13,8 +13,8 @@ const GENERAL_TIPS: GuideTip[] = [
 
 const ROUTE_TIPS: Record<string, GuideTip[]> = {
     '/': [
-        { text: "Welcome to the Career Map! Click on any floating domain to begin your quest.", emotion: 'waving' },
-        { text: "You can drag the map to explore, or zoom to inspect the areas closely. Each island is a new career choice.", emotion: 'happy' },
+        { text: "Welcome to the Career Map! Click on any Career District to begin your quest.", emotion: 'waving' },
+        { text: "You can drag the map to explore, or zoom to inspect the areas closely. Each District is a new career choice.", emotion: 'happy' },
         { text: "I see many unchartered territories! The path to Mastery requires you to earn above 80% on challenges.", emotion: 'thinking' },
     ],
     '/profile': [
@@ -36,7 +36,7 @@ const CAREER_DESCRIPTIONS: Record<string, GuideTip[]> = {
     'culinary-arts': [
         { text: "The Culinary Arts require more than just recipes! It's about heat management, timing, flavor profiling, and an artist's eye for presentation.", emotion: 'excited' },
         { text: "Chefs, bakers, and sous-chefs train for years to refine their palate. In the real world, working in a kitchen teaches ultimate teamwork and grace under pressure.", emotion: 'thinking' },
-        { text: "Real-world advice: Start by mastering the basics—knife skills and heat control. Even the greatest Michelin star chefs started by chopping onions perfectly!", emotion: 'happy' }
+        { text: "Real-world advice: Start by mastering the basics - knife skills and heat control. Even the greatest Michelin star chefs started by chopping onions perfectly!", emotion: 'happy' }
     ],
     'information-technology': [
         { text: "Information Technology forms the vital infrastructure of our modern world! Programming, networking, and cybersecurity protect our digital spaces.", emotion: 'happy' },
@@ -54,7 +54,7 @@ const CAREER_DESCRIPTIONS: Record<string, GuideTip[]> = {
         { text: "Real-world advice: Learn to write clearly and concisely. In an age of endless content, the ability to tell a compelling, truthful story is invaluable.", emotion: 'excited' }
     ],
     'health-sciences': [
-        { text: "Health Sciences are the highest calling—the preservation of life! Doctors, nurses, and researchers unravel the mysteries of the human body.", emotion: 'excited' },
+        { text: "Health Sciences are the highest calling - the preservation of life! Doctors, nurses, and researchers unravel the mysteries of the human body.", emotion: 'excited' },
         { text: "Empathy combined with rigorous scientific knowledge is required here. In the real world, healthcare workers are the frontline heroes of society.", emotion: 'thinking' },
         { text: "Real-world advice: Cultivate immense patience and compassion. Science provides the cure, but humanity provides the healing.", emotion: 'happy' }
     ],
@@ -231,7 +231,7 @@ export function generateResponse(query: string, pathname: string): GuideTip {
 
     // 9. Handle General Play or Help
     if (wantsToPlay && !wantsHelp) {
-        return { text: "To play, wander to the Map! Click on any floating island to enter that Career Realm. Then, select a simulated challenge to test thy skills and earn XP!", emotion: 'excited' };
+        return { text: "To play, wander to the Map! Click on any Career District to enter that field. Then, select a simulated challenge to test thy skills and earn XP!", emotion: 'excited' };
     }
 
     if (wantsHelp || hasWord(['help'])) {

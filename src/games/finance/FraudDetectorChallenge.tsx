@@ -27,7 +27,7 @@ const TRANSACTIONS_POOL: FlaggedTransaction[] = [
         category: 'Electronics',
         isFraud: true,
         redFlags: ['Unusually large amount', 'Transaction at 2:47 AM', 'Amount just under $5,000 reporting threshold'],
-        explanation: 'The amount is structured to stay just under the $5,000 reporting threshold — a classic smurfing technique. The 2:47 AM timestamp is also suspicious.'
+        explanation: 'The amount is structured to stay just under the $5,000 reporting threshold  -  a classic smurfing technique. The 2:47 AM timestamp is also suspicious.'
     },
     {
         id: 2,
@@ -99,7 +99,7 @@ const TRANSACTIONS_POOL: FlaggedTransaction[] = [
         category: 'Gift Cards',
         isFraud: true,
         redFlags: ['Bulk gift card purchase', 'Suspicious merchant domain (.biz)', 'Late-night transaction'],
-        explanation: 'Bulk gift card purchases are a top indicator of fraud — gift cards are nearly untraceable. The .biz domain and late-night timing add more suspicion.'
+        explanation: 'Bulk gift card purchases are a top indicator of fraud  -  gift cards are nearly untraceable. The .biz domain and late-night timing add more suspicion.'
     },
     {
         id: 8,
@@ -122,8 +122,8 @@ const TRANSACTIONS_POOL: FlaggedTransaction[] = [
         time: '4:22 AM',
         category: 'Electronics',
         isFraud: true,
-        redFlags: ['Duplicate charge — same merchant, same amount 3 minutes prior', 'Early morning hours'],
-        explanation: 'This is a duplicate charge — the same exact amount was charged by the same merchant just 3 minutes earlier. Combined with the 4 AM timing, this is suspicious.'
+        redFlags: ['Duplicate charge  -  same merchant, same amount 3 minutes prior', 'Early morning hours'],
+        explanation: 'This is a duplicate charge  -  the same exact amount was charged by the same merchant just 3 minutes earlier. Combined with the 4 AM timing, this is suspicious.'
     },
     {
         id: 10,
@@ -236,7 +236,7 @@ export function FraudDetectorChallenge({ onComplete }: FraudDetectorChallengePro
                                 <strong>ALERT:</strong> The bank's automated fraud detection system has flagged
                                 suspicious activity across multiple accounts. As the senior fraud analyst on duty,
                                 you need to review <strong>{TOTAL_TO_REVIEW} flagged transactions</strong> and
-                                determine which are genuinely fraudulent and which are legitimate. Be thorough —
+                                determine which are genuinely fraudulent and which are legitimate. Be thorough  - 
                                 missing real fraud is dangerous, but flagging innocent customers erodes trust and
                                 costs the bank money!
                             </p>
@@ -248,14 +248,14 @@ export function FraudDetectorChallenge({ onComplete }: FraudDetectorChallengePro
                                     <CheckCircle2 className="w-5 h-5 text-green-600" />
                                     <span className="font-bold text-green-800">Mark Legitimate</span>
                                 </div>
-                                <p className="text-sm text-green-700">Clear the flag — transaction is normal</p>
+                                <p className="text-sm text-green-700">Clear the flag  -  transaction is normal</p>
                             </div>
                             <div className="bg-red-50 rounded-xl p-4 border border-red-100">
                                 <div className="flex items-center gap-2 mb-1">
                                     <AlertTriangle className="w-5 h-5 text-red-600" />
                                     <span className="font-bold text-red-800">Flag as Fraud</span>
                                 </div>
-                                <p className="text-sm text-red-700">Escalate — freeze the account</p>
+                                <p className="text-sm text-red-700">Escalate  -  freeze the account</p>
                             </div>
                         </div>
 

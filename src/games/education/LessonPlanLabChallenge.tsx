@@ -81,7 +81,7 @@ const ROUNDS: LessonRound[] = [
             { id: 'r5', category: 'resources', text: 'Scientific calculators and a pre-algebra workbook designed for middle school students', correct: false },
             { id: 'r6', category: 'resources', text: 'A high school geometry textbook and printed coordinate plane worksheets with decimals', correct: false },
         ],
-        explanation: 'For young learners, fractions must be concrete and tactile. Paper pizza cutting makes abstract concepts visible, partner gallery walks build collaborative skills, and manipulatives let students physically explore equal parts. This is far more effective than lectures or worksheets — children understand fractions when they can touch and see them.',
+        explanation: 'For young learners, fractions must be concrete and tactile. Paper pizza cutting makes abstract concepts visible, partner gallery walks build collaborative skills, and manipulatives let students physically explore equal parts. This is far more effective than lectures or worksheets  -  children understand fractions when they can touch and see them.',
     },
     {
         subject: 'English Language Arts', gradeLevel: '7th Grade', topic: 'Persuasive Writing', icon: '✍️',
@@ -182,19 +182,27 @@ function DraggableOption({ option, onRemove }: { option: LessonOption, onRemove?
     );
 }
 
-function DroppableSlot({ category, assignedOption, isEvaluating }: { category: 'objectives' | 'strategies' | 'assessments' | 'resources', assignedOption: LessonOption | null, isEvaluating: boolean }) {
+function DroppableSlot({ category, assignedOption, isEvaluating, activeDragItem, onClear }: {
+    category: 'objectives' | 'strategies' | 'assessments' | 'resources',
+    assignedOption: LessonOption | null,
+    isEvaluating: boolean,
+    activeDragItem: LessonOption | null,
+    onClear?: () => void
+}) {
     const { setNodeRef, isOver } = useDroppable({
         id: category, // Drop zone ID matches the category
         data: { category }
     });
 
     const info = CATEGORY_LABELS[category];
+    const isValidTarget = activeDragItem && activeDragItem.category === category;
 
     return (
         <div
             ref={setNodeRef}
-            className={`border-2 rounded-2xl p-4 transition-all min-h-[140px] flex flex-col ${isOver ? 'bg-indigo-50 border-indigo-400 border-dashed scale-[1.02]' : 'bg-gray-50 border-gray-200'
-                }`}
+            className={`border-2 rounded-2xl p-4 transition-all min-h-[140px] flex flex-col ${
+                isOver && isValidTarget ? 'bg-indigo-50 border-indigo-400 border-dashed scale-[1.02]' : 'bg-gray-50 border-gray-200'
+            }`}
         >
             <div className="font-bold text-gray-700 flex items-center gap-2 mb-2">
                 <span className="text-xl">{info.icon}</span>
@@ -208,8 +216,17 @@ function DroppableSlot({ category, assignedOption, isEvaluating }: { category: '
 
             <div className="flex-1 flex flex-col justify-center">
                 {assignedOption ? (
-                    <div className="text-sm font-medium text-gray-900 border-l-4 border-indigo-500 pl-3 py-1 bg-white p-2 rounded shadow-sm">
+                    <div className="text-sm font-medium text-gray-900 border-l-4 border-indigo-500 pl-3 py-1 bg-white p-2 rounded shadow-sm relative group/slot">
                         {assignedOption.text}
+                        {!isEvaluating && onClear && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onClear(); }}
+                                className="absolute -top-2 -right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover/slot:opacity-100 transition-all cursor-pointer shadow-sm z-10"
+                                title="Remove block"
+                            >
+                                ✕
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="text-sm text-gray-400 text-center border-2 border-dashed border-gray-300 rounded-xl py-6">
@@ -281,6 +298,15 @@ export function LessonPlanLabChallenge({ onComplete }: LessonPlanLabChallengePro
             ...prev,
             [targetCategory]: draggedOption // Overwrites if one was already there
         }));
+    };
+
+    const handleClearSlot = (category: string) => {
+        playSfx('click');
+        setAssignments(prev => {
+            const next = { ...prev };
+            delete next[category];
+            return next;
+        });
     };
 
     const handleEvaluate = () => {
@@ -395,35 +421,48 @@ export function LessonPlanLabChallenge({ onComplete }: LessonPlanLabChallengePro
 
                     {/* Right Panel: Blueprint Timeline */}
                     <div className="flex-1 bg-white rounded-3xl border border-indigo-100 p-6 flex flex-col shadow-sm relative">
-                        <h3 className="font-bold text-xl text-gray-900 mb-6 flex items-center">
-                            📐 Lesson Plan Blueprint
-                            {isComplete && phase === 'building' && (
-                                <motion.button
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    onClick={handleEvaluate}
-                                    className="ml-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md text-sm cursor-pointer"
-                                >
-                                    Evaluate Lesson Plan →
-                                </motion.button>
-                            )}
-                            {phase === 'evaluating' && (
-                                <motion.button
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    onClick={handleNextRound}
-                                    className="ml-auto px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md text-sm cursor-pointer"
-                                >
-                                    Proceed to Next Lesson →
-                                </motion.button>
-                            )}
+                        <h3 className="font-bold text-xl text-gray-900 mb-6 flex items-center w-full">
+                            <span>📐 Lesson Plan Blueprint</span>
+                            <div className="ml-auto flex items-center gap-3">
+                                {Object.keys(assignments).length > 0 && phase === 'building' && (
+                                    <button
+                                        onClick={() => {
+                                            playSfx('click');
+                                            setAssignments({});
+                                        }}
+                                        className="px-4 py-2 border-2 border-red-200 hover:border-red-500 text-red-500 hover:bg-red-50 rounded-xl text-sm transition-colors cursor-pointer font-bold"
+                                    >
+                                        Clear Blueprint
+                                    </button>
+                                )}
+                                {isComplete && phase === 'building' && (
+                                    <motion.button
+                                        initial={{ scale: 0.9, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        onClick={handleEvaluate}
+                                        className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md text-sm cursor-pointer"
+                                    >
+                                        Evaluate Lesson Plan →
+                                    </motion.button>
+                                )}
+                                {phase === 'evaluating' && (
+                                    <motion.button
+                                        initial={{ scale: 0.9, opacity: 0 }}
+                                        animate={{ scale: 1, opacity: 1 }}
+                                        onClick={handleNextRound}
+                                        className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-md text-sm cursor-pointer"
+                                    >
+                                        Proceed to Next Lesson →
+                                    </motion.button>
+                                )}
+                            </div>
                         </h3>
 
                         <div className="flex-1 grid grid-cols-2 gap-4">
-                            <DroppableSlot category="objectives" assignedOption={assignments['objectives'] || null} isEvaluating={phase === 'evaluating'} />
-                            <DroppableSlot category="strategies" assignedOption={assignments['strategies'] || null} isEvaluating={phase === 'evaluating'} />
-                            <DroppableSlot category="assessments" assignedOption={assignments['assessments'] || null} isEvaluating={phase === 'evaluating'} />
-                            <DroppableSlot category="resources" assignedOption={assignments['resources'] || null} isEvaluating={phase === 'evaluating'} />
+                            <DroppableSlot category="objectives" assignedOption={assignments['objectives'] || null} isEvaluating={phase === 'evaluating'} activeDragItem={activeDragItem} onClear={() => handleClearSlot('objectives')} />
+                            <DroppableSlot category="strategies" assignedOption={assignments['strategies'] || null} isEvaluating={phase === 'evaluating'} activeDragItem={activeDragItem} onClear={() => handleClearSlot('strategies')} />
+                            <DroppableSlot category="assessments" assignedOption={assignments['assessments'] || null} isEvaluating={phase === 'evaluating'} activeDragItem={activeDragItem} onClear={() => handleClearSlot('assessments')} />
+                            <DroppableSlot category="resources" assignedOption={assignments['resources'] || null} isEvaluating={phase === 'evaluating'} activeDragItem={activeDragItem} onClear={() => handleClearSlot('resources')} />
                         </div>
                     </div>
 

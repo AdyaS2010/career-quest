@@ -1,4 +1,4 @@
-// PICO-8 City (Kenney, CC0) tile engine helpers — shared by the walkable
+// PICO-8 City (Kenney, CC0) tile engine helpers  -  shared by the walkable
 // per-domain worlds. Tileset: 24×15 grid of 8px tiles, packed (no spacing).
 export const TILE = 8;
 export const SHEET_COLS = 24;
@@ -51,10 +51,10 @@ export function loadSheet(): Promise<HTMLImageElement> {
 // Classify each tile index as "water" by sampling its average colour from the
 // sheet (PICO-8 water is strongly blue). Used to make canals solid/unwalkable.
 // Classify every tile from the sheet pixels (run once, cached). Walkable GROUND
-// is detected positively — grass (green), sand (orange), lot/sidewalk (muted
+// is detected positively  -  grass (green), sand (orange), lot/sidewalk (muted
 // blue-dominant purple-gray) or road (dark neutral). Everything else under index
 // 262 is a building/roof (solid); water (blue) is solid too. This is robust where
-// guessing index ranges was not — validated against an offline PNG decode.
+// guessing index ranges was not  -  validated against an offline PNG decode.
 let _cls: { water: Set<number>; building: Set<number>; solid: Set<number>; door: Set<number>; road: Set<number>; solidObj: Set<number> } | null = null;
 export function classifyTerrain(sheet: HTMLImageElement) {
   if (_cls) return _cls;
@@ -88,7 +88,7 @@ export function classifyTerrain(sheet: HTMLImageElement) {
     const roadCol = r < 115 && g < 110 && b < 110;
     const pavement = (Math.max(r, g, b) - Math.min(r, g, b)) < 32 && r >= 90 && r <= 212 && g >= 85 && b >= 80;
     const ground = grass || sand || lot || roadCol || pavement; // walkable surfaces
-    // `building` = broad (any wall/roof/coloured tile) — used only for placing
+    // `building` = broad (any wall/roof/coloured tile)  -  used only for placing
     // doorsteps/signs, NOT for collision.
     if (wf > 0.13 || !ground) {
       building.add(i);
@@ -108,7 +108,7 @@ export function isRoad(idx: number) { return _cls ? _cls.road.has(idx) : false; 
 export function isDoorTile(idx: number) { return _cls ? _cls.door.has(idx) : false; }
 export function isSolidObject(idx: number) { return _cls ? _cls.solidObj.has(idx) : false; }
 
-// Walkable cells directly south of an actual DOOR tile — the welcome-mat spot.
+// Walkable cells directly south of an actual DOOR tile  -  the welcome-mat spot.
 export function doorFrontCells(map: BaseMap, walk: boolean[]): number[] {
   const out: number[] = [];
   for (let y = 1; y < map.h; y++) for (let x = 0; x < map.w; x++) {
@@ -130,7 +130,7 @@ export function buildWalkable(map: BaseMap, solid: Set<number>): boolean[] {
   return walk;
 }
 
-// Walkable cells that sit directly in front of (just south of) a building tile —
+// Walkable cells that sit directly in front of (just south of) a building tile  - 
 // i.e. building doorsteps. Great spots for "enter here" markers.
 export function doorstepCells(map: BaseMap): number[] {
   const out: number[] = [];

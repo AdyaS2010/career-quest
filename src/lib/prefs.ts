@@ -45,10 +45,10 @@ const fmtOffset = (h: number): string => {
 const OFFSETS = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0, 1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 9, 9.5, 10, 11, 12, 13];
 
 export const TZ_OPTIONS: { label: string; value: string }[] = [
-  { label: 'Auto — use my device', value: 'auto' },
+  { label: 'Auto  -  use my device', value: 'auto' },
   ...OFFSETS.map(h => ({ label: fmtOffset(h), value: (h >= 0 ? '+' : '') + h })),
 ];
 
 export function tzLabel(tz: string): string {
-  return TZ_OPTIONS.find(o => o.value === tz)?.label ?? 'Auto — use my device';
+  return TZ_OPTIONS.find(o => o.value === tz)?.label ?? 'Auto  -  use my device';
 }

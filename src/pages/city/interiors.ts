@@ -26,7 +26,7 @@ export const INTERIORS: Record<string, InteriorDef> = {
     slug: 'culinary-arts', room: 'The Bistro Kitchen',
     floor: '#e7d3b1', floorAlt: '#dcc59c', wall: '#7c2d12', wallTrim: '#9a3412', accent: '#fb923c',
     mentorName: 'Chef Remy', mentorFace: '👨‍🍳',
-    mentorLine: "Heard, chef? Take orders at the register, cook on the line, then plate at the pass. Clean, fast, beautiful — let's move!",
+    mentorLine: "Heard, chef? Take orders at the register, cook on the line, then plate at the pass. Clean, fast, beautiful  -  let's move!",
     stations: [{ x: 210, y: 200, emoji: '🧾' }, { x: 520, y: 175, emoji: '🔥' }, { x: 830, y: 200, emoji: '🍽️' }],
     rug: { x: 360, y: 372, w: 320, h: 150, color: '#7c2d12' },
     furniture: [
@@ -76,7 +76,7 @@ export const INTERIORS: Record<string, InteriorDef> = {
     decor: [{ x: 300, y: 24, kind: 'window', w: 90, h: 56 }, { x: 480, y: 30, kind: 'clock' }, { x: 620, y: 26, kind: 'poster', w: 64, h: 54, color: '#60a5fa' }],
   },
   'health-sciences': {
-    slug: 'health-sciences', room: 'Questford General — ER',
+    slug: 'health-sciences', room: 'Questford General  -  ER',
     floor: '#e6f0f3', floorAlt: '#d3e6ec', wall: '#0e7490', wallTrim: '#155e75', accent: '#22d3ee',
     mentorName: 'Dr. Cruz', mentorFace: '🧑‍⚕️',
     mentorLine: "Incoming! Triage at the first bay, run the exam in the middle, then fill the order at the pharmacy. Calm hands save lives.",
@@ -213,10 +213,10 @@ export const INTERIORS: Record<string, InteriorDef> = {
     decor: [{ x: 150, y: 26, kind: 'window', w: 84, h: 54 }, { x: 820, y: 28, kind: 'clock' }, { x: 760, y: 24, kind: 'poster', w: 64, h: 56, color: '#fcd34d' }],
   },
   'arts-entertainment': {
-    slug: 'arts-entertainment', room: 'The Grand Theater — Backstage',
+    slug: 'arts-entertainment', room: 'The Grand Theater  -  Backstage',
     floor: '#2a1024', floorAlt: '#341430', wall: '#831843', wallTrim: '#9d174d', accent: '#f9a8d4',
     mentorName: 'Director Sol', mentorFace: '🎬',
-    mentorLine: "Places, everyone! Paint the set at the studio, run the lighting board, then take the stage for the big number. Lights, camera — dazzle them!",
+    mentorLine: "Places, everyone! Paint the set at the studio, run the lighting board, then take the stage for the big number. Lights, camera  -  dazzle them!",
     stations: [{ x: 210, y: 215, emoji: '🎨' }, { x: 520, y: 245, emoji: '🎭' }, { x: 830, y: 215, emoji: '💡' }],
     rug: { x: 380, y: 410, w: 280, h: 120, color: '#831843' },
     furniture: [
@@ -244,7 +244,7 @@ export function interiorFor(slug: string): InteriorDef {
   return INTERIORS[slug] ?? INTERIORS['culinary-arts'];
 }
 
-// Floor finish per room — gives each interior a designed, distinct feel.
+// Floor finish per room  -  gives each interior a designed, distinct feel.
 export const FLOOR_PATTERN: Record<string, 'wood' | 'tile' | 'carpet' | 'marble'> = {
   'culinary-arts': 'tile', 'information-technology': 'carpet', 'health-sciences': 'tile', 'law-government': 'marble',
   'media-communication': 'carpet', 'financial-services': 'marble', 'education': 'wood', 'arts-entertainment': 'wood',
@@ -274,8 +274,8 @@ export const RESOURCES: Record<string, DomainResources> = {
   'health-sciences': {
     project: 'Earn a CPR/First-Aid certification and write a one-page reflection on a clinic visit.',
     links: [
-      { label: 'Red Cross — Take a Class', url: 'https://www.redcross.org/take-a-class' },
-      { label: 'Khan Academy — Health & Medicine', url: 'https://www.khanacademy.org/science/health-and-medicine' },
+      { label: 'Red Cross  -  Take a Class', url: 'https://www.redcross.org/take-a-class' },
+      { label: 'Khan Academy  -  Health & Medicine', url: 'https://www.khanacademy.org/science/health-and-medicine' },
       { label: 'HOSA Future Health Pros', url: 'https://hosa.org' },
     ],
   },
@@ -283,7 +283,7 @@ export const RESOURCES: Record<string, DomainResources> = {
     project: 'Write a mock case brief on a real issue and argue it in a debate or mock trial.',
     links: [
       { label: 'iCivics', url: 'https://www.icivics.org' },
-      { label: 'Khan Academy — US Government', url: 'https://www.khanacademy.org/humanities/us-government-and-civics' },
+      { label: 'Khan Academy  -  US Government', url: 'https://www.khanacademy.org/humanities/us-government-and-civics' },
       { label: 'National High School Mock Trial', url: 'https://www.nationalmocktrial.org' },
     ],
   },
@@ -298,7 +298,7 @@ export const RESOURCES: Record<string, DomainResources> = {
   'financial-services': {
     project: 'Build a personal monthly budget and a mock investment portfolio; track it for a month.',
     links: [
-      { label: 'Khan Academy — Finance', url: 'https://www.khanacademy.org/economics-finance-domain' },
+      { label: 'Khan Academy  -  Finance', url: 'https://www.khanacademy.org/economics-finance-domain' },
       { label: 'Investopedia', url: 'https://www.investopedia.com' },
       { label: 'Next Gen Personal Finance', url: 'https://www.ngpf.org' },
     ],
@@ -307,7 +307,7 @@ export const RESOURCES: Record<string, DomainResources> = {
     project: 'Design a 15-minute lesson, teach it to a friend, and collect their feedback.',
     links: [
       { label: 'Khan Academy', url: 'https://www.khanacademy.org' },
-      { label: 'Coursera — Teaching', url: 'https://www.coursera.org/browse/social-sciences/education' },
+      { label: 'Coursera  -  Teaching', url: 'https://www.coursera.org/browse/social-sciences/education' },
       { label: 'edX', url: 'https://www.edx.org' },
     ],
   },
@@ -316,7 +316,7 @@ export const RESOURCES: Record<string, DomainResources> = {
     links: [
       { label: 'Skillshare', url: 'https://www.skillshare.com' },
       { label: 'Behance (build a portfolio)', url: 'https://www.behance.net' },
-      { label: 'Coursera — Arts & Humanities', url: 'https://www.coursera.org/browse/arts-and-humanities' },
+      { label: 'Coursera  -  Arts & Humanities', url: 'https://www.coursera.org/browse/arts-and-humanities' },
     ],
   },
 };

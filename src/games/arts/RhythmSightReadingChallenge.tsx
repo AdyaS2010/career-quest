@@ -29,7 +29,7 @@ const QUESTION_BANK: MusicQuestion[] = [
         options: shuffleArray([
             { id: 'n1a', text: '3 beats', correct: true, explanation: 'A half note = 2 beats. The dot adds half its value (1 beat). So 2 + 1 = 3 beats. Dotted notes always add 50% of the original duration.' },
             { id: 'n1b', text: '4 beats', correct: false, explanation: 'That would be a whole note. A dotted half note is 3 beats (2 + 1). The dot adds half the note\'s value, not a full beat.' },
-            { id: 'n1c', text: '2 beats', correct: false, explanation: 'That\'s a regular half note without a dot. The dot is the key — it adds half the original value, making it 2 + 1 = 3 beats.' },
+            { id: 'n1c', text: '2 beats', correct: false, explanation: 'That\'s a regular half note without a dot. The dot is the key  -  it adds half the original value, making it 2 + 1 = 3 beats.' },
         ]),
     },
     {
@@ -38,8 +38,8 @@ const QUESTION_BANK: MusicQuestion[] = [
         notation: '𝄾',
         context: 'Rests tell musicians when NOT to play. Each note value has a corresponding rest of equal duration.',
         options: shuffleArray([
-            { id: 'n2a', text: 'Quarter rest (𝄾)', correct: true, explanation: 'The quarter rest equals one beat of silence in 4/4 time, just as a quarter note equals one beat of sound. It looks like a zigzag or lightning bolt.' },
-            { id: 'n2b', text: 'Half rest (sits on top of the line)', correct: false, explanation: 'A half rest sits ON TOP of the middle line and equals 2 beats of silence. Think: it\'s like a hat sitting on top — hats are "heavy" and push down, so they\'re longer.' },
+            { id: 'n2a', text: 'District rest (𝄾)', correct: true, explanation: 'The district rest equals one beat of silence in 4/4 time, just as a district note equals one beat of sound. It looks like a zigzag or lightning bolt.' },
+            { id: 'n2b', text: 'Half rest (sits on top of the line)', correct: false, explanation: 'A half rest sits ON TOP of the middle line and equals 2 beats of silence. Think: it\'s like a hat sitting on top  -  hats are "heavy" and push down, so they\'re longer.' },
             { id: 'n2c', text: 'Whole rest (hangs below the line)', correct: false, explanation: 'A whole rest hangs BELOW the fourth line and equals 4 beats of silence (a full measure in 4/4). It looks like a top hat hanging upside down.' },
         ]),
     },
@@ -50,7 +50,7 @@ const QUESTION_BANK: MusicQuestion[] = [
         context: 'Understanding how note values subdivide is fundamental to reading rhythm accurately.',
         options: shuffleArray([
             { id: 'n3c', text: '4 eighth notes', correct: false, explanation: 'Four eighth notes only fill half a measure (2 beats). Since each eighth note = half a beat, you need 8 to fill the full 4 beats.' },
-            { id: 'n3a', text: '8 eighth notes', correct: true, explanation: 'Each eighth note gets half a beat. With 4 beats per measure in 4/4 time: 4 ÷ 0.5 = 8 eighth notes. That\'s where the name "eighth" comes from — 8 per measure!' },
+            { id: 'n3a', text: '8 eighth notes', correct: true, explanation: 'Each eighth note gets half a beat. With 4 beats per measure in 4/4 time: 4 ÷ 0.5 = 8 eighth notes. That\'s where the name "eighth" comes from  -  8 per measure!' },
             { id: 'n3b', text: '16 eighth notes', correct: false, explanation: 'That would be sixteenth notes! 16 sixteenth notes fill one measure of 4/4. Eighth notes are twice as long, so only 8 fit per measure.' },
         ]),
     },
@@ -59,10 +59,10 @@ const QUESTION_BANK: MusicQuestion[] = [
         id: 'r1', category: 'rhythm',
         prompt: 'What does the "4" on top in a 3/4 time signature tell you?',
         notation: '³⁄₄',
-        context: 'Time signatures are like fractions — the top and bottom numbers each communicate different information.',
+        context: 'Time signatures are like fractions  -  the top and bottom numbers each communicate different information.',
         options: shuffleArray([
-            { id: 'r1b', text: 'There are 4 beats per measure', correct: false, explanation: 'The top number is 3, not 4! In 3/4 time, there are 3 beats per measure. The bottom 4 means the quarter note gets one beat.' },
-            { id: 'r1a', text: 'Wait — the top number is 3, meaning 3 beats per measure', correct: true, explanation: 'Careful reading! In 3/4, the top number 3 tells you there are 3 beats per measure. The bottom 4 tells you the quarter note gets one beat. This is the waltz feel: ONE-two-three, ONE-two-three.' },
+            { id: 'r1b', text: 'There are 4 beats per measure', correct: false, explanation: 'The top number is 3, not 4! In 3/4 time, there are 3 beats per measure. The bottom 4 means the district note gets one beat.' },
+            { id: 'r1a', text: 'Wait  -  the top number is 3, meaning 3 beats per measure', correct: true, explanation: 'Careful reading! In 3/4, the top number 3 tells you there are 3 beats per measure. The bottom 4 tells you the district note gets one beat. This is the waltz feel: ONE-two-three, ONE-two-three.' },
             { id: 'r1c', text: 'The tempo is 3/4 of normal speed', correct: false, explanation: 'Time signatures have nothing to do with tempo (speed). The top number = beats per measure, the bottom number = which note value gets one beat.' },
         ]),
     },
@@ -73,8 +73,8 @@ const QUESTION_BANK: MusicQuestion[] = [
         context: 'Some time signatures have special names and symbols used in orchestral, band, and choral music.',
         options: shuffleArray([
             { id: 'r2a', text: '2/2 (alla breve)', correct: true, explanation: 'Cut time (₵ or 2/2) has 2 beats per measure with the half note getting one beat. It moves quickly and is perfect for marches and fast-paced music because you feel 2 strong beats instead of 4.' },
-            { id: 'r2b', text: '4/4 (common time)', correct: false, explanation: '4/4 is "common time" (marked with C), not "cut time." Cut time literally "cuts" the common time in half — 2 beats instead of 4, with the half note getting the beat.' },
-            { id: 'r2c', text: '6/8 (compound duple)', correct: false, explanation: '6/8 is compound duple time, common in jigs and some ballads. It groups into 2 groups of 3 eighth notes. Cut time is 2/2 — 2 half-note beats per measure.' },
+            { id: 'r2b', text: '4/4 (common time)', correct: false, explanation: '4/4 is "common time" (marked with C), not "cut time." Cut time literally "cuts" the common time in half  -  2 beats instead of 4, with the half note getting the beat.' },
+            { id: 'r2c', text: '6/8 (compound duple)', correct: false, explanation: '6/8 is compound duple time, common in jigs and some ballads. It groups into 2 groups of 3 eighth notes. Cut time is 2/2  -  2 half-note beats per measure.' },
         ]),
     },
     {
@@ -83,7 +83,7 @@ const QUESTION_BANK: MusicQuestion[] = [
         context: 'Syncopation is one of the most important rhythmic concepts in jazz, funk, Latin, and pop music.',
         options: shuffleArray([
             { id: 'r3b', text: 'A steady, predictable pulse on every beat', correct: false, explanation: 'That\'s the opposite of syncopation! A steady pulse on every beat is called "playing on the beat" or "straight rhythm." Syncopation specifically disrupts this predictability.' },
-            { id: 'r3a', text: 'Emphasis on unexpected or "off" beats, creating rhythmic tension', correct: true, explanation: 'Syncopation places accents on weak beats or between beats, creating a "push-pull" feeling. It\'s what makes funk groovy, jazz swinging, and reggae bouncing — the surprise of emphasis where you don\'t expect it.' },
+            { id: 'r3a', text: 'Emphasis on unexpected or "off" beats, creating rhythmic tension', correct: true, explanation: 'Syncopation places accents on weak beats or between beats, creating a "push-pull" feeling. It\'s what makes funk groovy, jazz swinging, and reggae bouncing  -  the surprise of emphasis where you don\'t expect it.' },
             { id: 'r3c', text: 'Gradually slowing down the tempo throughout a passage', correct: false, explanation: 'That\'s called "ritardando" (rit.). Syncopation is about WHERE accents fall within the beat structure, not about changing the overall speed of the music.' },
         ]),
     },
@@ -95,7 +95,7 @@ const QUESTION_BANK: MusicQuestion[] = [
         context: 'Dynamic markings tell the performer how loud or soft to play. They come from Italian words.',
         options: shuffleArray([
             { id: 'd1a', text: 'pp → mp → f → ff', correct: true, explanation: 'pp (pianissimo = very soft) → mp (mezzo piano = medium soft) → f (forte = loud) → ff (fortissimo = very loud). The "p" letters mean soft, "f" letters mean loud, and more letters = more extreme.' },
-            { id: 'd1b', text: 'ff → f → mp → pp', correct: false, explanation: 'This is LOUDEST to softest — the reverse order. ff is the loudest and pp is the softest. The question asked for softest to loudest.' },
+            { id: 'd1b', text: 'ff → f → mp → pp', correct: false, explanation: 'This is LOUDEST to softest  -  the reverse order. ff is the loudest and pp is the softest. The question asked for softest to loudest.' },
             { id: 'd1c', text: 'mp → pp → ff → f', correct: false, explanation: 'This order doesn\'t follow any logical progression. The correct softest-to-loudest order is: pp (very soft) → mp (medium soft) → f (loud) → ff (very loud).' },
         ]),
     },
@@ -103,10 +103,10 @@ const QUESTION_BANK: MusicQuestion[] = [
         id: 'd2', category: 'dynamics',
         prompt: 'What does a crescendo marking (< shape) tell the performer?',
         notation: '< < < < < <',
-        context: 'Expressive markings give performers instructions beyond just notes and rhythms — they shape the emotional journey of the music.',
+        context: 'Expressive markings give performers instructions beyond just notes and rhythms  -  they shape the emotional journey of the music.',
         options: shuffleArray([
-            { id: 'd2c', text: 'Play the passage staccato (short and detached)', correct: false, explanation: 'Staccato is shown with dots above or below notes. The "hairpin" shape < is specifically about volume dynamics — getting gradually louder over time.' },
-            { id: 'd2a', text: 'Gradually get louder over the passage', correct: true, explanation: 'A crescendo (the opening "hairpin" shape <) tells the performer to gradually increase volume. Think of the symbol itself — it opens up wider, like sound expanding. The opposite (>) is decrescendo/diminuendo.' },
+            { id: 'd2c', text: 'Play the passage staccato (short and detached)', correct: false, explanation: 'Staccato is shown with dots above or below notes. The "hairpin" shape < is specifically about volume dynamics  -  getting gradually louder over time.' },
+            { id: 'd2a', text: 'Gradually get louder over the passage', correct: true, explanation: 'A crescendo (the opening "hairpin" shape <) tells the performer to gradually increase volume. Think of the symbol itself  -  it opens up wider, like sound expanding. The opposite (>) is decrescendo/diminuendo.' },
             { id: 'd2b', text: 'Gradually speed up the tempo of the passage', correct: false, explanation: 'Speeding up is "accelerando" (accel.). Crescendo specifically controls volume, not speed. Dynamics and tempo are independent musical elements.' },
         ]),
     },
@@ -114,9 +114,9 @@ const QUESTION_BANK: MusicQuestion[] = [
     {
         id: 't1', category: 'terms',
         prompt: 'What does "allegro" indicate about how a piece should be performed?',
-        context: 'Italian tempo markings are universal in Western music — musicians worldwide use the same terms regardless of their native language.',
+        context: 'Italian tempo markings are universal in Western music  -  musicians worldwide use the same terms regardless of their native language.',
         options: shuffleArray([
-            { id: 't1b', text: 'Play very slowly and broadly', correct: false, explanation: 'That would be "largo" (very slow and broad). Allegro is at the fast end of the tempo spectrum — typically 120-156 BPM. Remembering allegro means "cheerful" helps recall it\'s upbeat and quick.' },
+            { id: 't1b', text: 'Play very slowly and broadly', correct: false, explanation: 'That would be "largo" (very slow and broad). Allegro is at the fast end of the tempo spectrum  -  typically 120-156 BPM. Remembering allegro means "cheerful" helps recall it\'s upbeat and quick.' },
             { id: 't1a', text: 'Play at a fast, lively tempo (120-156 BPM)', correct: true, explanation: 'Allegro literally means "cheerful" in Italian and indicates a brisk, energetic tempo. It\'s one of the most common tempo markings, used in countless symphonic movements, pop songs, and marches.' },
             { id: 't1c', text: 'Play with a gradual decrease in volume', correct: false, explanation: 'Gradual volume decrease is "diminuendo" or "decrescendo." Allegro is a tempo marking (speed), not a dynamic marking (volume). These are separate categories of musical instruction.' },
         ]),
@@ -124,11 +124,11 @@ const QUESTION_BANK: MusicQuestion[] = [
     {
         id: 't2', category: 'terms',
         prompt: 'A score says "D.C. al Fine" at the end of a section. What should you do?',
-        context: 'Navigation markings tell performers how to move through a piece — when to repeat, skip, or end.',
+        context: 'Navigation markings tell performers how to move through a piece  -  when to repeat, skip, or end.',
         options: shuffleArray([
-            { id: 't2a', text: 'Go back to the very beginning and play until you reach the "Fine" marking', correct: true, explanation: '"D.C." stands for "Da Capo" (from the head/beginning). "al Fine" means "until the Fine (end) marking." So you restart the piece from bar 1 and stop when you reach "Fine" — even if there\'s more music written after it.' },
+            { id: 't2a', text: 'Go back to the very beginning and play until you reach the "Fine" marking', correct: true, explanation: '"D.C." stands for "Da Capo" (from the head/beginning). "al Fine" means "until the Fine (end) marking." So you restart the piece from bar 1 and stop when you reach "Fine"  -  even if there\'s more music written after it.' },
             { id: 't2b', text: 'Skip ahead to the Coda section and play to the end of the piece', correct: false, explanation: 'Jumping to a Coda is indicated by "D.S. al Coda" or a Coda symbol (⊕). "D.C. al Fine" specifically sends you back to the very beginning, not forward to a Coda.' },
-            { id: 't2c', text: 'Repeat just the current section one more time, then stop completely', correct: false, explanation: 'Repeating a single section uses repeat signs (double bar with dots). "D.C. al Fine" sends you all the way back to bar 1 of the piece — the "Capo" (head) — not just the current section.' },
+            { id: 't2c', text: 'Repeat just the current section one more time, then stop completely', correct: false, explanation: 'Repeating a single section uses repeat signs (double bar with dots). "D.C. al Fine" sends you all the way back to bar 1 of the piece  -  the "Capo" (head)  -  not just the current section.' },
         ]),
     },
     // KEY SIGNATURE QUESTIONS
@@ -139,7 +139,7 @@ const QUESTION_BANK: MusicQuestion[] = [
         context: 'Key signatures appear at the beginning of every line of music and tell you which notes are raised or lowered throughout.',
         options: shuffleArray([
             { id: 'k1b', text: 'G major (one sharp)', correct: false, explanation: 'G major has one sharp (F#) in its key signature. A completely clean key signature with zero sharps or flats is the natural key of C major.' },
-            { id: 'k1a', text: 'C major', correct: true, explanation: 'C major uses only the white keys on a piano — no sharps or flats needed. That\'s why it\'s often the first scale students learn. Its relative minor (A minor) also has no accidentals in its key signature.' },
+            { id: 'k1a', text: 'C major', correct: true, explanation: 'C major uses only the white keys on a piano  -  no sharps or flats needed. That\'s why it\'s often the first scale students learn. Its relative minor (A minor) also has no accidentals in its key signature.' },
             { id: 'k1c', text: 'F major (one flat)', correct: false, explanation: 'F major has one flat (B♭) in its key signature. Only C major (and A minor) have the distinction of zero accidentals, using purely natural notes.' },
         ]),
     },
@@ -148,8 +148,8 @@ const QUESTION_BANK: MusicQuestion[] = [
         prompt: 'What information does a key signature primarily communicate to performers?',
         context: 'Key signatures are a shorthand that prevents composers from writing the same accidentals over and over on every note.',
         options: shuffleArray([
-            { id: 'k2c', text: 'How fast or slow the piece should be performed overall', correct: false, explanation: 'Tempo is communicated by tempo markings (like "Allegro" or metronome numbers), not key signatures. Key signatures are exclusively about pitch — which notes are sharp or flat.' },
-            { id: 'k2a', text: 'Which notes are consistently sharp or flat throughout the piece', correct: true, explanation: 'Key signatures are efficiency tools — instead of writing a sharp or flat on every F in a G major piece, you put one F# in the key signature. Every F in the piece is then automatically sharped unless otherwise marked.' },
+            { id: 'k2c', text: 'How fast or slow the piece should be performed overall', correct: false, explanation: 'Tempo is communicated by tempo markings (like "Allegro" or metronome numbers), not key signatures. Key signatures are exclusively about pitch  -  which notes are sharp or flat.' },
+            { id: 'k2a', text: 'Which notes are consistently sharp or flat throughout the piece', correct: true, explanation: 'Key signatures are efficiency tools  -  instead of writing a sharp or flat on every F in a G major piece, you put one F# in the key signature. Every F in the piece is then automatically sharped unless otherwise marked.' },
             { id: 'k2b', text: 'Which instruments should play in each section of the composition', correct: false, explanation: 'Instrumentation is shown by the instrument names at the left of each staff and the score order. Key signatures tell you about pitch modifications, not orchestration.' },
         ]),
     },

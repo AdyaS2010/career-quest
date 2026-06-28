@@ -1,4 +1,4 @@
-// Client-side "life sim" wallet — spendable coins, character upgrades and
+// Client-side "life sim" wallet  -  spendable coins, character upgrades and
 // cosmetics, kept in localStorage so it never touches the leaderboard XP
 // (profile.total_score) or the database.
 import type { Palette } from '../pages/city/art';
@@ -30,7 +30,7 @@ export function saveWallet(uid: string, w: Wallet) {
   try { localStorage.setItem(key(uid), JSON.stringify(w)); } catch { /* ignore */ }
 }
 
-// reward coins (e.g. after a shift) — returns the new wallet
+// reward coins (e.g. after a shift)  -  returns the new wallet
 export function awardCoins(uid: string, amount: number): Wallet {
   const w = loadWallet(uid);
   w.coins += amount;

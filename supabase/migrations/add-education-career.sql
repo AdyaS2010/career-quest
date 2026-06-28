@@ -35,7 +35,7 @@ BEGIN
   VALUES (
     education_career_id,
     'Classroom Conductor',
-    'It''s your first week as a preschool teacher! A room full of energetic kids with different learning styles needs engaging activities — match each student with the perfect activity.',
+    'It''s your first week as a preschool teacher! A room full of energetic kids with different learning styles needs engaging activities  -  match each student with the perfect activity.',
     1,
     100,
     'mini_game',
@@ -61,7 +61,7 @@ BEGIN
   VALUES (
     education_career_id,
     'School Crisis Manager',
-    'You''re the assistant principal and it''s a chaotic Monday morning. Multiple urgent situations arrive in your inbox — prioritize wisely and choose the best response for each crisis!',
+    'You''re the assistant principal and it''s a chaotic Monday morning. Multiple urgent situations arrive in your inbox  -  prioritize wisely and choose the best response for each crisis!',
     3,
     100,
     'mini_game',

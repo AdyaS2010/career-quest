@@ -99,7 +99,7 @@ export function Arcade() {
           // @ts-ignore
           await supabase.from('profiles').update(updates as Database['public']['Tables']['profiles']['Update']).eq('id', user.id);
           setProfile({ ...pData, ...updates } as Profile);
-          showGuide(diff === -1 ? "Welcome to Questford! +50 day-one bonus 🔥" : isNext ? `Day ${newStreak} streak! +50 🔥` : `New streak — +50 🔥`, 'happy');
+          showGuide(diff === -1 ? "Welcome to Questford! +50 day-one bonus 🔥" : isNext ? `Day ${newStreak} streak! +50 🔥` : `New streak  -  +50 🔥`, 'happy');
         } else setProfile(pData);
       }
 
@@ -177,7 +177,7 @@ export function Arcade() {
       {/* ambient glow + stars */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 12%, rgba(96,165,250,0.18), transparent 40%), radial-gradient(circle at 82% 8%, rgba(167,139,250,0.16), transparent 38%)' }} />
       <div className="absolute inset-0 pointer-events-none opacity-[0.5]" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-      {/* city skyline silhouette across the bottom — keeps the Questford feel */}
+      {/* city skyline silhouette across the bottom  -  keeps the Questford feel */}
       <svg className="absolute bottom-0 inset-x-0 w-full pointer-events-none" viewBox="0 0 1440 240" preserveAspectRatio="none" style={{ height: '30vh' }}>
         <defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1c2c54" /><stop offset="1" stopColor="#0b1024" /></linearGradient></defs>
         {Array.from({ length: 22 }).map((_, i) => { const x = i * 68, w = 50 + (i % 4) * 14, h = 90 + ((i * 53) % 130); return (

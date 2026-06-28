@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, useCallb
 type SfxType = 'click' | 'success' | 'error' | 'complete' | 'hover' | 'notification' | 'tick' | 'warning'
   | 'enter' | 'score' | 'star' | 'levelup' | 'coin' | 'chime' | 'footstep' | 'greet';
 
-// Each place in the world gets its own cozy ambient bed — a soft evolving pad
+// Each place in the world gets its own cozy ambient bed  -  a soft evolving pad
 // plus gentle random "twinkles", all synthesised live (no audio files, fully
 // royalty-free). Scenes map 1:1 to the career slugs, plus the hub + arcade.
 export type AmbienceScene =
@@ -92,7 +92,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     mutedRef.current = muted;
     // Everything routes through one master gain, so muting is a single, instant,
     // bulletproof fade to silence. We then fully SUSPEND the audio hardware so
-    // absolutely nothing can leak through — no stray oscillator, ambient bed, or
+    // absolutely nothing can leak through  -  no stray oscillator, ambient bed, or
     // scheduled note keeps whispering. Unmute resumes and fades back up.
     const ctx = audioContextRef.current;
     if (!ctx || !masterOutRef.current) return;
@@ -192,7 +192,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         playTone(440, 'square', 0.15, 0.5, 0.06);
         break;
       case 'enter':
-        // warm doorway chime — a soft thud and a bell that rings open
+        // warm doorway chime  -  a soft thud and a bell that rings open
         playTone(110, 'sine', 0.18, 0, 0.07);
         playTone(659.25, 'sine', 0.28, 0.02, 0.11);
         playTone(987.77, 'sine', 0.7, 0.10, 0.09);
@@ -220,12 +220,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         playTone(1318.51, 'square', 0.14, 0.06, 0.08);
         break;
       case 'chime':
-        // light, friendly doormat "ting" — a soft bell that rings as you arrive
+        // light, friendly doormat "ting"  -  a soft bell that rings as you arrive
         playTone(1046.50, 'sine', 0.16, 0, 0.06);
         playTone(1567.98, 'sine', 0.5, 0.06, 0.045);
         break;
       case 'footstep': {
-        // soft muffled step — a low cushioned thud with a faint tap on top, with
+        // soft muffled step  -  a low cushioned thud with a faint tap on top, with
         // a touch of random pitch so a walking run never sounds mechanical.
         const base = 150 + Math.random() * 26;
         playTone(base, 'sine', 0.04, 0, 0.022);
@@ -245,7 +245,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!audioContextRef.current || !masterOutRef.current) return;
     // Already playing this exact theme? Let it keep rolling.
     if (bgmNodesRef.current && bgmVariantRef.current === variant) return;
-    // Switching themes (city ⇄ career) — tear the old loop down first.
+    // Switching themes (city ⇄ career)  -  tear the old loop down first.
     if (bgmIntervalRef.current) { clearTimeout(bgmIntervalRef.current); bgmIntervalRef.current = null; }
     if (bgmNodesRef.current) { try { bgmNodesRef.current.gainNode.disconnect(); } catch { /* ignore */ } bgmNodesRef.current = null; }
 
@@ -255,8 +255,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const oscillators: OscillatorNode[] = [];
 
     // Two moods share one tiny sequencer:
-    //  • 'serene' — the warm "Questford Stroll" that floats over the city + menus.
-    //  • 'chip'   — the bouncy 8-bit "Adventure Theme" that plays inside a career.
+    //  • 'serene'  -  the warm "Questford Stroll" that floats over the city + menus.
+    //  • 'chip'    -  the bouncy 8-bit "Adventure Theme" that plays inside a career.
     type Track = {
       level: number; tempo: number;
       melodyWave: OscillatorType; bassWave: OscillatorType;
@@ -266,7 +266,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       melody: number[]; bass: number[];
     };
 
-    // Questford Stroll — gentle I–vi–IV–V (C–Am–F–G), soft sine lead + bass.
+    // Questford Stroll  -  gentle I–vi–IV–V (C–Am–F–G), soft sine lead + bass.
     const serene: Track = {
       level: 0.026, tempo: 175,
       melodyWave: 'sine', bassWave: 'sine',
@@ -295,7 +295,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       ],
     };
 
-    // 8-bit Adventure Theme — upbeat retro romp with a funky triangle lead.
+    // 8-bit Adventure Theme  -  upbeat retro romp with a funky triangle lead.
     const chip: Track = {
       level: 0.030, tempo: 144,
       melodyWave: 'triangle', bassWave: 'sine',
@@ -423,7 +423,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     const stops: Array<() => void> = [];
 
-    // Sustained chord — each voice is a gently detuned pair that "breathes" via a slow LFO.
+    // Sustained chord  -  each voice is a gently detuned pair that "breathes" via a slow LFO.
     preset.pad.forEach((freq, i) => {
       const voice = c.createGain();
       voice.gain.value = 0.16;

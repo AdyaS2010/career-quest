@@ -61,7 +61,7 @@ BEGIN
   VALUES (
     finance_career_id,
     'Fraud Detector',
-    'The bank''s AI flagged suspicious transactions across multiple accounts. Review them carefully — catch the fraud, but don''t flag innocent customers!',
+    'The bank''s AI flagged suspicious transactions across multiple accounts. Review them carefully  -  catch the fraud, but don''t flag innocent customers!',
     3,
     100,
     'mini_game',

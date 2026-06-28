@@ -30,7 +30,7 @@ const MARKET_EVENTS_POOL: MarketEvent[][] = [
     // Round 1 events (pick 1)
     [
         {
-            headline: 'Fed Announces Interest Rate Cut — Markets Rally',
+            headline: 'Fed Announces Interest Rate Cut  -  Markets Rally',
             source: 'Financial Times',
             impact: { Stocks: 1.15, Bonds: 1.08, 'Real Estate': 1.10, Crypto: 1.20, Savings: 0.97 },
             sentiment: 'positive',
@@ -45,7 +45,7 @@ const MARKET_EVENTS_POOL: MarketEvent[][] = [
     // Round 2 events
     [
         {
-            headline: 'Tech Giant Reports Record Earnings — Stock Surge',
+            headline: 'Tech Giant Reports Record Earnings  -  Stock Surge',
             source: 'Bloomberg',
             impact: { Stocks: 1.18, Bonds: 1.0, 'Real Estate': 1.02, Crypto: 1.12, Savings: 1.0 },
             sentiment: 'positive',
@@ -66,7 +66,7 @@ const MARKET_EVENTS_POOL: MarketEvent[][] = [
             sentiment: 'mixed',
         },
         {
-            headline: 'Housing Market Boom — Real Estate at All-Time High',
+            headline: 'Housing Market Boom  -  Real Estate at All-Time High',
             source: 'MarketWatch',
             impact: { Stocks: 1.05, Bonds: 0.98, 'Real Estate': 1.25, Crypto: 1.05, Savings: 1.0 },
             sentiment: 'positive',
@@ -183,7 +183,7 @@ export function InvestmentSimulatorChallenge({ onComplete }: InvestmentSimulator
                             <h3 className="font-bold text-teal-900 text-lg mb-2">📋 Scenario Briefing</h3>
                             <p className="text-teal-800 leading-relaxed">
                                 A new client, Ms. Rivera, walks into your office with <strong>$10,000</strong> she
-                                wants to invest. Market conditions are uncertain — earnings reports are coming in,
+                                wants to invest. Market conditions are uncertain  -  earnings reports are coming in,
                                 interest rates are shifting, and global events are unfolding. Build her a diversified
                                 portfolio and navigate <strong>3 rounds</strong> of market events to maximize returns.
                                 Your reputation as a financial advisor depends on it!
@@ -324,7 +324,7 @@ export function InvestmentSimulatorChallenge({ onComplete }: InvestmentSimulator
                     <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-6 text-white">
                         <div className="flex items-center gap-2 mb-2">
                             <Newspaper className="w-5 h-5 text-amber-400" />
-                            <span className="text-amber-400 font-bold uppercase text-sm tracking-wider">Breaking News — Round {round + 1}</span>
+                            <span className="text-amber-400 font-bold uppercase text-sm tracking-wider">Breaking News  -  Round {round + 1}</span>
                         </div>
                         <h2 className="text-2xl font-bold">{currentEvent.headline}</h2>
                         <p className="text-slate-400 text-sm mt-1">Source: {currentEvent.source}</p>
@@ -422,7 +422,7 @@ export function InvestmentSimulatorChallenge({ onComplete }: InvestmentSimulator
                     {finalScore >= 80
                         ? "Exceptional returns! Ms. Rivera is thrilled and referring her friends to you."
                         : finalScore >= 50
-                            ? "Decent performance. Ms. Rivera is satisfied but expects better next quarter."
+                            ? "Decent performance. Ms. Rivera is satisfied but expects better next district."
                             : "Rough market conditions took their toll. Time to reassess your strategy."}
                 </p>
 

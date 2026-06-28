@@ -31,12 +31,26 @@ export function LeaderboardPage() {
             // hidden via the optional show_on_leaderboard column (if present); the
             // current player is hidden according to their local preference.
             const hideSelf = user ? !loadPrefs(user.id).showOnLeaderboard : false;
-            const visible = ((data || []) as Profile[]).filter(p => {
+            let visible = ((data || []) as Profile[]).filter(p => {
                 if ((p as any).show_on_leaderboard === false) return false;
                 if (user && p.id === user.id && hideSelf) return false;
                 return true;
-            }).slice(0, 10);
-            setLeaders(visible);
+            });
+
+            const isGuest = localStorage.getItem('isGuest') === 'true';
+            if (isGuest && user) {
+                const guestProfileStr = localStorage.getItem('guest_profile');
+                if (guestProfileStr) {
+                    const guestProfile = JSON.parse(guestProfileStr) as Profile;
+                    if (!visible.some(p => p.id === 'guest')) {
+                        visible.push(guestProfile);
+                    }
+                }
+            }
+
+            visible.sort((a, b) => b.total_score - a.total_score);
+            const sliced = visible.slice(0, 10);
+            setLeaders(sliced);
 
             if (user) {
                 const { data: userData, error: userError } = await supabase

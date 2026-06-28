@@ -190,7 +190,7 @@ export function BankTellerChallenge({ onComplete }: { onComplete: (score: number
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl mb-6">
                             <h3 className="font-bold text-blue-900 text-lg mb-2">👋 Briefing</h3>
                             <p className="text-blue-800 leading-relaxed text-sm">
-                                As a senior teller, processing transactions isn't just about counting cash—it's about protecting the bank and the customers. You will interview customers requesting unusual services.
+                                As a senior teller, processing transactions isn't just about counting cash - it's about protecting the bank and the customers. You will interview customers requesting unusual services.
                                 <br /><br />
                                 <strong>Your Goal:</strong> Listen to their statements, <strong>Press</strong> them for more details, and <strong>Present Evidence</strong> when you catch them in a lie or a scam.
                             </p>

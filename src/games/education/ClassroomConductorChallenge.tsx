@@ -102,7 +102,13 @@ function DraggableStudent({ student, isAssigned }: { student: Student; isAssigne
     );
 }
 
-function DroppableActivity({ activity, assignedStudents, isEvaluating, results }: { activity: Activity, assignedStudents: Student[], isEvaluating: boolean, results: Record<string, boolean> }) {
+function DroppableActivity({ activity, assignedStudents, isEvaluating, results, onUnassign }: {
+    activity: Activity,
+    assignedStudents: Student[],
+    isEvaluating: boolean,
+    results: Record<string, boolean>,
+    onUnassign?: (studentId: string) => void
+}) {
     const { setNodeRef, isOver } = useDroppable({
         id: activity.id,
         data: activity
@@ -137,6 +143,16 @@ function DroppableActivity({ activity, assignedStudents, isEvaluating, results }
                                 >
                                     {isCorrect ? '✅' : '❌'}
                                 </motion.div>
+                            )}
+
+                            {!isEvaluating && onUnassign && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onUnassign(student.id); }}
+                                    className="absolute -top-1 -right-1 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-all cursor-pointer shadow z-10 font-bold"
+                                    title={`Unassign ${student.name}`}
+                                >
+                                    ✕
+                                </button>
                             )}
 
                             {/* Evaluation Tooltip */}
@@ -219,6 +235,15 @@ export function ClassroomConductorChallenge({ onComplete }: ClassroomConductorCh
         }
     };
 
+    const handleUnassignStudent = (studentId: string) => {
+        playSfx('click');
+        setAssignments(prev => {
+            const next = { ...prev };
+            delete next[studentId];
+            return next;
+        });
+    };
+
     const handleEvaluate = () => {
         playSfx('success');
         const newResults: Record<string, boolean> = {};
@@ -287,26 +312,39 @@ export function ClassroomConductorChallenge({ onComplete }: ClassroomConductorCh
                     <h2 className="text-2xl font-bold text-gray-900">{currentPeriod.name}</h2>
                     <p className="text-sm text-gray-500 mt-1">Assign each student to the station that best fits their learning style.</p>
                 </div>
-                {isReadyToEvaluate && (
-                    <motion.button
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 cursor-pointer"
-                        onClick={handleEvaluate}
-                    >
-                        Evaluate Layout →
-                    </motion.button>
-                )}
-                {phase === 'evaluating' && (
-                    <motion.button
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-green-500/30 cursor-pointer"
-                        onClick={handleNextPeriod}
-                    >
-                        {currentPeriodIndex < PERIODS.length - 1 ? 'Start Next Period →' : 'Finish Day →'}
-                    </motion.button>
-                )}
+                <div className="flex items-center gap-2">
+                    {Object.keys(assignments).length > 0 && phase === 'assigning' && (
+                        <button
+                            onClick={() => {
+                                playSfx('click');
+                                setAssignments({});
+                            }}
+                            className="px-4 py-2 border-2 border-red-200 hover:border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-colors cursor-pointer text-sm"
+                        >
+                            Clear Layout
+                        </button>
+                    )}
+                    {isReadyToEvaluate && phase === 'assigning' && (
+                        <motion.button
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 cursor-pointer text-sm"
+                            onClick={handleEvaluate}
+                        >
+                            Evaluate Layout →
+                        </motion.button>
+                    )}
+                    {phase === 'evaluating' && (
+                        <motion.button
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-green-500/30 cursor-pointer text-sm"
+                            onClick={handleNextPeriod}
+                        >
+                            {currentPeriodIndex < PERIODS.length - 1 ? 'Start Next Period →' : 'Finish Day →'}
+                        </motion.button>
+                    )}
+                </div>
             </div>
 
             <DndContext
@@ -325,6 +363,7 @@ export function ClassroomConductorChallenge({ onComplete }: ClassroomConductorCh
                                 assignedStudents={students.filter(s => assignments[s.id] === activity.id)}
                                 isEvaluating={phase === 'evaluating'}
                                 results={results}
+                                onUnassign={handleUnassignStudent}
                             />
                         ))}
                     </div>

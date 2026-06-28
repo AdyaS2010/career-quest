@@ -34,13 +34,13 @@ const ROW_Y = [130, 350];
 function slotPos(i: number) { return { x: SLOT_X[i % 5], y: ROW_Y[Math.floor(i / 5)] }; }
 
 const WELCOME: DialogueLine[] = [
-  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Hi there — welcome to the Questford Arcade! ✨ I'm Pixel, and I'll be right here with you." },
-  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Every machine inside lets you LIVE a real career for a few minutes. No pressure — just play, explore, and find what lights you up!" },
+  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Hi there  -  welcome to the Questford Arcade! ✨ I'm Pixel, and I'll be right here with you." },
+  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Every machine inside lets you LIVE a real career for a few minutes. No pressure  -  just play, explore, and find what lights you up!" },
   { speaker: GUIDE.name, portrait: GUIDE.face, text: "Step up to the doors and press E (or tap Enter) to head inside. Let's go!" },
 ];
 const ENTERED: DialogueLine[] = [
-  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Whoa… feel that? ✨ The cabinets just hummed to life — like they were waiting for you." },
-  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Each one is a different career, with three quick simulations to try. Walk up to any machine and press E to play. The glowing ones are extra brain-teasers — fun for coins!" },
+  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Whoa… feel that? ✨ The cabinets just hummed to life  -  like they were waiting for you." },
+  { speaker: GUIDE.name, portrait: GUIDE.face, text: "Each one is a different career, with three quick simulations to try. Walk up to any machine and press E to play. The glowing ones are extra brain-teasers  -  fun for coins!" },
 ];
 
 export function ArcadeWorld() {

@@ -7,7 +7,7 @@ interface PageTransitionProps {
 
 // A cinematic "step through the doorway" transition: the incoming scene eases
 // in from slightly zoomed-in while fading and de-blurring, and the outgoing
-// scene keeps pushing in as it fades — so moving between the map, the city and
+// scene keeps pushing in as it fades  -  so moving between the map, the city and
 // a career world feels like a deliberate camera move rather than an instant
 // cut. Both keyframes stay at scale >= 1 so a full-bleed scene never reveals an
 // edge. Honours the user's reduced-motion preference with a plain quick fade.

@@ -148,7 +148,7 @@ export function LandingPage() {
             className="text-xl md:text-2xl max-w-2xl mx-auto mb-10 font-doodle"
             style={{ color: 'var(--text-secondary)' }}
           >
-            Jump into immersive worlds. Complete hands-on challenges. Figure out what you truly love doing.
+            Jump into immersive Districts. Complete hands-on challenges. Figure out what you truly love doing.
           </p>
 
           <motion.button
@@ -160,6 +160,9 @@ export function LandingPage() {
             Start Your Journey
             <ArrowRight className="w-6 h-6" />
           </motion.button>
+          <p className="text-sm mt-3 opacity-80" style={{ color: 'var(--text-secondary)' }}>
+            Play instantly as a guest or sign up to save your progress!
+          </p>
         </motion.div>
       </section>
 
@@ -189,8 +192,8 @@ export function LandingPage() {
               {
                 step: '1',
                 emoji: '🗺️',
-                title: 'Pick a Career World',
-                desc: 'Choose from 8 immersive islands — Culinary Arts, IT, Health Sciences, Law, Finance, Education, Media, and Arts & Design.'
+                title: 'Pick a Career District',
+                desc: 'Choose from 8 immersive Districts: Culinary Arts, Information Technology, Health Sciences, Law & Government, Financial Services, Education, Media & Communication, and Arts & Entertainment.'
               },
               {
                 step: '2',
@@ -245,8 +248,8 @@ export function LandingPage() {
             {[
               {
                 icon: Compass,
-                title: "8 Career Worlds",
-                desc: "From culinary arts to software engineering, explore diverse professions through immersive islands.",
+                title: "8 Career Districts",
+                desc: "From culinary arts to software engineering, explore diverse professions through immersive Districts.",
                 color: "blue",
                 rotate: "-2deg"
               },
@@ -326,6 +329,9 @@ export function LandingPage() {
             Create Free Account
             <Sparkles className="w-5 h-5 group-hover:animate-spin" />
           </motion.button>
+          <p className="text-sm mt-4 text-white/70">
+            Or play instantly as a guest!
+          </p>
         </motion.div>
       </section>
 

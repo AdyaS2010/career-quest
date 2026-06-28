@@ -26,9 +26,9 @@ const QUESTION_BANK: ColorQuestion[] = [
         prompt: 'Which palette uses complementary colors?',
         context: 'Complementary colors sit directly opposite each other on the color wheel, creating maximum contrast and visual energy.',
         options: shuffleArray([
-            { id: 'h1a', text: 'Blue & Orange', colors: ['#2563eb', '#ea580c'], correct: true, explanation: 'Blue and orange are directly opposite on the color wheel — the classic complementary pair. This high-contrast combination creates visual tension and draws the eye.' },
+            { id: 'h1a', text: 'Blue & Orange', colors: ['#2563eb', '#ea580c'], correct: true, explanation: 'Blue and orange are directly opposite on the color wheel  -  the classic complementary pair. This high-contrast combination creates visual tension and draws the eye.' },
             { id: 'h1b', text: 'Blue & Green', colors: ['#2563eb', '#16a34a'], correct: false, explanation: 'Blue and green are analogous colors (neighbors on the wheel), not complementary. They create harmony but lack the dramatic contrast of complements.' },
-            { id: 'h1c', text: 'Blue & Purple', colors: ['#2563eb', '#9333ea'], correct: false, explanation: 'Blue and purple are also analogous — they share blue as a base. Complementary pairs always cross the wheel, never sit next to each other.' },
+            { id: 'h1c', text: 'Blue & Purple', colors: ['#2563eb', '#9333ea'], correct: false, explanation: 'Blue and purple are also analogous  -  they share blue as a base. Complementary pairs always cross the wheel, never sit next to each other.' },
         ]),
     },
     {
@@ -36,8 +36,8 @@ const QUESTION_BANK: ColorQuestion[] = [
         prompt: 'Which set forms a triadic color scheme?',
         context: 'Triadic schemes use three colors equally spaced around the color wheel (120° apart), creating vibrant, balanced compositions.',
         options: shuffleArray([
-            { id: 'h2a', text: 'Red, Yellow & Blue', colors: ['#dc2626', '#eab308', '#2563eb'], correct: true, explanation: 'The three primary colors form a perfect triadic scheme — each is 120° from the others on the color wheel, creating maximum balance with full vibrancy.' },
-            { id: 'h2b', text: 'Red, Orange & Yellow', colors: ['#dc2626', '#ea580c', '#eab308'], correct: false, explanation: 'These are analogous colors — they sit next to each other on the warm side of the wheel. A triadic scheme requires even spacing across the entire wheel.' },
+            { id: 'h2a', text: 'Red, Yellow & Blue', colors: ['#dc2626', '#eab308', '#2563eb'], correct: true, explanation: 'The three primary colors form a perfect triadic scheme  -  each is 120° from the others on the color wheel, creating maximum balance with full vibrancy.' },
+            { id: 'h2b', text: 'Red, Orange & Yellow', colors: ['#dc2626', '#ea580c', '#eab308'], correct: false, explanation: 'These are analogous colors  -  they sit next to each other on the warm side of the wheel. A triadic scheme requires even spacing across the entire wheel.' },
             { id: 'h2c', text: 'Red, Pink & Maroon', colors: ['#dc2626', '#ec4899', '#7f1d1d'], correct: false, explanation: 'These are monochromatic variations of red (different tints, shades, and tones of one hue), not a triadic scheme.' },
         ]),
     },
@@ -47,7 +47,7 @@ const QUESTION_BANK: ColorQuestion[] = [
         context: 'Analogous colors are neighbors on the color wheel (2-4 adjacent hues), creating smooth, harmonious transitions found often in nature.',
         options: shuffleArray([
             { id: 'h3c', text: 'Red & Green', colors: ['#dc2626', '#16a34a'], correct: false, explanation: 'Red and green are complementary (opposite on the wheel), not analogous. Think of how jarring Christmas colors can feel compared to a sunset palette.' },
-            { id: 'h3a', text: 'Yellow, Yellow-Green & Green', colors: ['#eab308', '#84cc16', '#16a34a'], correct: true, explanation: 'These three hues sit side by side on the color wheel, flowing naturally from yellow through green. This is exactly how analogous schemes work — gentle, nature-inspired transitions.' },
+            { id: 'h3a', text: 'Yellow, Yellow-Green & Green', colors: ['#eab308', '#84cc16', '#16a34a'], correct: true, explanation: 'These three hues sit side by side on the color wheel, flowing naturally from yellow through green. This is exactly how analogous schemes work  -  gentle, nature-inspired transitions.' },
             { id: 'h3b', text: 'Red, Blue & Yellow', colors: ['#dc2626', '#2563eb', '#eab308'], correct: false, explanation: 'These are the three primaries forming a triadic scheme (evenly spaced around the wheel), not analogous neighbors.' },
         ]),
     },
@@ -58,8 +58,8 @@ const QUESTION_BANK: ColorQuestion[] = [
         context: 'Cool colors (blues, blue-greens, violets) recede visually and evoke calmness, distance, and cold temperatures.',
         options: shuffleArray([
             { id: 't1a', text: 'Ice Blue, Lavender & Silver', colors: ['#93c5fd', '#c4b5fd', '#cbd5e1'], correct: true, explanation: 'These cool, desaturated tones perfectly capture winter\'s quiet stillness. The blue and violet family creates psychological "coolness" while the muted saturation suggests frost and overcast skies.' },
-            { id: 't1b', text: 'Crimson, Amber & Gold', colors: ['#dc2626', '#f59e0b', '#ca8a04'], correct: false, explanation: 'These are warm colors that evoke fire, autumn, and energy — the opposite of a serene winter mood. Warm hues advance visually and feel active, not calm.' },
-            { id: 't1c', text: 'Neon Green, Hot Pink & Electric Blue', colors: ['#4ade80', '#ec4899', '#3b82f6'], correct: false, explanation: 'These high-saturation neon colors are energetic and attention-grabbing — great for a party poster but completely wrong for a serene, tranquil winter landscape.' },
+            { id: 't1b', text: 'Crimson, Amber & Gold', colors: ['#dc2626', '#f59e0b', '#ca8a04'], correct: false, explanation: 'These are warm colors that evoke fire, autumn, and energy  -  the opposite of a serene winter mood. Warm hues advance visually and feel active, not calm.' },
+            { id: 't1c', text: 'Neon Green, Hot Pink & Electric Blue', colors: ['#4ade80', '#ec4899', '#3b82f6'], correct: false, explanation: 'These high-saturation neon colors are energetic and attention-grabbing  -  great for a party poster but completely wrong for a serene, tranquil winter landscape.' },
         ]),
     },
     {
@@ -67,9 +67,9 @@ const QUESTION_BANK: ColorQuestion[] = [
         prompt: 'A client wants a "cozy autumn cafe" brand identity. Which palette delivers?',
         context: 'Warm colors (reds, oranges, yellows, earth tones) advance toward the viewer and evoke warmth, comfort, and energy.',
         options: shuffleArray([
-            { id: 't2b', text: 'Arctic Blue, Mint & White', colors: ['#7dd3fc', '#a7f3d0', '#f8fafc'], correct: false, explanation: 'This cool, minty palette suggests freshness and clinical cleanliness — think spa or dental office, not a warm autumn cafe with steaming drinks.' },
-            { id: 't2a', text: 'Burnt Sienna, Warm Amber & Espresso', colors: ['#b45309', '#d97706', '#44271a'], correct: true, explanation: 'These earth tones directly mirror autumn — falling leaves, warm drinks, wooden interiors. The low saturation and warm undertones create psychological comfort and coziness.' },
-            { id: 't2c', text: 'Charcoal, Slate & Black', colors: ['#374151', '#64748b', '#111827'], correct: false, explanation: 'This achromatic palette feels sophisticated and modern, but it\'s cold and serious — more luxury brand than cozy cafe. There\'s no warmth or autumn feeling.' },
+            { id: 't2b', text: 'Arctic Blue, Mint & White', colors: ['#7dd3fc', '#a7f3d0', '#f8fafc'], correct: false, explanation: 'This cool, minty palette suggests freshness and clinical cleanliness  -  think spa or dental office, not a warm autumn cafe with steaming drinks.' },
+            { id: 't2a', text: 'Burnt Sienna, Warm Amber & Espresso', colors: ['#b45309', '#d97706', '#44271a'], correct: true, explanation: 'These earth tones directly mirror autumn  -  falling leaves, warm drinks, wooden interiors. The low saturation and warm undertones create psychological comfort and coziness.' },
+            { id: 't2c', text: 'Charcoal, Slate & Black', colors: ['#374151', '#64748b', '#111827'], correct: false, explanation: 'This achromatic palette feels sophisticated and modern, but it\'s cold and serious  -  more luxury brand than cozy cafe. There\'s no warmth or autumn feeling.' },
         ]),
     },
     // MOOD QUESTIONS
@@ -78,7 +78,7 @@ const QUESTION_BANK: ColorQuestion[] = [
         prompt: 'You\'re designing a poster for a children\'s art camp. Which palette creates the right energy?',
         context: 'High-saturation colors with variety create excitement and playfulness, while value contrast ensures readability.',
         options: shuffleArray([
-            { id: 'm1a', text: 'Bright Yellow, Coral & Turquoise', colors: ['#facc15', '#f97316', '#06b6d4'], correct: true, explanation: 'These saturated, cheerful colors vibrate with youthful energy. The warm-cool balance prevents monotony while the high saturation screams "fun!" — exactly what a children\'s camp wants.' },
+            { id: 'm1a', text: 'Bright Yellow, Coral & Turquoise', colors: ['#facc15', '#f97316', '#06b6d4'], correct: true, explanation: 'These saturated, cheerful colors vibrate with youthful energy. The warm-cool balance prevents monotony while the high saturation screams "fun!"  -  exactly what a children\'s camp wants.' },
             { id: 'm1b', text: 'Navy, Burgundy & Forest Green', colors: ['#1e3a5f', '#7f1d1d', '#14532d'], correct: false, explanation: 'These deep, dark colors convey formality, tradition, and seriousness. They\'d work for a law firm or university, but would feel heavy and unwelcoming for a kids\' art camp.' },
             { id: 'm1c', text: 'Beige, Taupe & Cream', colors: ['#d4c5a9', '#a89984', '#f5f0e8'], correct: false, explanation: 'This neutral palette is elegant and sophisticated but completely lacks the energy and excitement children respond to. It reads as "luxury home goods" not "art camp fun."' },
         ]),
@@ -88,8 +88,8 @@ const QUESTION_BANK: ColorQuestion[] = [
         prompt: 'A horror film poster needs a color palette that creates dread. Which one works?',
         context: 'Dark values, desaturated hues, and unexpected accent colors create tension, unease, and psychological discomfort.',
         options: shuffleArray([
-            { id: 'm2c', text: 'Pastel Pink, Sky Blue & Lavender', colors: ['#f9a8d4', '#7dd3fc', '#d8b4fe'], correct: false, explanation: 'Soft pastels evoke innocence, gentleness, and nurseries — the polar opposite of horror. Unless you\'re subverting expectations, these colors feel safe and comforting.' },
-            { id: 'm2b', text: 'Bright Orange, Lime Green & Cyan', colors: ['#f97316', '#84cc16', '#06b6d4'], correct: false, explanation: 'These bold, saturated colors feel sporty, tropical, and energetic — perfect for a smoothie brand, terrible for creating cinematic dread.' },
+            { id: 'm2c', text: 'Pastel Pink, Sky Blue & Lavender', colors: ['#f9a8d4', '#7dd3fc', '#d8b4fe'], correct: false, explanation: 'Soft pastels evoke innocence, gentleness, and nurseries  -  the polar opposite of horror. Unless you\'re subverting expectations, these colors feel safe and comforting.' },
+            { id: 'm2b', text: 'Bright Orange, Lime Green & Cyan', colors: ['#f97316', '#84cc16', '#06b6d4'], correct: false, explanation: 'These bold, saturated colors feel sporty, tropical, and energetic  -  perfect for a smoothie brand, terrible for creating cinematic dread.' },
             { id: 'm2a', text: 'Deep Crimson, Charcoal & Sickly Green', colors: ['#7f1d1d', '#1f2937', '#4d7c0f'], correct: true, explanation: 'This palette uses darkness and desaturation to create unease. The deep red suggests danger and blood, charcoal provides suffocating darkness, and the muted green adds an unsettling, toxic quality.' },
         ]),
     },
@@ -107,11 +107,11 @@ const QUESTION_BANK: ColorQuestion[] = [
     {
         id: 'x2', type: 'mixing',
         prompt: 'What happens when you add white to a pure hue?',
-        context: 'Modifying a pure hue with white, black, or gray creates tints, shades, and tones — the building blocks of sophisticated color palettes.',
+        context: 'Modifying a pure hue with white, black, or gray creates tints, shades, and tones  -  the building blocks of sophisticated color palettes.',
         options: shuffleArray([
-            { id: 'x2b', text: 'You create a shade (darker version)', colors: ['#1e3a5f'], correct: false, explanation: 'Adding black creates a shade. Adding white creates a tint. This distinction matters — shades feel heavier and more dramatic, while tints feel lighter and airier.' },
-            { id: 'x2a', text: 'You create a tint (lighter, pastel version)', colors: ['#93c5fd'], correct: true, explanation: 'Correct! White + any hue = a tint. Pastels are tints — they retain the hue\'s character but feel softer and more delicate. Think of baby pink (red + white).' },
-            { id: 'x2c', text: 'You create a tone (grayed-out version)', colors: ['#6b7280'], correct: false, explanation: 'Adding gray creates a tone. Tones feel muted and sophisticated — think "dusty rose" vs "bright pink." White specifically creates lighter tints, not tones.' },
+            { id: 'x2b', text: 'You create a shade (darker version)', colors: ['#1e3a5f'], correct: false, explanation: 'Adding black creates a shade. Adding white creates a tint. This distinction matters  -  shades feel heavier and more dramatic, while tints feel lighter and airier.' },
+            { id: 'x2a', text: 'You create a tint (lighter, pastel version)', colors: ['#93c5fd'], correct: true, explanation: 'Correct! White + any hue = a tint. Pastels are tints  -  they retain the hue\'s character but feel softer and more delicate. Think of baby pink (red + white).' },
+            { id: 'x2c', text: 'You create a tone (grayed-out version)', colors: ['#6b7280'], correct: false, explanation: 'Adding gray creates a tone. Tones feel muted and sophisticated  -  think "dusty rose" vs "bright pink." White specifically creates lighter tints, not tones.' },
         ]),
     },
     {
@@ -120,8 +120,8 @@ const QUESTION_BANK: ColorQuestion[] = [
         context: 'Understanding how to control saturation independently from value is essential for creating nuanced, professional-looking artwork.',
         options: shuffleArray([
             { id: 'x3a', text: 'Add the color\'s complement (opposite on the wheel)', colors: ['#9ca3af'], correct: true, explanation: 'Adding a color\'s complement effectively neutralizes it, reducing saturation while roughly maintaining value. This is how painters "gray down" colors naturally without making them lighter or darker.' },
-            { id: 'x3b', text: 'Add white to lighten and dilute the color', colors: ['#e0e7ff'], correct: false, explanation: 'White reduces saturation but also dramatically increases lightness — the color becomes a tint. The artist specifically wanted to keep the same lightness level.' },
-            { id: 'x3c', text: 'Add black to darken and mute the color', colors: ['#1e1b4b'], correct: false, explanation: 'Black reduces saturation but also dramatically decreases lightness — the color becomes a shade. The artist wanted to desaturate without changing how light or dark it is.' },
+            { id: 'x3b', text: 'Add white to lighten and dilute the color', colors: ['#e0e7ff'], correct: false, explanation: 'White reduces saturation but also dramatically increases lightness  -  the color becomes a tint. The artist specifically wanted to keep the same lightness level.' },
+            { id: 'x3c', text: 'Add black to darken and mute the color', colors: ['#1e1b4b'], correct: false, explanation: 'Black reduces saturation but also dramatically decreases lightness  -  the color becomes a shade. The artist wanted to desaturate without changing how light or dark it is.' },
         ]),
     },
 ];

@@ -64,7 +64,7 @@ export function Outro({ name, topName, palette, onClose }: { name: string; topNa
             <span className="text-slate-300 text-sm">Your standout path: </span>
             <span className="text-amber-300 font-black">{topName}</span>
           </div>
-          <p className="text-slate-300 text-sm mb-5">Now go build it for real — your adventure is just beginning. ✈️</p>
+          <p className="text-slate-300 text-sm mb-5">Now go build it for real  -  your adventure is just beginning. ✈️</p>
           <button onClick={onClose} className="px-8 py-3.5 rounded-2xl font-black text-slate-900 shadow-xl hover:scale-105 active:scale-95 transition-transform" style={{ background: 'linear-gradient(90deg,#fbbf24,#f59e0b)' }}>
             Continue exploring →
           </button>

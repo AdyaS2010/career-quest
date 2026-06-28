@@ -233,7 +233,7 @@ export function BugHuntChallenge({ onComplete }: BugHuntChallengeProps) {
                     }`}
                 >
                   <span className="text-gray-600 w-8 text-right mr-4 select-none">{line.id}</span>
-                  <span className={`${isSelected ? 'text-green-300' : 'text-gray-300'}`}>
+                  <span className={`whitespace-pre ${isSelected ? 'text-green-300' : 'text-gray-300'}`}>
                     {line.code || ' '}
                   </span>
 

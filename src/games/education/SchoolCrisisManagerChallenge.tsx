@@ -42,7 +42,7 @@ const CRISES: Crisis[] = [
         from: 'Mr. Rodriguez, Custodian',
         timestamp: '7:42 AM',
         context: 'A custodian discovered the issue during his morning rounds. Classes start at 8:00 AM.',
-        description: 'A pipe burst overnight in the B-wing hallway. The floor is soaked and slippery — you can see standing water near the lockers. Students start arriving in 18 minutes. The custodian has started mopping but says it will take at least an hour to fully dry.',
+        description: 'A pipe burst overnight in the B-wing hallway. The floor is soaked and slippery  -  you can see standing water near the lockers. Students start arriving in 18 minutes. The custodian has started mopping but says it will take at least an hour to fully dry.',
         responses: [
             {
                 id: 'r1b', text: 'Post "Wet Floor" caution signs at both ends of the hallway and send an email reminding students to walk carefully in that area',
@@ -74,7 +74,7 @@ const CRISES: Crisis[] = [
             {
                 id: 'r2a', text: 'Listen actively to her full account, validate that her concern is serious, and schedule a same-day meeting with the teacher, school counselor, and the families involved',
                 score: 30, outcome: 'Mrs. Chen feels genuinely heard and agrees to the collaborative meeting. The counselor identifies an underlying social dynamics issue and implements a structured inclusion plan. The teacher adjusts group formation strategies going forward.',
-                principle: 'Active listening plus a clear, immediate action plan de-escalates parent concerns effectively. Involving counselors addresses root causes — not just surface symptoms — and builds lasting trust with families.'
+                principle: 'Active listening plus a clear, immediate action plan de-escalates parent concerns effectively. Involving counselors addresses root causes  -  not just surface symptoms  -  and builds lasting trust with families.'
             },
             {
                 id: 'r2c', text: 'Reassure Mrs. Chen that some social conflict is a normal part of middle school development and that Mei will likely work through it on her own with time',
@@ -96,7 +96,7 @@ const CRISES: Crisis[] = [
         from: 'Ms. Williams, School Secretary',
         timestamp: '7:55 AM',
         context: 'This is already the third sub shortage this month. Teacher morale around coverage has been declining.',
-        description: 'Ms. Jackson, the 4th grade teacher, called in sick with no advance notice. The substitute teacher pool is completely empty — there are no certified subs available anywhere in the district today. Her class of 28 students arrives in 35 minutes. Mr. Kim, the other 4th grade teacher, has offered to help but already has 26 students of his own.',
+        description: 'Ms. Jackson, the 4th grade teacher, called in sick with no advance notice. The substitute teacher pool is completely empty  -  there are no certified subs available anywhere in the district today. Her class of 28 students arrives in 35 minutes. Mr. Kim, the other 4th grade teacher, has offered to help but already has 26 students of his own.',
         responses: [
             {
                 id: 'r3c', text: 'Set up Ms. Jackson\'s class in the auditorium with educational videos related to their current unit and assign a paraprofessional to supervise for the day',
@@ -131,7 +131,7 @@ const CRISES: Crisis[] = [
                 principle: 'Asking low-income families to individually fundraise deepens existing inequity and stigmatizes students. Schools should never exclude children from educational opportunities based solely on family financial circumstances.'
             },
             {
-                id: 'r4c', text: 'Cancel the field trip entirely for all students to avoid any fairness concerns — if some kids can\'t go, nobody should go so that no one feels singled out',
+                id: 'r4c', text: 'Cancel the field trip entirely for all students to avoid any fairness concerns  -  if some kids can\'t go, nobody should go so that no one feels singled out',
                 score: 10, outcome: 'All students miss an enriching hands-on science experience. The teacher is disappointed after spending weeks integrating the trip into curriculum plans. Families who already paid request refunds, creating more administrative work.',
                 principle: 'Canceling an educational experience punishes everyone to "solve" a solvable problem. Creative funding approaches can preserve both equity and the learning opportunity without requiring any student to miss out.'
             },
@@ -150,7 +150,7 @@ const CRISES: Crisis[] = [
         from: 'Coach Davis, Lunch Supervisor',
         timestamp: '8:05 AM (incident occurred yesterday)',
         context: 'Both students have clean disciplinary records. Other students filmed the incident on their phones.',
-        description: 'Two 7th graders, Marcus and Devon, got into a shoving match in the cafeteria yesterday during lunch over a basketball dispute. Coach Davis separated them quickly — neither was injured. However, several students filmed the incident and the videos are now circulating on social media with inflammatory captions. Both boys are in school today and their friend groups are taking sides.',
+        description: 'Two 7th graders, Marcus and Devon, got into a shoving match in the cafeteria yesterday during lunch over a basketball dispute. Coach Davis separated them quickly  -  neither was injured. However, several students filmed the incident and the videos are now circulating on social media with inflammatory captions. Both boys are in school today and their friend groups are taking sides.',
         responses: [
             {
                 id: 'r5b', text: 'Issue both students an immediate three-day out-of-school suspension as required by the school\'s zero-tolerance policy on physical altercations between students',
@@ -430,7 +430,7 @@ export function SchoolCrisisManagerChallenge({ onComplete }: SchoolCrisisManager
             <div className="max-w-3xl mx-auto p-6">
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
                     <div className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded-xl text-center font-bold text-sm mb-4 border border-yellow-200 shadow-sm inline-flex mx-auto items-center justify-center w-full">
-                        ⏸️ Shift Paused — Read carefully
+                        ⏸️ Shift Paused  -  Read carefully
                     </div>
 
                     <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-200 mb-6">

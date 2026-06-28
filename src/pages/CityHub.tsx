@@ -17,10 +17,10 @@ import { useTutorial } from '../contexts/TutorialContext';
 import { loadQuiz, saveQuiz, type QuizResult } from './city/quiz';
 import { loadWallet } from '../lib/wallet';
 import { loadPrefs, nowInTz } from '../lib/prefs';
-import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, type BaseMap } from './city/pico8';
+import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkable, reachable, spreadCells, doorstepCells, doorFrontCells, isRoad, isSolidObject, type BaseMap } from './city/pico8';
 import { AMENITIES } from './city/cityLayout';
 
-const SCALE = 6, TS = TILE * SCALE, SPEED = 2.7, REACH = TS * 1.3;
+const SCALE = 6, TS = TILE * SCALE, SPEED = 3.6, REACH = TS * 1.3;
 let savedPos: { x: number; y: number } | null = null; // remembers where the player left off across navigations
 
 type Rect = { x: number; y: number; w: number; h: number };
@@ -37,7 +37,7 @@ const SOFT_WALKABLE: Rect[] = [
 // Force SOLID (e.g. rooftops that read as walkable). Read off the 📍 readout.
 const SOLID_OVERRIDES: Rect[] = [];
 
-// Designer-placed door fronts — the walkable cell directly in front of each
+// Designer-placed door fronts  -  the walkable cell directly in front of each
 // building's door, keyed by career slug. Standing here and pressing E enters
 // that domain. Coordinates read off the live 📍 readout.
 const DOOR_COORDS: Record<string, { x: number; y: number }> = {
@@ -52,7 +52,7 @@ const DOOR_COORDS: Record<string, { x: number; y: number }> = {
   'home': { x: 28, y: 4 },
 };
 
-// Sign placement is INDEPENDENT of the doormats — each board sits wherever it
+// Sign placement is INDEPENDENT of the doormats  -  each board sits wherever it
 // reads best on its own building (tile centre, fractional ok). Tune freely; a
 // sign never has to keep the same distance from its mat as any other.
 const SIGN_COORDS: Record<string, { x: number; y: number }> = {
@@ -62,9 +62,9 @@ const SIGN_COORDS: Record<string, { x: number; y: number }> = {
   'information-technology': { x: 32.5, y: 7.8 },
   'arts-entertainment': { x: 25, y: 6.4 },
   'media-communication': { x: 25, y: 16.9 },
-  'law-government': { x: 14.5, y: 0.1 },         // top-edge building — keep the board low so it stays on screen
+  'law-government': { x: 14.5, y: 0.1 },         // top-edge building  -  keep the board low so it stays on screen
   'financial-services': { x: 13, y: 26.8 },
-  'home': { x: 28.55, y: 1.7 },
+  'home': { x: 28, y: 2.5 },
 };
 
 // Each domain is a little establishment on Questford's high street. Every name is
@@ -80,7 +80,7 @@ const DOMAIN_SIGN: Record<string, { name: string; textStyle: React.CSSProperties
   'media-communication':    { name: 'The Gazette',        textStyle: { fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, fontSize: 13.5, color: '#1c1917' } },
   'law-government':         { name: 'Citizen Court',      textStyle: { fontFamily: "'Cinzel Decorative', serif", fontWeight: 700, fontSize: 12.5, color: '#091e3a' } }, // deep blue-black
   'financial-services':     { name: 'Sterling Bank',      textStyle: { fontFamily: "'Cinzel', serif", fontWeight: 800, fontSize: 12, letterSpacing: '0.08em', color: '#5a6b7c' } }, // sleek metallic silver
-  'home':                   { name: 'Cottage Noir',       textStyle: { fontFamily: "'Outfit', sans-serif", fontWeight: 700, fontSize: 13, color: '#0ea5e9' } },
+  'home':                   { name: 'Cottage Noir',       textStyle: { fontFamily: "'Patrick Hand', cursive", fontWeight: 700, fontSize: 16.5, letterSpacing: '0.02em', color: '#1e3a8a' } },
 };
 
 interface Door { slug: string; name: string; color: ColorScheme; icon: string; cx: number; cy: number; mastered: boolean }
@@ -148,7 +148,7 @@ export function CityHub() {
   const showIntro = ready && !seenState.introSeen;
   busyRef.current = showIntro || showOnboardingChoice || !!dialogue || quizOpen || showSettings || showMap;
 
-  // HUD data (streak / level / xp / skills) — loaded separately from the map so
+  // HUD data (streak / level / xp / skills)  -  loaded separately from the map so
   // the canvas render loop is never disturbed.
   useEffect(() => {
     if (!user) return;
@@ -183,7 +183,7 @@ export function CityHub() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      // NOTE: don't reset loading/ready here — Supabase fires an auth refresh
+      // NOTE: don't reset loading/ready here  -  Supabase fires an auth refresh
       // shortly after load that re-runs this effect; resetting would flicker the
       // loading overlay back over the live city.
       try {
@@ -216,8 +216,8 @@ export function CityHub() {
         // Designer overrides (applied in order). inRect helper:
         const eachRect = (rects: Rect[], fn: (i: number) => void) => { for (const o of rects) for (let y = o.y; y < o.y + o.h; y++) for (let x = o.x; x < o.x + o.w; x++) if (x >= 0 && y >= 0 && x < map.w && y < map.h) fn(y * map.w + x); };
         eachRect(SOLID_OVERRIDES, i => { walk[i] = false; });                              // force solid
-        eachRect(SOFT_WALKABLE, i => { if (!solid.has(map.terrain[i])) walk[i] = true; });  // walkable except houses
-        eachRect(WALKABLE_OVERRIDES, i => { walk[i] = true; });                             // force walkable
+        eachRect(SOFT_WALKABLE, i => { if (!solid.has(map.terrain[i]) && !(map.objects[i] >= 0 && isSolidObject(map.objects[i]))) walk[i] = true; });  // walkable except houses & solid objects (trees)
+        eachRect(WALKABLE_OVERRIDES, i => { if (!(map.objects[i] >= 0 && isSolidObject(map.objects[i]))) walk[i] = true; });  // force walkable, but respect solid objects (trees)
 
         mapRef.current = map; walkRef.current = walk; sheetRef.current = sheet;
         const spawn = findSpawn(map, walk);
@@ -251,7 +251,7 @@ export function CityHub() {
     })();
     // NOTE: the animation-frame loop is owned by the [ready] effect below; don't
     // cancel it here. A Supabase auth refresh changes `user` and re-runs this
-    // effect — cancelling the RAF here (without restarting it) froze the player
+    // effect  -  cancelling the RAF here (without restarting it) froze the player
     // after navigating away and back.
     return () => { alive = false; };
   }, [user]);
@@ -285,6 +285,11 @@ export function CityHub() {
     // If they haven't seen this chapter's intro, give them the intro
     if (!seenState.chaptersSeen.includes(chapter.id)) {
       return chapter.intro;
+    }
+
+    // If they haven't started any career/challenge, repeat orientation intro
+    if (started === 0) {
+      return CHAPTERS[0].intro;
     }
 
     // Otherwise, give them a supportive, engaging counseling tip periodically
@@ -364,7 +369,7 @@ export function CityHub() {
     const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const baseSpeed = reducedMotion ? SPEED : 3.8;
+    const baseSpeed = reducedMotion ? SPEED : 5.5;
     const currentSpeed = baseSpeed * speedMultiplier;
 
     let prevT = performance.now();
@@ -386,8 +391,8 @@ export function CityHub() {
         if (K.has('a') || K.has('arrowleft')) dx -= 1; if (K.has('d') || K.has('arrowright')) dx += 1;
         if (K.has('w') || K.has('arrowup')) dy -= 1; if (K.has('s') || K.has('arrowdown')) dy += 1;
         if (dx || dy) { movingRef.current = true; const len = Math.hypot(dx, dy) || 1; dx = dx / len * currentSpeed; dy = dy / len * currentSpeed; if (dx) faceRef.current = dx < 0 ? -1 : 1;
-          if (walkableAt(map, walk, pos.x + dx, pos.y)) pos.x = Math.max(2, Math.min(worldW - 2, pos.x + dx));
-          if (walkableAt(map, walk, pos.x, pos.y + dy)) pos.y = Math.max(2, Math.min(worldH - 2, pos.y + dy)); }
+          if (walkableAt(map, walk, pos.x + dx, pos.y)) pos.x = Math.max(12, Math.min(worldW - 12, pos.x + dx));
+          if (walkableAt(map, walk, pos.x, pos.y + dy)) pos.y = Math.max(12, Math.min(worldH - 12, pos.y + dy)); }
       }
 
       // tutorial: the "take a stroll" beat advances the moment the player moves
@@ -414,7 +419,7 @@ export function CityHub() {
         blit(ctx, sheet, map.terrain[idx], dxp, dyp); blit(ctx, sheet, map.objects[idx], dxp, dyp);
       }
 
-      // district tints — a soft wash of each career's colour around its building
+      // district tints  -  a soft wash of each career's colour around its building
       for (const d of doorsRef.current) {
         const wx = (d.cx + 0.5) * TS - cam.x, wy = (d.cy + 0.5) * TS - cam.y;
         if (wx < -260 || wx > vw + 260 || wy < -260 || wy > vh + 260) continue;
@@ -438,12 +443,12 @@ export function CityHub() {
         drawDoormat(ctx, sx, sy, d.color.primary, d.mastered);
         const el = signEls.current.get(d.slug);
         if (el) {
-          // signs live on their own coordinates — never tied to the mat's spot
+          // signs live on their own coordinates  -  never tied to the mat's spot
           const sc = SIGN_COORDS[d.slug];
           let ssx = sc ? (sc.x + 0.5) * TS - cam.x : sx;
           let ssy = sc ? (sc.y + 0.5) * TS - cam.y : sy - TS * 1.42;
           // Edge buildings (law-government hugs the top row, financial-services the
-          // bottom) can't host a plate "off the map", and the camera clamps there —
+          // bottom) can't host a plate "off the map", and the camera clamps there  - 
           // so once the building is on screen we gently keep its nameplate inside the
           // viewport. SIGN_COORDS still nudges it freely; it just never gets shoved
           // off-screen or down onto the doormat. Interior buildings never trip this.
@@ -466,11 +471,11 @@ export function CityHub() {
 
       drawChar(ctx, pos.x - cam.x, pos.y - cam.y, '#22c55e', t, faceRef.current, movingRef.current);
 
-      // ===== day/night cycle — ambient wash driven by the player's chosen clock =====
+      // ===== day/night cycle  -  ambient wash driven by the player's chosen clock =====
       ctx.fillStyle = `rgba(${sky.r | 0},${sky.g | 0},${sky.b | 0},${sky.a})`;
       ctx.fillRect(0, 0, vw, vh);
 
-      // ===== night light glows — drawn ON TOP of the night wash to cut through and glow brightly =====
+      // ===== night light glows  -  drawn ON TOP of the night wash to cut through and glow brightly =====
       if (lightsOn && sky.glow > 0.05) {
         for (const d of doorsRef.current) {
           const wx = (d.cx + 0.5) * TS, wy = (d.cy + 0.5) * TS, sx = wx - cam.x, sy = wy - cam.y;
@@ -496,7 +501,7 @@ export function CityHub() {
       {/* soft vignette for depth */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(6,10,24,0.42) 100%)' }} />
 
-      {/* building signs — bespoke storefront nameplates, one typeface per trade */}
+      {/* building signs  -  bespoke storefront nameplates, one typeface per trade */}
       {doors.map((d) => {
         const sign = DOMAIN_SIGN[d.slug] ?? { 
           name: d.name, 
@@ -512,10 +517,10 @@ export function CityHub() {
 
         return (
           <div key={d.slug} ref={el => { signEls.current.set(d.slug, el); }} className="absolute left-0 top-0 z-20 pointer-events-none flex flex-col items-center" style={{ opacity: 0, transition: 'opacity .12s' }}>
-            {/* slim hanger — a single ring + stem, as if the plate hangs from a bracket */}
+            {/* slim hanger  -  a single ring + stem, as if the plate hangs from a bracket */}
             <span style={{ width: 6, height: 6, borderRadius: '50%', border: '1.5px solid rgba(38,28,18,0.6)', background: 'rgba(255,250,240,0.55)' }} />
             <span style={{ width: 2, height: 5, background: 'rgba(38,28,18,0.6)' }} />
-            {/* painted nameplate — neutral board, domain colour only in the frame + accent rule */}
+            {/* painted nameplate  -  neutral board, domain colour only in the frame + accent rule */}
             <div style={{ 
               position: 'relative', 
               padding: '5px 16px 6px', 
@@ -555,7 +560,7 @@ export function CityHub() {
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3 print:hidden">
         <div id="tutorial-hud-progress" className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }}>
           <span className="text-xl">🏙️</span>
-          <div className="hidden md:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">Where Futures Begin</p></div>
+          <div className="hidden md:block"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">FIND YOUR PLACE</p></div>
           <div className="flex items-center gap-1 ml-0.5 sm:ml-1">
             <Chip icon={<Flame className="w-4 h-4 text-orange-400" />} label={`${profile?.current_streak ?? 0}`} title="Daily streak" />
             <Chip icon={<Trophy className="w-4 h-4 text-yellow-300" />} label={`Lv${Math.floor((profile?.total_score ?? 0) / 100) + 1}`} title="Level" />
@@ -580,7 +585,7 @@ export function CityHub() {
         </div>
       )}
       {ready && !dialogue && <div className="absolute left-1/2 -translate-x-1/2 bottom-6 z-20 px-3 py-1.5 rounded-full text-white/80 text-xs font-bold" style={{ background: 'rgba(10,18,40,0.6)' }}>WASD / arrows to move · E to enter</div>}
-      {/* live tile coordinate — tell me these numbers to mark a spot */}
+      {/* live tile coordinate  -  tell me these numbers to mark a spot */}
       {ready && <div className="absolute bottom-6 right-4 z-20 px-2.5 py-1 rounded-lg text-emerald-200 text-xs font-mono font-bold" style={{ background: 'rgba(10,18,40,0.6)' }}>📍 <span ref={coordElRef}>0, 0</span></div>}
 
       {ready && !dialogue && <DPad onPress={(k, on) => { if (on) keysRef.current.add(k); else keysRef.current.delete(k); }} onAction={() => { const n = nearRef.current; if (n === 'npc') { playSfx('greet'); setDialogue(getMayorDialogue()); } else if (n) { playSfx('enter'); navigate(`/career/${n.slug}`); } }} />}
@@ -708,9 +713,9 @@ function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min
 // ===== day/night cycle: tint + window-glow strength keyframed across a real 24h clock =====
 type Sky = { r: number; g: number; b: number; a: number; glow: number };
 const SKY_KEYS: { h: number; s: Sky }[] = [
-  { h: 0,    s: { r: 18,  g: 26,  b: 70,  a: 0.50, glow: 1.00 } }, // deep night — blue with warm windows
+  { h: 0,    s: { r: 18,  g: 26,  b: 70,  a: 0.50, glow: 1.00 } }, // deep night  -  blue with warm windows
   { h: 5,    s: { r: 26,  g: 34,  b: 82,  a: 0.44, glow: 0.95 } }, // last of the night
-  { h: 6.5,  s: { r: 255, g: 168, b: 86,  a: 0.26, glow: 0.42 } }, // sunrise — warm gold
+  { h: 6.5,  s: { r: 255, g: 168, b: 86,  a: 0.26, glow: 0.42 } }, // sunrise  -  warm gold
   { h: 8,    s: { r: 255, g: 206, b: 130, a: 0.13, glow: 0.10 } }, // soft golden morning
   { h: 12,   s: { r: 255, g: 250, b: 235, a: 0.03, glow: 0.00 } }, // bright neutral noon
   { h: 15.5, s: { r: 255, g: 244, b: 214, a: 0.05, glow: 0.00 } }, // clear afternoon
@@ -728,7 +733,18 @@ function daylight(now: Date): Sky {
   return { r: mix(a.s.r, b.s.r), g: mix(a.s.g, b.s.g), b: mix(a.s.b, b.s.b), a: mix(a.s.a, b.s.a), glow: mix(a.s.glow, b.s.glow) };
 }
 function shadeHex(hex: string, p: number) { const n = parseInt((hex || '#888').replace('#', ''), 16); const r = Math.max(0, Math.min(255, (n >> 16) + p)), g = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + p)), b = Math.max(0, Math.min(255, (n & 0xff) + p)); return `rgb(${r},${g},${b})`; }
-function walkableAt(map: BaseMap, walk: boolean[], wx: number, wy: number) { const cx = Math.floor(wx / TS), cy = Math.floor(wy / TS); if (cx < 0 || cy < 0 || cx >= map.w || cy >= map.h) return false; return walk[cy * map.w + cx]; }
+function walkableAt(map: BaseMap, walk: boolean[], wx: number, wy: number) {
+  const margin = 10;
+  const cx = Math.floor(wx / TS), cy = Math.floor(wy / TS);
+  if (cx < 0 || cy < 0 || cx >= map.w || cy >= map.h) return false;
+  if (!walk[cy * map.w + cx]) return false;
+  for (const [dx, dy] of [[-margin, 0], [margin, 0], [0, -margin], [0, margin]]) {
+    const ncx = Math.floor((wx + dx) / TS), ncy = Math.floor((wy + dy) / TS);
+    if (ncx < 0 || ncy < 0 || ncx >= map.w || ncy >= map.h) return false;
+    if (!walk[ncy * map.w + ncx]) return false;
+  }
+  return true;
+}
 function hexA(hex: string, a: number) { const n = parseInt((hex || '#888').replace('#', ''), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; }
 function findSpawn(map: BaseMap, walk: boolean[]) { const cx = Math.floor(map.w / 2), cy = Math.floor(map.h / 2); for (let rad = 0; rad < Math.max(map.w, map.h); rad++) for (let dy = -rad; dy <= rad; dy++) for (let dx = -rad; dx <= rad; dx++) { const x = cx + dx, y = cy + dy; if (x < 0 || y < 0 || x >= map.w || y >= map.h) continue; if (walk[y * map.w + x]) return y * map.w + x; } return walk.findIndex(Boolean); }
 function blit(ctx: CanvasRenderingContext2D, sheet: HTMLImageElement, idx: number, dx: number, dy: number) { if (idx < 0) return; const sx = (idx % SHEET_COLS) * TILE, sy = Math.floor(idx / SHEET_COLS) * TILE; ctx.drawImage(sheet, sx, sy, TILE, TILE, dx, dy, TS, TS); }
@@ -738,8 +754,8 @@ function drawChar(ctx: CanvasRenderingContext2D, x: number, y: number, _body: st
   // round glasses, tidy hair, holding a book. Reads "eager student".
   const sweater = '#3b5b8c', sweaterDk = shadeHex(sweater, -34), skin = '#f6cfa3';
   const swing = moving ? Math.sin(t / 70) : 0, bob = moving ? Math.abs(Math.sin(t / 70)) * 2 : Math.sin(t / 430) * 1.1;
-  ctx.fillStyle = 'rgba(0,0,0,0.26)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 12, 4, 0, 0, 7); ctx.fill();
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob)); ctx.scale(face, 1);
+  ctx.fillStyle = 'rgba(0,0,0,0.26)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 5, 0, 0, 7); ctx.fill();
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob)); ctx.scale(face * 1.4, 1.4);
   // legs + shoes
   ctx.fillStyle = '#4a5168'; ctx.fillRect(-6, -11 + Math.max(0, swing * 2), 5, 11); ctx.fillRect(1, -11 + Math.max(0, -swing * 2), 5, 11);
   ctx.fillStyle = '#2a2030'; ctx.fillRect(-7, -2 + Math.max(0, swing * 2), 6, 3); ctx.fillRect(1, -2 + Math.max(0, -swing * 2), 6, 3);
@@ -781,9 +797,9 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number,
   const bob = Math.sin(t / 430) * 1.1; // gentle breathing bob
   
   // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 12, 4, 0, 0, 7); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 5, 0, 0, 7); ctx.fill();
   
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob));
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob)); ctx.scale(1.4, 1.4);
   
   // legs + shoes
   ctx.fillStyle = '#1e293b'; ctx.fillRect(-5, -11, 4, 11); ctx.fillRect(1, -11, 4, 11); // dark slate trousers
@@ -859,7 +875,7 @@ function drawNpc(ctx: CanvasRenderingContext2D, x: number, y: number, t: number,
   }
 }
 
-// A small district banner on a pole — flanks each building entrance in its colour.
+// A small district banner on a pole  -  flanks each building entrance in its colour.
 function drawBanner(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, t: number, lightsOn = false) {
   const wave = Math.sin(t / 260) * 1.6;
   ctx.save(); ctx.translate(Math.round(x), Math.round(y));
@@ -987,7 +1003,7 @@ function drawDoormat(ctx: CanvasRenderingContext2D, x: number, y: number, color:
   ctx.strokeStyle = hexA(col, 0.18); ctx.lineWidth = 1;
   for (let lx = rx + 3; lx < rx + w; lx += 4) { ctx.beginPath(); ctx.moveTo(lx, ry); ctx.lineTo(lx, ry + h); ctx.stroke(); }
   ctx.restore();
-  // outer border — gold if mastered, domain colour otherwise
+  // outer border  -  gold if mastered, domain colour otherwise
   ctx.lineWidth = 2.4; ctx.strokeStyle = col; roundRect(ctx, rx, ry, w, h, 5); ctx.stroke();
   // inner border line
   ctx.lineWidth = 1; ctx.strokeStyle = hexA(col, 0.7); roundRect(ctx, rx + 3.5, ry + 3.5, w - 7, h - 7, 3); ctx.stroke();

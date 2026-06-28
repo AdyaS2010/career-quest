@@ -43,7 +43,7 @@ export function IntroScreen({ defaultName, onBegin }: { defaultName: string; onB
 
         <div className="space-y-3 mt-5 text-slate-200/90 text-sm sm:text-base leading-relaxed">
           <p className="animate-fade-in" style={{ animationDelay: '0.15s' }}>
-            Fresh out of school, you arrive in <span className="text-amber-300 font-bold">Questford</span> — the one town where you can try eight real careers before deciding who you'll become.
+            Fresh out of school, you arrive in <span className="text-amber-300 font-bold">Questford</span>  -  the one town where you can try eight real careers before deciding who you'll become.
           </p>
           <p className="animate-fade-in" style={{ animationDelay: '0.35s' }}>
             Clock into internships at the Bistro, the Hospital, the Newsroom and more. Earn references, build your résumé, and chase the dream offer.

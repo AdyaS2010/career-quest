@@ -32,7 +32,7 @@ export function WorldIntro({ slug, careerName, roomName, mentorName, mentorFace,
   const [picked, setPicked] = useState<ScenarioChoice | null>(null);
   const [awarded, setAwarded] = useState(0);
 
-  // Nothing authored for this slug — don't block entry (run after mount, not in render).
+  // Nothing authored for this slug  -  don't block entry (run after mount, not in render).
   useEffect(() => { if (!scenario) onDone(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   if (!scenario) return null;
 
@@ -93,7 +93,7 @@ export function WorldIntro({ slug, careerName, roomName, mentorName, mentorFace,
           </div>
         )}
 
-        {/* Single keyed wrapper remounts on each phase/beat change — animates the
+        {/* Single keyed wrapper remounts on each phase/beat change  -  animates the
             new screen in cleanly without relying on AnimatePresence exit timing. */}
         <motion.div key={phase === 'beat' ? `beat-${beatIdx}` : phase}
           initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.34 }}

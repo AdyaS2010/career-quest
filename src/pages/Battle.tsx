@@ -179,7 +179,7 @@ export function Battle() {
           <div className="max-w-2xl mx-auto rounded-3xl border-2 shadow-2xl p-4 sm:p-5" style={{ background: 'rgba(10,8,22,0.92)', borderColor: cs.accent, backdropFilter: 'blur(6px)' }}>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${cs.primary}33` }}><Sparkles className="w-4 h-4" style={{ color: cs.accent }} /></div>
-              <span className="text-xs font-black uppercase tracking-widest" style={{ color: cs.accent }}>Cast {def.spell} — answer correctly!</span>
+              <span className="text-xs font-black uppercase tracking-widest" style={{ color: cs.accent }}>Cast {def.spell}  -  answer correctly!</span>
             </div>
             <h3 className="text-white font-bold text-lg sm:text-xl mb-4 leading-snug">{question.q}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

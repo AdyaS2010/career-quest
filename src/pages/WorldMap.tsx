@@ -23,7 +23,7 @@ const VB_W = 1200, VB_H = 780;
 // ===== isometric tile city (Kenney-style modular blocks; buildings sit on the lots) =====
 const TW = 132, TH = 66, OX = 560, OY = 306, SLAB = 24;
 const iso = (c: number, r: number) => ({ x: OX + (c - r) * (TW / 2), y: OY + (c + r) * (TH / 2) });
-// 8 building lots on the tile grid — two per quadrant, off the extreme corners so nothing overhangs
+// 8 building lots on the tile grid  -  two per quadrant, off the extreme corners so nothing overhangs
 const LOTS: { c: number; r: number }[] = [
   { c: 2, r: 0 }, { c: 1, r: 1 }, { c: 4, r: 0 }, { c: 4, r: 1 },
   { c: 0, r: 3 }, { c: 1, r: 3 }, { c: 4, r: 3 }, { c: 4, r: 4 },

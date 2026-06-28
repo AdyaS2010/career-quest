@@ -1,51 +1,146 @@
 import { useState } from 'react';
-import { Compass, Target, Trophy, Zap, Star, Flame, Sparkles } from 'lucide-react';
+import { Compass, Target, Trophy, Zap, Star, Flame, Sparkles, Coins } from 'lucide-react';
 import { AppNavbar } from '../components/AppNavbar';
 import { useTheme } from '../contexts/ThemeContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CAREER_PREVIEWS = [
-    { emoji: '🍳', name: 'Culinary Arts', desc: 'Take orders, cook meals under pressure, and plate like a pro!', secret: '🧑‍🍳 Fun fact: The world\'s largest pizza was 13,580 sq ft!' },
-    { emoji: '💻', name: 'Information Technology', desc: 'Hunt bugs, design systems, and build algorithms!', secret: '🤓 The first computer bug was an actual moth found in a relay!' },
-    { emoji: '🏥', name: 'Health Sciences', desc: 'Diagnose patients, plan treatments, and run the ER!', secret: '🫀 Your heart beats about 100,000 times per day!' },
-    { emoji: '⚖️', name: 'Law & Government', desc: 'Examine evidence, cross-examine witnesses, and argue cases!', secret: '🏛️ The longest trial in history lasted 908 days!' },
-    { emoji: '💰', name: 'Financial Services', desc: 'Balance budgets, catch fraud, and invest wisely!', secret: '📈 Warren Buffett bought his first stock at age 11!' },
-    { emoji: '📚', name: 'Education', desc: 'Conduct classrooms, plan lessons, and handle crises!', secret: '🍎 Finland has the shortest school days in the world!' },
-    { emoji: '📺', name: 'Media & Communication', desc: 'Craft stories, fact-check news, and master interviews!', secret: '📰 The first newspaper was published in 1605 in Germany!' },
-    { emoji: '🎨', name: 'Arts & Design', desc: 'Perform on Broadway, mix colors, and read music!', secret: '🎭 Shakespeare invented over 1,700 English words!' },
+    {
+        emoji: '🍳',
+        name: 'Culinary Arts',
+        desc: 'Take orders, cook meals under pressure, and plate like a pro!',
+        secrets: [
+            '🍳 The first chocolate chip cookie was actually invented by accident!',
+            '🍍 Pineapples can take up to three whole years to grow and mature!',
+            '🍯 Honey never spoils: you could theoretically eat 3,000-year-old honey!'
+        ]
+    },
+    {
+        emoji: '💻',
+        name: 'Information Technology',
+        desc: 'Hunt bugs, design systems, and build algorithms!',
+        secrets: [
+            '🤓 The first computer bug was an actual moth found trapped in a relay in 1947!',
+            '⌨️ The standard QWERTY keyboard layout was designed to slow down typists and prevent mechanical jams!',
+            '💾 The "save" icon is a floppy disk, which most players have never seen in real life!'
+        ]
+    },
+    {
+        emoji: '🏥',
+        name: 'Health Sciences',
+        desc: 'Diagnose patients, plan treatments, and run the ER!',
+        secrets: [
+            '🫀 Your heart beats about 100,000 times every single day!',
+            '🦒 Humans and giraffes have the exact same number of neck bones: seven!',
+            '🦷 Tooth enamel is the hardest substance in the human body, but it cannot self-repair!'
+        ]
+    },
+    {
+        emoji: '⚖️',
+        name: 'Law & Government',
+        desc: 'Examine evidence, cross-examine witnesses, and argue cases!',
+        secrets: [
+            '🏛️ The oldest known written laws were created in ancient Sumeria over 4,000 years ago!',
+            '🐹 In Switzerland, it is illegal to own just one guinea pig because they get lonely!',
+            '📜 The original United States Constitution is only four pages long!'
+        ]
+    },
+    {
+        emoji: '💰',
+        name: 'Financial Services',
+        desc: 'Balance budgets, catch fraud, and invest wisely!',
+        secrets: [
+            '📈 Warren Buffett bought his first stock at age 11 - talk about starting early!',
+            '💵 Paper money isn\'t paper: it\'s actually a blend of 75% cotton and 25% linen!',
+            '🐷 Piggy banks are named after "pygg" - a type of orange clay used to make dishes in the Middle Ages!'
+        ]
+    },
+    {
+        emoji: '📚',
+        name: 'Education',
+        desc: 'Conduct classrooms, plan lessons, and handle crises!',
+        secrets: [
+            '🏫 The oldest continuously operating university was founded by a woman in Morocco in 859 AD!',
+            '🎒 Finland has no standardized testing until high school, but has world-class scores!',
+            '✍️ Using a yellow highlighter doesn\'t leave a shadow when you photocopy a page!'
+        ]
+    },
+    {
+        emoji: '📺',
+        name: 'Media & Communication',
+        desc: 'Craft stories, fact-check news, and master interviews!',
+        secrets: [
+            '📰 The first newspaper was published in 1605 in Germany!',
+            '🎙️ The word "podcast" is a portmanteau of "iPod" and "broadcast"!',
+            '🕊️ Before the internet, homing pigeons were used to send news flashes across countries!'
+        ]
+    },
+    {
+        emoji: '🎨',
+        name: 'Arts & Design',
+        desc: 'Perform on Broadway, mix colors, and read music!',
+        secrets: [
+            '🎭 Shakespeare invented over 1,700 English words, including "lonely" and "swagger"!',
+            '🎨 The color "mummy brown" was actually made from ground-up mummies until the mid-1960s!',
+            '🎵 Listening to music releases dopamine, the same chemical released when eating chocolate!'
+        ]
+    },
 ];
 
 const STEPS = [
-    { icon: Compass, title: 'Explore the Map', desc: 'The Career Kingdom shows all 8 islands. Click any island to enter!', emoji: '🗺️' },
+    { icon: Compass, title: 'Explore the Map', desc: 'The Career Kingdom shows all 8 Districts. Click any District to enter!', emoji: '🗺️' },
     { icon: Target, title: 'Take On Challenges', desc: 'Each career has 3 unique mini-games. Beat one to unlock the next!', emoji: '🎯' },
     { icon: Trophy, title: 'Earn Points', desc: 'Score up to 100 points per challenge. Your best score is always saved!', emoji: '💯' },
     { icon: Zap, title: 'Level Up', desc: 'Every 100 XP = 1 level. Daily streaks give you bonus XP!', emoji: '⚡' },
-    { icon: Star, title: 'Unlock Achievements', desc: 'Special badges for milestones — first island, perfect scores, and more!', emoji: '🏅' },
+    { icon: Star, title: 'Unlock Achievements', desc: 'Special badges for milestones: first District, perfect scores, and more!', emoji: '🏅' },
     { icon: Flame, title: 'Keep Your Streak', desc: 'Log in every day for +50 XP. Miss a day? Streak resets! 😱', emoji: '🔥' },
 ];
 
 // Easter egg messages when clicking the sparkle button
 const EASTER_EGGS = [
-    '✨ You found a secret! The Career Quest team ate 47 pizzas during development.',
-    '🎉 Easter egg! The first version of this game was just a spreadsheet.',
-    '🐛 Bug or feature? Yes.',
-    '💡 Pro tip: The Konami code doesn\'t work here. We checked.',
-    '🎵 The background music is generated live by math. No MP3s were harmed!',
-    '🚀 This app has more lines of code than the Apollo 11 guidance computer.',
-    '🧭 The compass icon was chosen because career exploration IS an adventure!',
-    '🤫 Secret: there\'s a hidden achievement for completing ALL 24 challenges!',
+    '✨ You found a secret! If you click the city\'s duck 10 times, nothing happens, but it appreciates the attention.',
+    '🎉 Easter egg! The first version of this game was designed on a single sketchpad.',
+    '🐛 Is it a bug or a feature? Let\'s just call it an undocumented upgrade.',
+    '💡 Pro tip: The Mayor has a secret collection of pixelated stamps.',
+    '🎵 The background audio is generated live by synthesizers: no audio files were harmed!',
+    '🚀 Fun fact: This game has more lines of code than the Apollo 11 guidance computer.',
+    '🧭 The compass icon was chosen because exploring careers is a true adventure!',
+    '🤫 Secret: There is a hidden achievement for completing every single challenge in town!',
 ];
 
 export function HowToPlayPage() {
     const { theme } = useTheme();
     const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
+    const [cardFactIndices, setCardFactIndices] = useState<Record<number, number>>({});
     const [easterEggIndex, setEasterEggIndex] = useState(-1);
     const [sparkleCount, setSparkleCount] = useState(0);
 
-    const toggleCard = (i: number) => {
+    const handleCardClick = (i: number) => {
+        if (!flippedCards.has(i)) {
+            // Flip it
+            setFlippedCards(prev => {
+                const next = new Set(prev);
+                next.add(i);
+                return next;
+            });
+            // Initialize index to 0 if not present
+            if (cardFactIndices[i] === undefined) {
+                setCardFactIndices(prev => ({ ...prev, [i]: 0 }));
+            }
+        } else {
+            // Already flipped: cycle the fact
+            setCardFactIndices(prev => ({
+                ...prev,
+                [i]: ((prev[i] ?? 0) + 1) % 3
+            }));
+        }
+    };
+
+    const handleCloseCard = (i: number, e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent cycling fact
         setFlippedCards(prev => {
             const next = new Set(prev);
-            if (next.has(i)) next.delete(i); else next.add(i);
+            next.delete(i);
             return next;
         });
     };
@@ -65,18 +160,48 @@ export function HowToPlayPage() {
             <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
 
                 {/* Fun Header */}
-                <motion.section
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center"
-                >
-                    <h2 className="text-4xl md:text-5xl font-extrabold mb-3" style={{ color: 'var(--text-primary)' }}>
-                        Welcome to Career Quest!
-                    </h2>
-                    <p className="text-lg max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-                        Your adventure through 8 career worlds starts here. Let's show you the ropes! 🎮
-                    </p>
-                </motion.section>
+                <div className="relative overflow-hidden py-12 text-center">
+                    {/* Glowing Bloom Background Overlay */}
+                    <div className={`absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,${theme === 'dark' ? 'rgba(139,92,246,0.12)' : 'rgba(236,72,153,0.08)'},transparent_60%)]`} />
+                    {/* Floating icons using framer-motion */}
+                    <motion.div
+                        className="absolute top-4 left-6 text-3xl opacity-20 hidden md:block"
+                        animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
+                        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                    >
+                        🧭
+                    </motion.div>
+                    <motion.div
+                        className="absolute bottom-4 right-10 text-3xl opacity-25 hidden md:block"
+                        animate={{ y: [0, 12, 0], rotate: [0, -15, 0] }}
+                        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
+                    >
+                        🎮
+                    </motion.div>
+                    <motion.div
+                        className="absolute top-6 right-20 text-2xl opacity-15 hidden md:block"
+                        animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+                        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                    >
+                        ✨
+                    </motion.div>
+                    <motion.div
+                        className="absolute bottom-6 left-16 text-2xl opacity-20 hidden md:block"
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+                    >
+                        ⚙️
+                    </motion.div>
+
+                    <div className="relative z-10 space-y-4">
+                        <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 drop-shadow-[0_2px_10px_rgba(236,72,153,0.2)]">
+                            Welcome to Career Quest
+                        </h2>
+                        <p className="text-lg md:text-xl max-w-2xl mx-auto font-medium" style={{ color: 'var(--text-secondary)' }}>
+                            Explore eight unique career worlds, test your skills in interactive challenges, and discover the path that sparks your passion!
+                        </p>
+                    </div>
+                </div>
 
                 {/* Game Flow Steps */}
                 <section>
@@ -110,48 +235,73 @@ export function HowToPlayPage() {
                     </div>
                 </section>
 
-                {/* Career Previews — Flippable Cards */}
+                {/* Career Previews - Flippable Cards */}
                 <section>
                     <h2 className="text-3xl font-bold mb-2 text-center" style={{ color: 'var(--text-primary)' }}>
-                        8 Career Worlds to Explore
+                        8 Career Districts to Explore
                     </h2>
                     <p className="text-center text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
                         🤫 Psst... click any card to reveal a fun fact!
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        {CAREER_PREVIEWS.map((career, i) => (
-                            <motion.button
-                                key={i}
-                                onClick={() => toggleCard(i)}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                className="text-left w-full p-5 rounded-2xl border transition-all cursor-pointer"
-                                style={{
-                                    backgroundColor: flippedCards.has(i)
-                                        ? (theme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : '#f5f3ff')
-                                        : 'var(--surface-card)',
-                                    borderColor: flippedCards.has(i)
-                                        ? (theme === 'dark' ? 'rgba(139, 92, 246, 0.4)' : '#c4b5fd')
-                                        : 'var(--border-default)'
-                                }}
-                            >
-                                <div className="flex items-start gap-4">
-                                    <motion.span
-                                        className="text-4xl flex-shrink-0"
-                                        animate={flippedCards.has(i) ? { rotateY: 180 } : { rotateY: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                    >
-                                        {career.emoji}
-                                    </motion.span>
-                                    <div>
-                                        <h4 className="font-bold text-base mb-1" style={{ color: 'var(--text-primary)' }}>{career.name}</h4>
-                                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                                            {flippedCards.has(i) ? career.secret : career.desc}
-                                        </p>
+                        {CAREER_PREVIEWS.map((career, i) => {
+                            const isFlipped = flippedCards.has(i);
+                            const currentFactIndex = cardFactIndices[i] ?? 0;
+                            const currentFact = career.secrets[currentFactIndex];
+
+                            return (
+                                <motion.div
+                                    key={i}
+                                    onClick={() => handleCardClick(i)}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="relative text-left w-full p-5 rounded-2xl border transition-all cursor-pointer overflow-hidden min-h-[130px] flex flex-col justify-between"
+                                    style={{
+                                        backgroundColor: isFlipped
+                                            ? (theme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : '#f5f3ff')
+                                            : 'var(--surface-card)',
+                                        borderColor: isFlipped
+                                            ? (theme === 'dark' ? 'rgba(139, 92, 246, 0.4)' : '#c4b5fd')
+                                            : 'var(--border-default)'
+                                    }}
+                                >
+                                    {/* Close Button on Card Back */}
+                                    {isFlipped && (
+                                        <button
+                                            onClick={(e) => handleCloseCard(i, e)}
+                                            className="absolute top-3 right-3 p-1 rounded-full transition-colors hover:bg-black/10 dark:hover:bg-white/10 z-20"
+                                            title="Close fact"
+                                            aria-label="Close fact"
+                                        >
+                                            <span className="text-sm font-bold opacity-60 hover:opacity-100" style={{ color: 'var(--text-primary)' }}>✕</span>
+                                        </button>
+                                    )}
+
+                                    <div className="flex items-start gap-4 pr-6">
+                                        <motion.span
+                                            className="text-4xl flex-shrink-0 animate-pulse"
+                                            animate={isFlipped ? { rotateY: 180 } : { rotateY: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                        >
+                                            {career.emoji}
+                                        </motion.span>
+                                        <div className="space-y-1">
+                                            <h4 className="font-bold text-base" style={{ color: 'var(--text-primary)' }}>{career.name}</h4>
+                                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                                {isFlipped ? currentFact : career.desc}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.button>
-                        ))}
+
+                                    {/* Rotator Hint */}
+                                    {isFlipped && (
+                                        <div className="mt-3 text-[11px] font-bold tracking-wide uppercase text-purple-500/70 dark:text-purple-400/70 flex items-center gap-1">
+                                            <span>🔄 Click card again to rotate facts!</span>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </section>
 
@@ -199,10 +349,10 @@ export function HowToPlayPage() {
                     <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>💡 Pro Tips</h2>
                     <ul className="space-y-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                         <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Log in every day to keep your daily streak alive and earn bonus XP!</li>
-                        <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Retry challenges to improve your best score — only your highest counts.</li>
+                        <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Retry challenges to improve your best score - only your highest counts.</li>
                         <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Check the leaderboard to see how you stack up against other players.</li>
                         <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Share your achievements with friends using the Share button!</li>
-                        <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Complete all 3 challenges in a career with 80%+ accuracy to master that island.</li>
+                        <li className="flex items-start gap-2"><span className="text-green-500 font-bold">✓</span> Complete all 3 challenges in a career with 80%+ accuracy to master that District.</li>
                         <li className="flex items-start gap-2"><span className="text-yellow-500 font-bold">★</span> <strong>Secret:</strong> There are hidden fun facts on this page. Did you find them all?</li>
                     </ul>
                 </motion.section>

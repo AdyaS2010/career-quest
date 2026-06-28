@@ -1,4 +1,4 @@
-// Questford — a walkable street-grid town. Three avenues run east–west, each
+// Questford  -  a walkable street-grid town. Three avenues run east–west, each
 // lined on its north side with shopfronts; leafy park bands and a central
 // fountain plaza sit between them, with pedestrian lanes crossing north–south.
 // EVERY building faces the same way (roof up, entrance down onto the street
@@ -40,7 +40,7 @@ export const BUILDINGS: BuildingDef[] = CAREERS.map(c => ({
   x: LOT_X[c.lot], y: ROW_Y[c.row], w: BW, h: BH, doorSide: 'bottom',
 }));
 
-// Amenity buildings — the "life sim" spots (market, style shop, gym). They use
+// Amenity buildings  -  the "life sim" spots (market, style shop, gym). They use
 // the same building art but open a shop interior instead of a career sim.
 interface AmenityMeta { slug: string; label: string; blurb: string; emoji: string; color: string; roof: string; awning: string; storefront: string; icon: string; row: number; lot: number; }
 const AMENITY_META: AmenityMeta[] = [
@@ -77,7 +77,7 @@ export const PARK = { x: 540, y: 620, w: 1720, h: 240 };
 export const FOUNTAIN = { x: 1400, y: 730, r: 72 };
 export const SPAWN = { x: 1120, y: 800 };
 
-// Park bands (green spaces between the avenues) — used for grass tinting/props.
+// Park bands (green spaces between the avenues)  -  used for grass tinting/props.
 export const PARK_BANDS = [
   { x: 0, y: 600, w: WORLD_W, h: 300 },
   { x: 0, y: 1340, w: WORLD_W, h: 300 },

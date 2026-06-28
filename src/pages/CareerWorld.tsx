@@ -842,7 +842,7 @@ export function CareerWorld() {
         </section>
       </main>
 
-      {/* Next Steps — real-world project + resources for this field */}
+      {/* Next Steps  -  real-world project + resources for this field */}
       {showRes && (() => { const r = RESOURCES[careerSlug || '']; if (!r) return null; return createPortal(
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" style={{ background: 'rgba(2,6,23,0.62)', backdropFilter: 'blur(3px)' }} onClick={() => setShowRes(false)}>
           <div className="w-full max-w-md rounded-3xl border-4 shadow-2xl overflow-hidden" style={{ background: 'linear-gradient(160deg,#0f1f1a,#0b1220)', borderColor: '#34d399' }} onClick={e => e.stopPropagation()}>
@@ -881,7 +881,7 @@ export function CareerWorld() {
         document.body
       ); })()}
 
-      {/* Career briefing — job description + BLS Quick Facts, shown on entry */}
+      {/* Career briefing  -  job description + BLS Quick Facts, shown on entry */}
       {showBrief && createPortal(
         <div className="fixed inset-0 z-[150] bg-black/45 flex items-center justify-center p-4">
           <div

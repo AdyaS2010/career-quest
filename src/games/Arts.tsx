@@ -188,7 +188,7 @@ export function ArtsGame({ challenge, onComplete, onExit }: ArtsGameProps) {
                                 ? 'Great show! Your artistic instincts are sharp!'
                                 : score >= 50
                                     ? 'Good effort! Keep honing your creative skills!'
-                                    : 'Every artist grows through practice — keep creating!'}
+                                    : 'Every artist grows through practice  -  keep creating!'}
                     </p>
                 </div>
 

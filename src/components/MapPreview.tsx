@@ -20,7 +20,7 @@ function resolveIcon(name: string): LucideIcon {
 }
 
 // A compact island-map overlay that pops up over the city so the player can peek
-// at every career district and quick-jump straight into one — no full page change.
+// at every career district and quick-jump straight into one  -  no full page change.
 export function MapPreview({ doors, skills, recommended, onPick, onFullMap, onCity, onClose }: {
   doors: PreviewDoor[];
   skills: Record<string, { xp: number; status: Status }>;

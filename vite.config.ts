@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/apple-touch-icon.png', 'icons/favicon.svg'],
       manifest: {
-        name: 'Questford — Career Quest',
+        name: 'Questford - Career Quest',
         short_name: 'Questford',
         description: 'Explore careers by stepping into real on-the-job simulations across a cozy world map.',
         theme_color: '#0f1b3d',

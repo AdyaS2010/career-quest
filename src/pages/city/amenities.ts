@@ -50,15 +50,55 @@ export const AMENITY_DEFS: Record<string, AmenityDef> = {
       { id: 'mkt-tee', label: 'Noir Tee (teal)', desc: 'A fresh teal top', cost: 70, kind: 'cosmetic', field: 'top', value: '#14b8a6', swatch: '#14b8a6' },
     ],
     furniture: [
-      { kind: 'bed', x: 50, y: 130, w: 190, h: 90, color: '#1e293b' },
-      { kind: 'shelf', x: 270, y: 130, w: 100, h: 140, color: '#7c2d12' },
-      { kind: 'desk', x: 670, y: 140, w: 140, h: 90, color: '#1f2937' },
-      { kind: 'screen', x: 700, y: 120, w: 80, h: 60, color: '#020617', accent: '#a855f7' },
-      { kind: 'server', x: 840, y: 130, w: 70, h: 130, color: '#111827' },
-      { kind: 'fridge', x: 920, y: 130, w: 70, h: 96, color: '#374151' },
-      { kind: 'sofa', x: 120, y: 430, w: 200, h: 84, color: '#312e81' },
-      { kind: 'tv', x: 160, y: 300, w: 120, h: 86, color: '#1e1b4b' },
-      { kind: 'rack', x: 780, y: 420, w: 160, h: 110, color: '#475569' },
+      // Partition walls (Y-sorted: segment bottoms are at 260 and 560 respectively)
+      { kind: 'wall_v', x: 320, y: 96, w: 32, h: 164, color: '#7c2d12' },
+      { kind: 'wall_v', x: 320, y: 380, w: 32, h: 180, color: '#7c2d12' },
+      { kind: 'wall_v', x: 720, y: 96, w: 32, h: 164, color: '#7c2d12' },
+      { kind: 'wall_v', x: 720, y: 380, w: 32, h: 180, color: '#7c2d12' },
+
+      // ── Left Room: Kitchen & Living ──
+      { kind: 'fridge', x: 50, y: 110, w: 48, h: 96, color: '#b45309' },
+      { kind: 'sink', x: 98, y: 120, w: 48, h: 48, color: '#b45309' },
+      { kind: 'cabinet', x: 146, y: 120, w: 48, h: 48, color: '#b45309' },
+      { kind: 'stove', x: 194, y: 120, w: 48, h: 48, color: '#1f2937' },
+      { kind: 'fireplace', x: 250, y: 110, w: 56, h: 72, color: '#92400e' }, // chimney near partition
+      
+      { kind: 'table_v', x: 250, y: 240, w: 48, h: 120, color: '#b45309' },
+      { kind: 'stool', x: 210, y: 260, w: 32, h: 32, color: '#b45309' },
+      { kind: 'stool', x: 210, y: 310, w: 32, h: 32, color: '#b45309' },
+      { kind: 'stool', x: 300, y: 260, w: 32, h: 32, color: '#b45309' },
+      { kind: 'stool', x: 300, y: 310, w: 32, h: 32, color: '#b45309' },
+      
+      // Sofa and TV (Speed Sort Game Station)
+      { kind: 'tv', x: 130, y: 380, w: 64, h: 56, color: '#1f2937' },
+      { kind: 'sofa', x: 80, y: 460, w: 160, h: 64, color: '#b45309' },
+      { kind: 'barrel', x: 260, y: 530, w: 40, h: 48, color: '#92400e' },
+
+      // ── Middle Room: Reception / Vanity ──
+      { kind: 'server', x: 370, y: 120, w: 48, h: 96, color: '#475569' },
+      { kind: 'rack', x: 630, y: 120, w: 96, h: 48, color: '#475569' },
+      
+      // Bookshelf (Memory Match Game Station) — positioned properly against the right side of the room, off the rug
+      { kind: 'shelf', x: 610, y: 430, w: 96, h: 96, color: '#b45309' },
+      { kind: 'chest', x: 550, y: 450, w: 48, h: 40, color: '#b45309' },
+      
+      // Torches & decor
+      { kind: 'torch', x: 360, y: 100, w: 20, h: 40, color: '#fbbf24' },
+      { kind: 'torch', x: 700, y: 100, w: 20, h: 40, color: '#fbbf24' },
+      { kind: 'crate', x: 660, y: 530, w: 44, h: 44, color: '#92400e' },
+
+      // ── Right Room: Bedroom, Study & Music ──
+      { kind: 'bed', x: 850, y: 120, w: 128, h: 128, color: '#10b981' },
+      { kind: 'shelf', x: 750, y: 120, w: 96, h: 96, color: '#b45309' },
+      
+      // Desk (Word Scramble Game Station) — interactive
+      { kind: 'desk', x: 850, y: 360, w: 144, h: 48, color: '#b45309' },
+      { kind: 'screen', x: 900, y: 320, w: 48, h: 48, color: '#1f2937' },
+      
+      { kind: 'piano', x: 780, y: 440, w: 128, h: 128, color: '#1f2937' },
+      { kind: 'barrel', x: 940, y: 480, w: 40, h: 48, color: '#92400e' },
+      { kind: 'torch', x: 960, y: 300, w: 20, h: 40, color: '#fbbf24' },
     ],
+
   },
 };

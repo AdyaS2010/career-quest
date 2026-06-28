@@ -10,7 +10,7 @@ import type { Profile, Career, UserChallengeProgress } from '../lib/database.typ
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const { theme } = useTheme();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [careers, setCareers] = useState<Career[]>([]);
@@ -350,19 +350,25 @@ export function ProfilePage() {
                 </button>
 
                 <button
-                  onClick={handlePrintReport}
-                  className="flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-700 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center mb-2.5"
+                  onClick={isGuest ? () => alert("Register a free account to unlock your printable Career Report Card!") : handlePrintReport}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center mb-2.5 ${
+                    isGuest ? 'bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed opacity-60' : 'bg-white hover:bg-indigo-50 text-indigo-700'
+                  }`}
                 >
                   <BookOpen className="w-4 h-4" />
-                  Career Report
+                  Career Report {isGuest && '🔒'}
                 </button>
 
                 <button
-                  onClick={handlePrintCertificate}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-900 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center"
+                  onClick={isGuest ? () => alert("Register a free account to unlock your Certificate of Achievement!") : handlePrintCertificate}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all shadow-xl text-sm font-bold uppercase tracking-wider w-full justify-center ${
+                    isGuest
+                      ? 'bg-gray-200 dark:bg-gray-800 text-gray-400 cursor-not-allowed opacity-60'
+                      : 'bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-900'
+                  }`}
                 >
                   <Award className="w-4 h-4" />
-                  Print Certificate
+                  Print Certificate {isGuest && '🔒'}
                 </button>
               </div>
             </div>
@@ -378,7 +384,7 @@ export function ProfilePage() {
             <div className="p-6 text-center">
               <Target className="w-10 h-10 mx-auto mb-3" style={{ color: theme === 'dark' ? '#fcd34d' : '#d97706' }} />
               <div className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{completedCareers}</div>
-              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Islands Mastered</div>
+              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Districts Mastered</div>
             </div>
 
             <div className="p-6 text-center">
@@ -532,10 +538,10 @@ export function ProfilePage() {
 
             <div className="space-y-4">
               {[
-                { icon: '🌟', title: 'First Island', desc: 'Complete your first career island', unlocked: completedCareers >= 1 },
+                { icon: '🌟', title: 'First District', desc: 'Complete your first career District', unlocked: completedCareers >= 1 },
                 { icon: '⚡', title: 'Challenge Master', desc: 'Complete 10 challenges', unlocked: totalChallengesCompleted >= 10 },
                 { icon: '💯', title: 'Perfectionist', desc: 'Get a perfect score on any challenge', unlocked: perfectScores >= 1 },
-                { icon: '👑', title: 'Career Champion', desc: 'Complete all 8 career islands', unlocked: completedCareers >= 8 },
+                { icon: '👑', title: 'Career Champion', desc: 'Complete all 8 career Districts', unlocked: completedCareers >= 8 },
                 { icon: '🚀', title: 'Level 10 Legend', desc: 'Reach level 10', unlocked: currentLevel >= 10 },
                 { icon: '🍳', title: 'Master Chef', desc: 'Complete all Culinary Arts challenges', unlocked: (careerStartedCount[careers.find(c => c.slug === 'culinary-arts')?.id || ''] || 0) >= (careerChallengeCount[careers.find(c => c.slug === 'culinary-arts')?.id || ''] || 99) },
                 { icon: '💻', title: 'Code Warrior', desc: 'Complete all Information Technology challenges', unlocked: (careerStartedCount[careers.find(c => c.slug === 'information-technology')?.id || ''] || 0) >= (careerChallengeCount[careers.find(c => c.slug === 'information-technology')?.id || ''] || 99) },
@@ -672,7 +678,7 @@ export function ProfilePage() {
               <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-slate-200/50 pl-2">
                 <span className="text-[8px] text-slate-400 uppercase tracking-wider font-sans">Questford Office of the Mayor</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold text-slate-900 font-serif">— Mayor Questopher, Counselor-in-Chief</span>
+                  <span className="text-[9px] font-bold text-slate-900 font-serif"> -  Mayor Questopher, Counselor-in-Chief</span>
                   <span className="font-serif text-sm font-bold text-slate-800 italic" style={{ fontFamily: "'Kalam', cursive" }}>Questopher</span>
                 </div>
               </div>
@@ -681,7 +687,7 @@ export function ProfilePage() {
             {/* Metric Scoreboard - Clean Gray Borders, White Backgrounds, High-Contrast */}
             <div className="grid grid-cols-4 gap-3 mb-4 break-inside-avoid">
               {[
-                { label: 'Islands Mastered', value: `${completedCareers} / 8`, trend: 'District Competency' },
+                { label: 'Districts Mastered', value: `${completedCareers} / 8`, trend: 'District Competency' },
                 { label: 'Successful Trials', value: `${totalChallengesCompleted} Runs`, trend: 'Skill Validation' },
                 { label: 'Evaluation Precision', value: `${averageScore}%`, trend: 'Accuracy Rating' },
                 { label: 'Login Consistency', value: `${profile?.longest_streak || 0} Days`, trend: 'Persistence Factor' }

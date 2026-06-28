@@ -19,42 +19,42 @@ const PRESET_FEEDBACKS: Feedback[] = [
         name: 'Avery MS',
         rating: 5,
         comment: 'The culinary arts game is so fun but the timer is scary lol! I love how the ingredients look. Great for FBLA!!',
-        created_at: '2026-02-24T14:30:00Z'
+        created_at: '2026-06-25T14:30:00Z'
     },
     {
         id: 'p2',
         name: 'Leo da lawyer',
         rating: 4,
         comment: 'The cross examination is tricky but addictive. I actually learned what a leading question is. Maybe add a way to skip dialogue?',
-        created_at: '2026-02-11T09:12:00Z'
+        created_at: '2026-05-18T09:12:00Z'
     },
     {
         id: 'p3',
         name: 'Dr. Radhika S',
         rating: 5,
         comment: 'A remarkable pedagogical approach to career readiness. The simulation depth is impressive for a high school level project. Highly recommended for classrooms.',
-        created_at: '2026-08-10T16:45:00Z'
+        created_at: '2026-06-02T16:45:00Z'
     },
     {
         id: 'p4',
         name: 'Jordan_Codes',
         rating: 4,
-        comment: 'IT island is fire! 8-bit music goes hard. Feedback: The debugging challenge could use a bit more variety in error types, but overall super polished.',
-        created_at: '2026-02-07T11:20:00Z'
+        comment: 'IT District is fire! 8-bit music goes hard. Feedback: The debugging challenge could use a bit more variety in error types, but overall super polished.',
+        created_at: '2026-04-20T11:20:00Z'
     },
     {
         id: 'p5',
         name: 'Marcus K., Tech Advisor',
         rating: 5,
-        comment: "Impressive codebase and user experience. The 'Island' metaphor works perfectly for progress tracking. Solid 5 stars for this FBLA submission.",
-        created_at: '2026-01-28T13:00:00Z'
+        comment: "Impressive codebase and user experience. The 'District' metaphor works perfectly for progress tracking. Solid 5 stars for this FBLA submission.",
+        created_at: '2026-03-31T13:00:00Z'
     },
     {
         id: 'p6',
         name: 'Chloe B.',
         rating: 5,
-        comment: 'I mastered the Financial Services island!! I never realized how much I like charts and numbers. The feedback loop is really satisfying.',
-        created_at: '2026-01-16T18:30:00Z'
+        comment: 'I mastered the Financial Services District!! I never realized how much I like charts and numbers. The feedback loop is really satisfying.',
+        created_at: '2026-03-05T18:30:00Z'
     }
 ];
 

@@ -27,4 +27,4 @@ falls back to the built-in drawn building, so you can add them one at a time.
 - Keep the 8 in a **consistent style and scale** so the map looks cohesive.
 
 A matching `assets/map/island.png` and `assets/map/sea.png` can be added later
-for a fully illustrated map — ask and I'll wire those in too.
+for a fully illustrated map - ask and I'll wire those in too.

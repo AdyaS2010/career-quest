@@ -13,7 +13,7 @@ import { loadWallet } from '../lib/wallet';
 
 type Status = 'mastered' | 'in_progress' | 'not_started';
 
-// The single source-of-truth HUD navbar — identical look + icons on every
+// The single source-of-truth HUD navbar  -  identical look + icons on every
 // menu/utility page (map, profile, leaderboard, how-to, about, feedback). It
 // loads its own streak/level/XP/coins and powers the Career Compass, the Quest
 // map quick-pick overlay and the Settings panel, so any page gets the full city
@@ -71,7 +71,7 @@ export function AppNavbar() {
       <header className="sticky top-0 inset-x-0 z-50 flex items-center justify-between gap-2 px-3 sm:px-5 py-3 print:hidden">
         <button id="tutorial-hud-progress" onClick={() => navigate('/')} className="flex items-center gap-2 px-2.5 sm:px-3 py-2 rounded-2xl transition-transform hover:scale-[1.02]" style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)' }} title="Back to city">
           <span className="text-xl">🏙️</span>
-          <div className="hidden md:block text-left"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">Where Futures Begin</p></div>
+          <div className="hidden md:block text-left"><h1 className="font-fantasy text-white text-lg leading-none">Questford</h1><p className="text-[10px] tracking-[0.2em] text-blue-200/70 font-bold uppercase">FIND YOUR PLACE</p></div>
           <div className="flex items-center gap-1 ml-0.5 sm:ml-1">
             <Chip icon={<Flame className="w-4 h-4 text-orange-400" />} label={`${profile?.current_streak ?? 0}`} title="Daily streak" />
             <Chip icon={<Trophy className="w-4 h-4 text-yellow-300" />} label={`Lv${level}`} title="Level" />

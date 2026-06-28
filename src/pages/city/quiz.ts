@@ -1,4 +1,4 @@
-// Career-discovery quiz — scenario questions weighted across the 8 domains.
+// Career-discovery quiz  -  scenario questions weighted across the 8 domains.
 // Engaging, fast, and genuinely useful: it ranks the player's best-fit careers
 // and suggests where to start, and the result is re-viewable any time.
 
@@ -19,7 +19,7 @@ export interface QuizQuestion { q: string; options: QuizOption[]; }
 
 export const QUIZ: QuizQuestion[] = [
   {
-    q: "Free Saturday afternoon — what are you doing?",
+    q: "Free Saturday afternoon  -  what are you doing?",
     options: [
       { label: 'Cooking a feast for friends', emoji: '🍝', weights: { 'culinary-arts': 3, 'education': 1 } },
       { label: 'Building or tinkering with tech', emoji: '🔧', weights: { 'information-technology': 3, 'financial-services': 1 } },

@@ -4,7 +4,7 @@ import App from './App.tsx';
 import './index.css';
 
 // In dev, a service worker left over from a previous production build keeps
-// serving stale, broken precached chunks on localhost (cache-first) — which
+// serving stale, broken precached chunks on localhost (cache-first)  -  which
 // shows up as a blank white screen on certain routes and survives normal
 // refreshes. Tear any worker + caches down so the dev server is the single
 // source of truth, then do one guarded reload for a clean, uncached load.

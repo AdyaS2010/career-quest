@@ -17,7 +17,7 @@ import { TILE, SHEET_COLS, loadBaseMap, loadSheet, classifyTerrain, buildWalkabl
 
 const SCALE = 6;          // 8px tile → 48px on screen
 const TS = TILE * SCALE;  // tile size in screen px
-const SPEED = 2.7;        // player walk speed (px/frame)
+const SPEED = 3.6;        // player walk speed (px/frame)
 const REACH = TS * 1.15;  // how close to interact
 
 interface Interactable { kind: 'sim' | 'npc'; cx: number; cy: number; challenge?: Challenge; lines?: DialogueLine[]; idx?: number }
@@ -118,7 +118,7 @@ export function DomainWorld() {
         const tip = RESOURCES[careerSlug]?.project;
         inter.push({ kind: 'npc', cx: npcCell.x, cy: npcCell.y, idx: 0, lines: [
           { speaker: m.mentorName, portrait: m.mentorFace, text: m.mentorLine },
-          ...(tip ? [{ speaker: m.mentorName, portrait: m.mentorFace, text: `Tip: a great way to take ${career.name} further in real life — ${tip}` }] : []),
+          ...(tip ? [{ speaker: m.mentorName, portrait: m.mentorFace, text: `Tip: a great way to take ${career.name} further in real life  -  ${tip}` }] : []),
         ] });
         interRef.current = inter;
 
@@ -140,7 +140,7 @@ export function DomainWorld() {
     setDialogue([
       { speaker: m.mentorName, portrait: m.mentorFace, text: `Welcome to the ${career.name} district! I'm ${m.mentorName}, your guide here.` },
       { speaker: m.mentorName, portrait: m.mentorFace, text: `Use WASD or the arrow keys to walk around. The glowing markers are real ${career.name} simulations.` },
-      { speaker: m.mentorName, portrait: m.mentorFace, text: `Walk up to one and press E to begin — or come find me for tips. Off you go!` },
+      { speaker: m.mentorName, portrait: m.mentorFace, text: `Walk up to one and press E to begin  -  or come find me for tips. Off you go!` },
     ]);
   }, [ready, career, careerSlug, user]);
 
@@ -178,7 +178,7 @@ export function DomainWorld() {
     const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const baseSpeed = reducedMotion ? SPEED : 3.8;
+    const baseSpeed = reducedMotion ? SPEED : 5.5;
     const currentSpeed = baseSpeed * speedMultiplier;
 
     const loop = (t: number) => {
@@ -204,8 +204,8 @@ export function DomainWorld() {
           movingRef.current = true;
           const len = Math.hypot(dx, dy) || 1; dx = (dx / len) * currentSpeed; dy = (dy / len) * currentSpeed;
           if (dx) faceRef.current = dx < 0 ? -1 : 1;
-          const okX = walkableAt(map, walk, pos.x + dx, pos.y); if (okX) pos.x = Math.max(2, Math.min(worldW - 2, pos.x + dx));
-          const okY = walkableAt(map, walk, pos.x, pos.y + dy); if (okY) pos.y = Math.max(2, Math.min(worldH - 2, pos.y + dy));
+          const okX = walkableAt(map, walk, pos.x + dx, pos.y); if (okX) pos.x = Math.max(12, Math.min(worldW - 12, pos.x + dx));
+          const okY = walkableAt(map, walk, pos.x, pos.y + dy); if (okY) pos.y = Math.max(12, Math.min(worldH - 12, pos.y + dy));
         }
       }
 
@@ -342,9 +342,16 @@ function shadeHex(hex: string, p: number) {
   return `rgb(${r},${g},${b})`;
 }
 function walkableAt(map: BaseMap, walk: boolean[], wx: number, wy: number) {
+  const margin = 10;
   const cx = Math.floor(wx / TS), cy = Math.floor(wy / TS);
   if (cx < 0 || cy < 0 || cx >= map.w || cy >= map.h) return false;
-  return walk[cy * map.w + cx];
+  if (!walk[cy * map.w + cx]) return false;
+  for (const [dx, dy] of [[-margin, 0], [margin, 0], [0, -margin], [0, margin]]) {
+    const ncx = Math.floor((wx + dx) / TS), ncy = Math.floor((wy + dy) / TS);
+    if (ncx < 0 || ncy < 0 || ncx >= map.w || ncy >= map.h) return false;
+    if (!walk[ncy * map.w + ncx]) return false;
+  }
+  return true;
 }
 function findSpawn(map: BaseMap, walk: boolean[]) {
   const cx = Math.floor(map.w / 2), cy = Math.floor(map.h / 2);
@@ -366,8 +373,8 @@ function drawChar(ctx: CanvasRenderingContext2D, x: number, y: number, body: str
   const swing = moving ? Math.sin(t / 70) : 0;          // leg / arm swing
   const bob = moving ? Math.abs(Math.sin(t / 70)) * 2 : Math.sin(t / 420) * 1.2;
   const dark = shadeHex(body, -42), light = shadeHex(body, 26);
-  ctx.fillStyle = 'rgba(0,0,0,0.26)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 12, 4, 0, 0, 7); ctx.fill();
-  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob)); ctx.scale(face, 1);
+  ctx.fillStyle = 'rgba(0,0,0,0.26)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 5, 0, 0, 7); ctx.fill();
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y - bob)); ctx.scale(face * 1.4, 1.4);
   // legs (alternating step)
   ctx.fillStyle = '#3a4258';
   ctx.fillRect(-6, -12 + Math.max(0, swing * 2), 5, 12);

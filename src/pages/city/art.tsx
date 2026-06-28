@@ -1,4 +1,4 @@
-// Hand-drawn SVG art kit for Questford — cohesive outlined, shaded sprites that
+// Hand-drawn SVG art kit for Questford  -  cohesive outlined, shaded sprites that
 // replace the old emoji + flat-CSS look. One consistent ink color, soft
 // gradients, cast shadows and rim highlights give it a real 2D-game feel.
 import type { BuildingDef } from './cityLayout';

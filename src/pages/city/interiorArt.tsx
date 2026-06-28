@@ -12,7 +12,9 @@ function dk(hex: string, p: number) {
 export type FurnitureKind =
   | 'counter' | 'stove' | 'fridge' | 'cabinet' | 'desk' | 'screen' | 'server'
   | 'bed' | 'cart' | 'bench' | 'podium' | 'vault' | 'camera' | 'easel'
-  | 'stage' | 'board' | 'studentDesk' | 'shelf' | 'sofa' | 'tv' | 'rack' | 'produce' | 'booth';
+  | 'stage' | 'board' | 'studentDesk' | 'shelf' | 'sofa' | 'tv' | 'rack' | 'produce' | 'booth'
+  | 'wall_v' | 'wall_h' | 'sink' | 'piano' | 'stool' | 'table_v'
+  | 'torch' | 'barrel' | 'chest' | 'crate' | 'fireplace' | 'rug_lg' | 'bookshelf_tall' | 'mirror_full';
 
 export function FurnitureSprite({ kind, w, h, color, accent = '#94a3b8' }: {
   kind: FurnitureKind; w: number; h: number; color: string; accent?: string;
@@ -217,7 +219,7 @@ export function ArcadeCabinet({ color, accent, icon, near, done, label }: { colo
   );
 }
 
-/* a clean interactive job terminal — where a shift/challenge is started */
+/* a clean interactive job terminal  -  where a shift/challenge is started */
 export function JobStation({ accent, icon, done, near }: { accent: string; icon: string; done: boolean; near: boolean }) {
   return (
     <svg width="92" height="96" viewBox="0 0 92 96" style={{ overflow: 'visible' }}>

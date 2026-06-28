@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Palette, Users, Accessibility, Smartphone, Zap, Shield, Heart } from 'lucide-react';
 import { AppNavbar } from '../components/AppNavbar';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DESIGN_SECTIONS = [
     {
@@ -10,7 +11,7 @@ const DESIGN_SECTIONS = [
         points: [
             'Target audience: high school students exploring career options',
             'Gamified learning reduces intimidation around career exploration',
-            'Progressive difficulty — each career has 3 increasingly challenging mini-games',
+            'Progressive difficulty - each career has 3 increasingly challenging mini-games',
             'Familiar game mechanics (memory, puzzle, simulation) lower the learning curve',
         ]
     },
@@ -47,7 +48,7 @@ const DESIGN_SECTIONS = [
             'Focus-visible indicators on all buttons and links',
             'Color contrast ratios meet WCAG AA standards in both themes',
             'Reduced-motion support via CSS prefers-reduced-motion',
-            'Keyboard navigable — Tab through all interactive elements',
+            'Keyboard navigable - Tab through all interactive elements',
         ]
     },
     {
@@ -55,7 +56,7 @@ const DESIGN_SECTIONS = [
         title: 'Performance',
         color: 'from-yellow-500 to-red-500',
         points: [
-            'Procedural audio via Web Audio API — zero external audio files to load',
+            'Procedural audio via Web Audio API - zero external audio files to load',
             'Lazy route loading keeps initial bundle size lean',
             'Optimistic UI updates for instant feedback on user actions',
             'Supabase real-time subscriptions for live leaderboard updates',
@@ -68,7 +69,7 @@ const DESIGN_SECTIONS = [
         points: [
             'Supabase Auth with email/password and OAuth providers',
             'Row Level Security (RLS) on all database tables',
-            'User data is scoped — players can only modify their own records',
+            'User data is scoped  -  players can only modify their own records',
             'Public read access for leaderboards and static career content',
         ]
     },
@@ -76,16 +77,17 @@ const DESIGN_SECTIONS = [
 
 const JOURNEY_STEPS = [
     { label: 'Landing Page', desc: 'Clear value proposition, How It Works, and CTA' },
-    { label: 'Sign Up / Log In', desc: 'Quick auth flow, character name selection' },
-    { label: 'Career Map', desc: 'Visual overview of all 8 career worlds' },
-    { label: 'Career World', desc: '3 challenges per career, progressive unlock' },
-    { label: 'Challenge', desc: 'Interactive mini-game with real-time scoring' },
-    { label: 'Results', desc: 'Score breakdown, XP earned, streak bonus' },
-    { label: 'Profile', desc: 'Stats, achievements, streak, share & feedback' },
-    { label: 'Leaderboard', desc: 'Global rankings to drive competition' },
+    { label: 'Sign Up / Guest Login', desc: 'Quick auth, Play as Guest option, and name selection' },
+    { label: 'Career Map', desc: 'Visual 2D map with 8 interactive career Districts' },
+    { label: 'Cottage Home', desc: 'Cozy personal interior with character customization' },
+    { label: 'Simulation District', desc: '3 progressive job challenges per career District' },
+    { label: 'Leaderboard Rankings', desc: 'Track your standing on the live rankings against other players' },
+    { label: 'Results & Profile', desc: 'Review your accuracy scores, level up, and unlock achievements' },
+    { label: 'Mastery & Replay', desc: 'Return to Districts to beat your high scores and master all careers!' },
 ];
 
 export function AboutPage() {
+    const [activeStep, setActiveStep] = useState(0);
 
     return (
         <div
@@ -111,32 +113,80 @@ export function AboutPage() {
                 </motion.section>
 
                 {/* User Journey Flow */}
-                <section>
-                    <h3 className="text-2xl font-bold mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
-                        <Heart className="w-6 h-6 inline-block mr-2 text-pink-500" />
+                <section className="space-y-6">
+                    <h3 className="text-2xl font-bold text-center" style={{ color: 'var(--text-primary)' }}>
+                        <Heart className="w-6 h-6 inline-block mr-2 text-pink-500 animate-pulse" />
                         User Journey
                     </h3>
-                    <div className="flex flex-wrap justify-center gap-3">
-                        {JOURNEY_STEPS.map((step, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: i * 0.05 }}
-                                className="flex items-center gap-2"
-                            >
-                                <div
-                                    className="px-4 py-3 rounded-xl border text-center min-w-[140px]"
-                                    style={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-default)' }}
+                    
+                    <div className="relative max-w-3xl mx-auto py-6 px-4">
+                        {/* Connecting Line */}
+                        <div className="absolute top-1/2 left-4 right-4 h-1 -translate-y-1/2 bg-gray-200 dark:bg-slate-700 rounded-full" />
+                        
+                        {/* Animated Active Track Line */}
+                        <motion.div 
+                            className="absolute top-1/2 left-4 h-1 -translate-y-1/2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(activeStep / (JOURNEY_STEPS.length - 1)) * 100}%` }}
+                            style={{ maxWidth: 'calc(100% - 2rem)' }}
+                            transition={{ duration: 0.3 }}
+                        />
+
+                        {/* Interactive Nodes */}
+                        <div className="relative flex justify-between items-center z-10">
+                            {JOURNEY_STEPS.map((step, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setActiveStep(i)}
+                                    className="w-10 h-10 rounded-full border-2 font-black text-sm flex items-center justify-center transition-all focus:outline-none hover:scale-110 active:scale-95"
+                                    style={{
+                                        backgroundColor: i === activeStep 
+                                            ? 'var(--accent-primary)' 
+                                            : i < activeStep 
+                                                ? 'var(--surface-card)' 
+                                                : 'var(--surface-card)',
+                                        borderColor: i === activeStep 
+                                            ? 'var(--accent-primary)' 
+                                            : i < activeStep 
+                                                ? '#8b5cf6' 
+                                                : 'var(--border-default)',
+                                        color: i === activeStep 
+                                            ? '#fff' 
+                                            : i < activeStep 
+                                                ? 'var(--text-primary)' 
+                                                : 'var(--text-muted)',
+                                        boxShadow: i === activeStep ? '0 0 12px var(--accent-primary)' : 'none'
+                                    }}
+                                    title={step.label}
+                                    aria-label={`Step ${i + 1}: ${step.label}`}
                                 >
-                                    <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{step.label}</div>
-                                    <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>{step.desc}</div>
-                                </div>
-                                {i < JOURNEY_STEPS.length - 1 && (
-                                    <span className="text-lg font-bold" style={{ color: 'var(--text-muted)' }}>→</span>
-                                )}
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Step Detail Card */}
+                    <div className="min-h-[120px] flex items-center justify-center">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeStep}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="max-w-md w-full p-6 rounded-2xl border text-center shadow-lg"
+                                style={{ backgroundColor: 'var(--surface-card)', borderColor: 'var(--border-default)' }}
+                            >
+                                <span className="text-xs font-bold uppercase tracking-widest text-purple-500">Step {activeStep + 1} of {JOURNEY_STEPS.length}</span>
+                                <h4 className="text-xl font-bold mt-1 mb-2" style={{ color: 'var(--text-primary)' }}>
+                                    {JOURNEY_STEPS[activeStep].label}
+                                </h4>
+                                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                    {JOURNEY_STEPS[activeStep].desc}
+                                </p>
                             </motion.div>
-                        ))}
+                        </AnimatePresence>
                     </div>
                 </section>
 
