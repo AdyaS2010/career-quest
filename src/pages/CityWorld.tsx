@@ -413,7 +413,7 @@ export function CityWorld() {
       const il = Math.hypot(ix, iy);
       const sprint = keys.current.has('shift') ? SPRINT_MULT : 1;
       const gymBoost = 1 + walletRef.current.speedLvl * 0.16;   // gym sprint upgrades
-      const baseMaxSpeed = reducedMotion ? MAX_SPEED : 400;
+      const baseMaxSpeed = reducedMotion ? MAX_SPEED : 480;
       const maxSpd = baseMaxSpeed * gymBoost;
       let tx = 0, ty = 0;
       if (il > 0.01) { tx = (ix / il) * maxSpd * sprint; ty = (iy / il) * maxSpd * sprint; }

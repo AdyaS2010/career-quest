@@ -147,7 +147,7 @@ export function CareerInterior() {
     const wallet = loadWallet(user?.id || 'anon');
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const baseSpeed = reducedMotion ? SPEED : 360;
+    const baseSpeed = reducedMotion ? SPEED : 432;
     const currentSpeed = baseSpeed * speedMultiplier;
 
     const step = (ts: number) => {

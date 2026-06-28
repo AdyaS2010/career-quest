@@ -208,7 +208,7 @@ export function ArcadeWorld() {
       let ix = 0, iy = 0;
       if (!blockedRef.current) { const k = keys.current; ix = (k.has('d') || k.has('arrowright') ? 1 : 0) - (k.has('a') || k.has('arrowleft') ? 1 : 0) + touch.current.x; iy = (k.has('s') || k.has('arrowdown') ? 1 : 0) - (k.has('w') || k.has('arrowup') ? 1 : 0) + touch.current.y; }
       const l = Math.hypot(ix, iy);
-      const baseSpeed = reducedMotion ? SPEED : 350;
+      const baseSpeed = reducedMotion ? SPEED : 420;
       const currentSpeed = baseSpeed;
       let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * currentSpeed; ty = iy / l * currentSpeed; }
       const sm = 1 - Math.exp(-ACCEL_K * dt); p.vx += (tx - p.vx) * sm; p.vy += (ty - p.vy) * sm;
