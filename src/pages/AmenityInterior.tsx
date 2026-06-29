@@ -217,7 +217,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
       }
       const l = Math.hypot(ix, iy);
       const speedMultiplier = 1 + (wallet.speedLvl || 0) * 0.18;
-      const baseSpeed = reducedMotion ? SPEED : 420;
+      const baseSpeed = reducedMotion ? SPEED : 310;
       const currentSpeed = baseSpeed * speedMultiplier;
       let tx = 0, ty = 0; if (l > 0.01) { tx = ix / l * currentSpeed; ty = iy / l * currentSpeed; }
       const s = 1 - Math.exp(-ACCEL_K * dt);

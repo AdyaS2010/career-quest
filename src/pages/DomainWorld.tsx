@@ -178,7 +178,7 @@ export function DomainWorld() {
     const wallet = user ? loadWallet(user.id) : { speedLvl: 0 };
     const speedLvl = wallet.speedLvl || 0;
     const speedMultiplier = 1 + speedLvl * 0.18;
-    const baseSpeed = reducedMotion ? SPEED : 6.6;
+    const baseSpeed = reducedMotion ? SPEED : 5.0;
     const currentSpeed = baseSpeed * speedMultiplier;
 
     const loop = (t: number) => {
