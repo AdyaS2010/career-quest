@@ -264,30 +264,40 @@ export function DomainWorld() {
 
   return (
     <div ref={wrapRef} className="fixed inset-0 overflow-hidden select-none" style={{ background: '#0a1228', touchAction: 'none' }}>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'pixelated' }} />
+      <canvas ref={canvasRef} role="img" aria-label="Career district map — use WASD or arrow keys to move, E to interact" className="absolute inset-0 w-full h-full" style={{ imageRendering: 'pixelated' }} />
 
-      {/* Cinematic dark transition overlay */}
+      {/* Cinematic loading overlay with skeleton */}
       <AnimatePresence>
         {loading && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className="absolute inset-0 z-50 bg-[#0a1228]"
-          />
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5"
+            style={{ background: 'radial-gradient(ellipse at 50% 40%, #162040, #0a1228 70%)' }}
+          >
+            <div className="text-4xl animate-bounce">🗺️</div>
+            <div className="font-fantasy text-white text-xl tracking-wide">Entering District…</div>
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: '0ms' }} />
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" style={{ animationDelay: '150ms' }} />
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: '300ms' }} />
+            </div>
+            <p className="text-slate-400 text-sm font-medium">Preparing the world…</p>
+          </motion.div>
         )}
       </AnimatePresence>
 
       {/* top HUD */}
       <header className="absolute top-0 inset-x-0 z-40 flex items-center justify-between gap-2 px-3 sm:px-5 py-3">
-        <button onClick={() => navigate('/')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-white font-bold text-sm shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}>
+        <button onClick={() => navigate('/')} aria-label="Return to city map" className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-white font-bold text-sm shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}>
           <ArrowLeft className="w-4 h-4" /> Map
         </button>
         <div className="px-3 py-2 rounded-xl text-white font-black text-sm shadow-lg truncate max-w-[45vw]" style={{ background: 'rgba(10,18,40,0.78)', border: `1px solid ${cs.primary}66`, backdropFilter: 'blur(8px)', color: '#fff' }}>{career?.name}</div>
         <div className="flex items-center gap-1.5">
           <div className="flex items-center gap-1 px-2.5 py-2 rounded-xl text-amber-300 font-black text-sm shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(250,204,21,0.35)', backdropFilter: 'blur(8px)' }}><Coins className="w-4 h-4" />{coins}</div>
-          <button onClick={() => setShowRes(true)} title="Next steps" className="p-2 rounded-xl text-emerald-300 shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(52,211,153,0.4)', backdropFilter: 'blur(8px)' }}><Sparkles className="w-5 h-5" /></button>
-          <button onClick={toggleMute} className="p-2 rounded-xl text-slate-200 shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}>{muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</button>
+          <button onClick={() => setShowRes(true)} title="Next steps" aria-label="Next steps" className="p-2 rounded-xl text-emerald-300 shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(52,211,153,0.4)', backdropFilter: 'blur(8px)' }}><Sparkles className="w-5 h-5" /></button>
+          <button onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} className="p-2 rounded-xl text-slate-200 shadow-lg" style={{ background: 'rgba(10,18,40,0.78)', border: '1px solid rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}>{muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}</button>
         </div>
       </header>
 
@@ -417,16 +427,26 @@ function drawPortal(ctx: CanvasRenderingContext2D, x: number, y: number, color: 
 
 // On-screen controls for touch devices.
 function DPad({ onPress, onAction, accent }: { onPress: (k: string, on: boolean) => void; onAction: () => void; accent: string }) {
-  const btn = (k: string, label: string, cls: string) => (
-    <button className={`absolute w-12 h-12 rounded-xl text-white text-xl font-black flex items-center justify-center ${cls}`} style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.2)', touchAction: 'none' }}
-      onPointerDown={e => { e.preventDefault(); onPress(k, true); }} onPointerUp={e => { e.preventDefault(); onPress(k, false); }} onPointerLeave={() => onPress(k, false)} onContextMenu={e => e.preventDefault()}>{label}</button>
+  const btn = (k: string, label: string, ariaLabel: string, cls: string) => (
+    <button
+      aria-label={ariaLabel}
+      className={`absolute w-14 h-14 rounded-xl text-white text-2xl font-black flex items-center justify-center active:scale-90 transition-transform ${cls}`}
+      style={{ background: 'rgba(10,18,40,0.75)', border: '2px solid rgba(255,255,255,0.25)', touchAction: 'none', WebkitTapHighlightColor: 'transparent' }}
+      onPointerDown={e => { e.preventDefault(); onPress(k, true); }}
+      onPointerUp={e => { e.preventDefault(); onPress(k, false); }}
+      onPointerLeave={() => onPress(k, false)}
+      onContextMenu={e => e.preventDefault()}
+    >{label}</button>
   );
   return (
     <div className="sm:hidden">
-      <div className="absolute left-5 bottom-6 z-30" style={{ width: 150, height: 150 }}>
-        {btn('w', '▲', 'left-[51px] top-0')}{btn('a', '◀', 'left-0 top-[51px]')}{btn('d', '▶', 'left-[102px] top-[51px]')}{btn('s', '▼', 'left-[51px] top-[102px]')}
+      <div className="absolute left-4 bottom-5 z-30" style={{ width: 168, height: 168 }}>
+        {btn('w', '▲', 'Move up', 'left-[57px] top-0')}
+        {btn('a', '◀', 'Move left', 'left-0 top-[57px]')}
+        {btn('d', '▶', 'Move right', 'left-[114px] top-[57px]')}
+        {btn('s', '▼', 'Move down', 'left-[57px] top-[114px]')}
       </div>
-      <button onClick={onAction} className="absolute right-6 bottom-12 z-30 w-16 h-16 rounded-full text-slate-900 text-lg font-black shadow-xl" style={{ background: accent }}>E</button>
+      <button onClick={onAction} aria-label="Interact" className="absolute right-5 bottom-10 z-30 w-[72px] h-[72px] rounded-full text-slate-900 text-xl font-black shadow-xl active:scale-90 transition-transform" style={{ background: accent, WebkitTapHighlightColor: 'transparent' }}>E</button>
     </div>
   );
 }

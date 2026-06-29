@@ -289,7 +289,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
     <div className="fixed inset-0 overflow-hidden select-none" style={{ background: 'radial-gradient(circle at 50% 0%, #1f2937, #0b1220 70%)' }}>
       {/* header */}
       <div className="absolute top-0 inset-x-0 z-40 flex items-center justify-between px-4 py-2.5" style={{ background: 'linear-gradient(180deg, rgba(11,18,32,0.95), transparent)' }}>
-        <button onClick={() => navigate('/')} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-sm"><ArrowLeft className="w-4 h-4" /> City</button>
+        <button onClick={() => navigate('/')} aria-label="Return to city" className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-bold text-sm"><ArrowLeft className="w-4 h-4" /> City</button>
         <div className="font-fantasy text-white text-lg sm:text-2xl">{def.room}</div>
         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white font-bold text-sm"><Coins className="w-4 h-4 text-amber-400" />{wallet.coins}</div>
       </div>
@@ -526,7 +526,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
 
       {/* game station prompt */}
       {slug === 'home' && nearStation && !shopOpen && !dialogue && !activeGame && !nearCounter && (
-        <button onClick={() => act()} className="absolute left-1/2 -translate-x-1/2 bottom-8 z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl border-2 shadow-2xl hover:scale-105 active:scale-95 transition-transform" style={{ background: 'rgba(15,23,42,0.92)', borderColor: '#fbbf24' }}>
+        <button onClick={() => act()} aria-label="Play mini-game" className="absolute left-1/2 -translate-x-1/2 bottom-8 z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl border-2 shadow-2xl hover:scale-105 active:scale-95 transition-transform" style={{ background: 'rgba(15,23,42,0.92)', borderColor: '#fbbf24' }}>
           <span className="text-2xl">{nearStation.emoji}</span>
           <span className="text-white font-black">
             {canPlay(user?.id || 'anon', nearStation.game) ? nearStation.label : `${nearStation.label} — ⏳ Tomorrow`}
@@ -536,7 +536,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
       )}
       {/* shop prompt */}
       {nearCounter && !shopOpen && !dialogue && !activeGame && (
-        <button onClick={() => setShopOpen(true)} className="absolute left-1/2 -translate-x-1/2 bottom-8 z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl border-2 shadow-2xl hover:scale-105 active:scale-95 transition-transform" style={{ background: 'rgba(15,23,42,0.92)', borderColor: def.accent }}>
+        <button onClick={() => setShopOpen(true)} aria-label="Open shop" className="absolute left-1/2 -translate-x-1/2 bottom-8 z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl border-2 shadow-2xl hover:scale-105 active:scale-95 transition-transform" style={{ background: 'rgba(15,23,42,0.92)', borderColor: def.accent }}>
           <span className="text-2xl">{def.clerkFace}</span><span className="text-white font-black">Open {def.counterLabel || 'Shop'}</span><span className="px-3 py-1.5 rounded-lg bg-white text-slate-900 font-black text-sm">E</span>
         </button>
       )}
@@ -571,7 +571,7 @@ export function AmenityInterior({ slug }: { slug: string }) {
                 );
               })}
             </div>
-            <button onClick={() => setShopOpen(false)} className="w-full py-3.5 font-black text-slate-900" style={{ background: def.accent }}>Done</button>
+            <button onClick={() => setShopOpen(false)} aria-label="Close shop" className="w-full py-3.5 font-black text-slate-900" style={{ background: def.accent }}>Done</button>
           </div>
         </div>
       )}

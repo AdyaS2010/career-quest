@@ -497,7 +497,7 @@ export function CityHub() {
 
   return (
     <div ref={wrapRef} className="fixed inset-0 overflow-hidden select-none" style={{ background: '#0a1228', touchAction: 'none' }}>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ imageRendering: 'pixelated' }} />
+      <canvas ref={canvasRef} role="img" aria-label="Questford city map — use WASD or arrow keys to move, E to interact" className="absolute inset-0 w-full h-full" style={{ imageRendering: 'pixelated' }} />
       {/* soft vignette for depth */}
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(6,10,24,0.42) 100%)' }} />
 
@@ -544,15 +544,25 @@ export function CityHub() {
         );
       })}
 
-      {/* Cinematic dark transition overlay */}
+      {/* Cinematic loading overlay with skeleton */}
       <AnimatePresence>
         {loading && (
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className="absolute inset-0 z-50 bg-[#0a1228]"
-          />
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5"
+            style={{ background: 'radial-gradient(ellipse at 50% 40%, #162040, #0a1228 70%)' }}
+          >
+            <div className="text-4xl animate-bounce">🏙️</div>
+            <div className="font-fantasy text-white text-2xl tracking-wide">Questford</div>
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" style={{ animationDelay: '0ms' }} />
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" style={{ animationDelay: '150ms' }} />
+              <div className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: '300ms' }} />
+            </div>
+            <p className="text-slate-400 text-sm font-medium">Loading the city…</p>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -1016,6 +1026,26 @@ function Chip({ icon, label, title }: { icon: React.ReactNode; label: string; ti
   return <div title={title} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 text-white text-xs font-black"><span aria-hidden>{icon}</span><span className="tabular-nums">{label}</span></div>;
 }
 function DPad({ onPress, onAction }: { onPress: (k: string, on: boolean) => void; onAction: () => void }) {
-  const btn = (k: string, label: string, cls: string) => (<button className={`absolute w-12 h-12 rounded-xl text-white text-xl font-black flex items-center justify-center ${cls}`} style={{ background: 'rgba(10,18,40,0.7)', border: '1px solid rgba(255,255,255,0.2)', touchAction: 'none' }} onPointerDown={e => { e.preventDefault(); onPress(k, true); }} onPointerUp={e => { e.preventDefault(); onPress(k, false); }} onPointerLeave={() => onPress(k, false)} onContextMenu={e => e.preventDefault()}>{label}</button>);
-  return (<div className="sm:hidden"><div className="absolute left-5 bottom-6 z-30" style={{ width: 150, height: 150 }}>{btn('w', '▲', 'left-[51px] top-0')}{btn('a', '◀', 'left-0 top-[51px]')}{btn('d', '▶', 'left-[102px] top-[51px]')}{btn('s', '▼', 'left-[51px] top-[102px]')}</div><button onClick={onAction} className="absolute right-6 bottom-12 z-30 w-16 h-16 rounded-full text-slate-900 text-lg font-black shadow-xl bg-emerald-400">E</button></div>);
+  const btn = (k: string, label: string, ariaLabel: string, cls: string) => (
+    <button
+      aria-label={ariaLabel}
+      className={`absolute w-14 h-14 rounded-xl text-white text-2xl font-black flex items-center justify-center active:scale-90 transition-transform ${cls}`}
+      style={{ background: 'rgba(10,18,40,0.75)', border: '2px solid rgba(255,255,255,0.25)', touchAction: 'none', WebkitTapHighlightColor: 'transparent' }}
+      onPointerDown={e => { e.preventDefault(); onPress(k, true); }}
+      onPointerUp={e => { e.preventDefault(); onPress(k, false); }}
+      onPointerLeave={() => onPress(k, false)}
+      onContextMenu={e => e.preventDefault()}
+    >{label}</button>
+  );
+  return (
+    <div className="sm:hidden">
+      <div className="absolute left-4 bottom-5 z-30" style={{ width: 168, height: 168 }}>
+        {btn('w', '▲', 'Move up', 'left-[57px] top-0')}
+        {btn('a', '◀', 'Move left', 'left-0 top-[57px]')}
+        {btn('d', '▶', 'Move right', 'left-[114px] top-[57px]')}
+        {btn('s', '▼', 'Move down', 'left-[57px] top-[114px]')}
+      </div>
+      <button onClick={onAction} aria-label="Interact" className="absolute right-5 bottom-10 z-30 w-[72px] h-[72px] rounded-full text-slate-900 text-xl font-black shadow-xl bg-emerald-400 active:scale-90 transition-transform" style={{ WebkitTapHighlightColor: 'transparent' }}>E</button>
+    </div>
+  );
 }
