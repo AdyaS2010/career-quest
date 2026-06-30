@@ -1,181 +1,113 @@
-# CarQst - Career Exploration Game
+# 🏙️ Questford - Career Quest
+**FBLA Computer Game & Simulation Programming (2025-2026)**
+* LASA High School (TX)
+* Presenters: Adya Sastry, Anika Mehta, Priyanka Dhulipalla
 
-CarQst is an interactive career exploration platform built for FBLA Competition. Experience hands-on career simulations through Papa's Pizzeria-style mini-games across five diverse career paths: Culinary Arts, Information Technology, Law & Government, Media & Communication, and Health Sciences.
+Questford is an interactive, browser-based 16-bit RPG career exploration sandbox platform. Instead of answering static, text-heavy multiple-choice questionnaires, players explore a living retro town, step into professional environments (hospitals, courtrooms, kitchens, tech centers), roleplay as professionals, and complete interactive challenges mapped directly to real-world skill competencies.
 
-## 🎮 About the App
+---
 
-CarQst transforms career exploration into an engaging gaming experience. Each career path features three progressively challenging mini-games that simulate real-world job tasks. Students learn about different professions through interactive gameplay while earning scores and tracking their progress.
+## 🎮 Game Architecture & Core Loop
+Questford features a multi-tiered gameplay loop that connects self-discovery, active training, and performance tracking:
 
-### Featured Career Paths
+1. **The Core Exploration**: Walk around the city plaza using WASD/touch D-Pad controls. Interact with Mayor Questopher for career tips, or enter district buildings to take on shifts.
+2. **Interactive Career Shifts**: Step into 8 distinct career tracks containing 24+ unique mini-games (e.g. triaging patient symptoms in Health Sciences, debugging code in IT, cross-examining witnesses in Law).
+3. **Cottage Noir (Player Home)**: Customize your avatar, purchase speed/energy upgrades at the Mirror & Console shop, and play cozy skill-building home mini-games (Memory Match, Speed Sort, Word Scramble) capped by daily cooldowns.
+4. **NACE Standard Integration**: Progress translates into a standardized **Career Transcript & Report Card** aligned with the 8 NACE career readiness standards, exportable directly to PDF.
 
-- **🍳 Culinary Arts (Chef)** - Order taking, cooking with timers, plate presentation
-- **💻 Information Technology (Software Engineer)** - Bug hunting, algorithm building, system design
-- **⚖️ Law & Government (Lawyer)** - Evidence sorting, courtroom arguments, cross-examination
-- **📰 Media & Communication (Journalist)** - Fact-checking, interviewing, story crafting
-- **🏥 Health Sciences (Medical Professional)** - Patient diagnosis, treatment planning, ER triage
+---
 
-## 📁 Project Structure
-
+## 📁 Directory Structure & File Orientation
 ```
-CarQst-main/
+careerquest-main/
+├── public/
+│   └── assets/
+│       ├── cottage/            # 16-bit indoor furniture sprite sheets
+│       ├── landmarks/          # Unique vector/pixel art district building facades
+│       └── pico8/              # PICO-8 tilemap configuration & sprite assets
 ├── src/
-│   ├── components/           # Reusable UI components
-│   │   ├── AuthModal.tsx     # Authentication modal
-│   │   ├── CharacterGuide.tsx
-│   │   └── FloatingIsland.tsx
-│   ├── contexts/             # React context providers
-│   │   └── AuthContext.tsx   # User authentication state
-│   ├── games/                # Career game implementations
-│   │   ├── CulinaryArts.tsx  # Main culinary game wrapper
-│   │   ├── InformationTechnology.tsx
-│   │   ├── LawGovernment.tsx
-│   │   ├── MediaCommunication.tsx
-│   │   ├── HealthSciences.tsx
-│   │   ├── culinary/         # Culinary challenge components
-│   │   │   ├── CookingChallenge.tsx
-│   │   │   ├── OrderTakingChallenge.tsx
-│   │   │   └── PlatePresentationChallenge.tsx
-│   │   ├── it/               # IT challenge components
-│   │   │   ├── BugHuntChallenge.tsx
-│   │   │   ├── AlgorithmBuilderChallenge.tsx
-│   │   │   └── SystemDesignChallenge.tsx
-│   │   ├── law/              # Law challenge components
-│   │   │   ├── EvidenceDetectiveChallenge.tsx
-│   │   │   ├── CourtroomArgumentsChallenge.tsx
-│   │   │   └── CrossExaminationChallenge.tsx
-│   │   ├── media/            # Media challenge components
-│   │   │   ├── FactCheckChallenge.tsx
-│   │   │   ├── InterviewMasterChallenge.tsx
-│   │   │   └── StoryCrafterChallenge.tsx
-│   │   └── health/           # Health challenge components
-│   │       ├── SymptomDetectiveChallenge.tsx
-│   │       ├── TreatmentPlannerChallenge.tsx
-│   │       └── EmergencyRoomRushChallenge.tsx
-│   ├── lib/                  # Utility libraries
-│   │   ├── supabase.ts       # Supabase client configuration
-│   │   └── database.types.ts # TypeScript database types
-│   ├── pages/                # Main application pages
-│   │   ├── LandingPage.tsx   # Landing/home page
-│   │   ├── HomePage.tsx      # Career selection page
-│   │   ├── CareerWorld.tsx   # Career challenge router
-│   │   └── ProfilePage.tsx   # User profile and progress
-│   ├── App.tsx               # Main app component with routing
-│   ├── main.tsx              # Application entry point
-│   └── index.css             # Global styles with Tailwind
-├── supabase/
-│   └── migrations/           # Database migration 
-├── .env                      # Environment variables (Supabase credentials)
-├── package.json              # Project dependencies
-├── vite.config.ts            # Vite build configuration
-├── tailwind.config.js        # Tailwind CSS configuration
-└── tsconfig.json             # TypeScript configuration
+│   ├── components/             # Global layout & UI widgets
+│   │   ├── DialogueBox.tsx     # High-fidelity narrative dialogue bubble
+│   │   ├── IntroScreen.tsx     # Animated splash title screens
+│   │   └── SettingsModal.tsx   # Inclusive accessibility toggles
+│   ├── contexts/               # Global React states
+│   │   ├── AuthContext.tsx     # Supabase Session & Guest-Play handling
+│   │   └── ThemeContext.tsx    # Appearance, audio, and accessibility settings
+│   ├── games/                  # Custom 24+ career simulation mini-games
+│   │   ├── CulinaryArts.tsx    # Order taking, temperature timers, plating
+│   │   ├── InformationTechnology.tsx # Syntax debugging, algorithms, logic blocks
+│   │   ├── LawGovernment.tsx   # Evidence mapping, courthouse arguments, cross-exam
+│   │   ├── MediaCommunication.tsx # Fact-checking, interviewing, storyboard layout
+│   │   └── HealthSciences.tsx  # Patient triage, stethoscope diagnostic, ER rush
+│   ├── lib/                    # Configuration & state synchronizers
+│   │   ├── database.types.ts   # Database schemas
+│   │   ├── supabase.ts         # Supabase connection client
+│   │   └── wallet.ts           # State/coin balance, purchases, and local storage
+│   ├── pages/                  # Main scene pages
+│   │   ├── CityHub.tsx         # The main 2D outer city map (custom canvas engine)
+│   │   ├── DomainWorld.tsx     # District-specific walkable 2D maps
+│   │   ├── AmenityInterior.tsx # Inside maps (Cottage Noir home, vanity shop)
+│   │   ├── LeaderboardPage.tsx # Supabase-synced global rankings
+│   │   ├── ProfilePage.tsx     # User progress dossier & NACE Career Report
+│   │   ├── HowToPlayPage.tsx   # Instruction guides & coin economy overview
+│   │   └── city/               # Game layout database & metadata definitions
+│   │       ├── CottageGames.tsx # Bookshelf/TV/Desk mini-games in Cottage Noir
+│   │       ├── cityLayout.ts   # Bounding boxes, district coords, gates
+│   │       ├── pico8.ts        # Custom 2D HTML5 canvas rendering engine loop
+│   │       ├── quiz.ts         # Career Compass match quiz logic
+│   │       └── story.ts        # Mayoral dialogue scripting engine
+│   ├── App.tsx                 # Routing, page transitions, and provider layout
+│   └── main.tsx                # Entry point
+├── vite.config.ts              # Vite config with offline PWA Workbox settings
+└── tailwind.config.js          # Styling configurations
 ```
+
+---
+
+## 🛠️ The Technology Stack
+*   **Core Logic**: React (v18.3) with TypeScript (v5.5) for type-safe scalability.
+*   **Build Tooling**: Vite for fast bundling and sub-second hot reloading.
+*   **Custom Graphics Renderer**: Written directly on HTML5 Canvas using delta-time physics and pixel-perfect coordinate scaling, ensuring high framerate performance on Chromebooks.
+*   **Backend & Security**: Supabase Auth (safe login, guest sessions) and PostgreSQL protected by strict **Row-Level Security (RLS)**.
+*   **Progressive Web App (PWA)**: Offline caching via Workbox Service Workers, fully installable on mobile/desktop.
+*   **A11y Features**: OpenDyslexic typeface, Speech Synthesis Screen Narrator, and high-contrast color scheme switches.
+
+---
+
+## 🎨 Professional Credits & Acknowledgements
+We are committed to creative integrity, professional standards, and proper licensing:
+1.  **Artwork & Sprites**: All outer map tiles, interior flooring, and furniture models are licensed under Creative Commons Zero (CC0) from the **Kenney Roguelike Assets Library** (Kenney Pico-8 City & Roguelike Indoor).
+2.  **Labor & Market Statistics**: Career descriptions, salary values, and growth indicators are fetched and compiled directly from the **U.S. Bureau of Labor Statistics (BLS)** Occupational Outlook Handbook.
+3.  **Career Readiness Framework**: Standard competency scoring matrices are aligned with the **National Association of Colleges and Employers (NACE)** guidelines.
+4.  **Academic References**: Statistics regarding student career uncertainty and pivot rates are sourced from the **YouScience Post-Graduation Readiness Report**.
+
+---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn package manager
-- Supabase account (for database and authentication)
-
 ### Installation
+1.  **Clone and enter directory:**
+    ```bash
+    git clone https://github.com/AdyaS2010/career-quest.git
+    cd career-quest
+    ```
+2.  **Install project dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Configure Environment Keys:**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+4.  **Launch the development server:**
+    ```bash
+    npm run dev
+    ```
+    Open `http://localhost:5173` to play!
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd CarQst-main
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   
-   Create a `.env` file in the root directory:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-   ```
-
-4. **Set up the database**
-   
-   Run the migration files in your Supabase SQL Editor in this order:
-   - First, run the base schema migration from `supabase/migrations/`
-   - Then run each career SQL file:
-     - `add-culinary-career.sql`
-     - `add-it-career.sql`
-     - `add-law-career.sql`
-     - `add-media-career.sql`
-     - `add-health-career.sql`
-
-### Running the Application
-
-**Development Mode:**
-```bash
-node node_modules/vite/bin/vite.js
-```
-
-The application will start at `http://localhost:5173`
-
-**Build for Production:**
-```bash
-npm run build
-```
-
-**Preview Production Build:**
-```bash
-npm run preview
-```
-
-## 🎯 Key Features
-
-- **Interactive Mini-Games** - Papa's Pizzeria-style gameplay mechanics
-- **Progress Tracking** - Save scores and track completion across careers
-- **User Authentication** - Secure login with Supabase Auth
-- **Responsive Design** - Optimized for desktop and mobile devices
-- **Real-time Scoring** - Immediate feedback and performance metrics
-- **Multiple Difficulty Levels** - Beginner, intermediate, and advanced challenges
-
-## 🛠️ Tech Stack
-
-- **Frontend:** React 18.3.1 + TypeScript 5.5.3
-- **Build Tool:** Vite 5.4.2
-- **Styling:** Tailwind CSS 3.4.1
-- **Backend:** Supabase (PostgreSQL + Auth)
-- **Routing:** React Router 7.9.5
-- **Icons:** Lucide React
-
-## 📝 Game Design
-
-Each career path follows a consistent structure:
-- **Challenge 1:** Beginner difficulty, tutorial-style mechanics
-- **Challenge 2:** Intermediate difficulty, introduces complexity
-- **Challenge 3:** Advanced difficulty, combines multiple skills
-
-All games feature:
-- Clear mission objectives and instructions
-- Real-time feedback and scoring
-- Star ratings (1-3 stars based on performance)
-- Retry functionality to improve scores
-- Smooth animations and transitions
-
-## 🎓 Educational Value
-
-CarQst helps students:
-- Explore diverse career options through hands-on experience
-- Understand daily tasks and challenges in different professions
-- Develop decision-making and problem-solving skills
-- Learn industry-specific terminology and concepts
-- Discover career interests in an engaging, low-pressure environment
-
-## 📄 License
-
-This project is created for FBLA Competition.
-
-## 👥 Contributors
-
-Developed by Team CarQst for FBLA Computer Game & Simulation Programming Competition.
-
+5.  **Build for Production:**
+    ```bash
+    npm run build
+    ```
